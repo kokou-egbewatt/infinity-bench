@@ -1,0 +1,34 @@
+---
+import { commitUrl, type Env, type Repo } from '../../lib/env';
+
+interface Props {
+  env: Env | null;
+  repo: Repo;
+  harness: string;
+}
+
+const { env, repo, harness } = Astro.props;
+const packages = Object.entries(env?.packages ?? {}).filter(([, v]) => v);
+---
+
+<div class="env">
+  {
+    env ? (
+      <>
+        {env.gpu?.name && <><b>{env.gpu.name}</b><br /></>}
+        {(env.gpu?.driver || env.gpu?.cuda) && (
+          <>
+            driver {env.gpu?.driver ?? '?'}, CUDA {env.gpu?.cuda ?? '?'}
+            <br />
+          </>
+        )}
+        {env.cluster?.k3s && <>k3s {env.cluster.k3s}<br /></>}
+        {packages.map(([k, v]) => <>{k} {v}<br /></>)}
+      </>
+    ) : (
+      <>no env.json for this post<br /></>
+    )
+  }
+  {repo === 'NeuroMesh' ? 'NeuroMesh ' : ''}harness <a href={commitUrl(repo, harness)}><b>{harness.slice(0, 7)}</b></a>
+  {env?.git?.dirty && <><br /><span class="dirty">run from uncommitted changes</span></>}
+</div>

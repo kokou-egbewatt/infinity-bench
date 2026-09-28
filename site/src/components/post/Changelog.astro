@@ -1,0 +1,27 @@
+---
+import { isoDate } from '../../lib/format';
+
+interface Props {
+  date: Date;
+  corrections: { date: Date; text: string; credit?: string }[];
+}
+
+const { date, corrections } = Astro.props;
+const entries = [...corrections].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+---
+
+<section class="chg">
+  <h2 id="changelog">Changelog</h2>
+  <ul>
+    {
+      entries.map((c) => (
+        <li>
+          <span>{isoDate(c.date)}</span>
+          {c.text}
+          {c.credit && ` Thanks to ${c.credit}.`}
+        </li>
+      ))
+    }
+    <li><span>{isoDate(date)}</span>Published.</li>
+  </ul>
+</section>

@@ -4,6 +4,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { SERIES, flatten, byPriority, type ResolvedSeries } from '../data/series';
 import { DATA_DIR } from './paths';
 import { computeStats } from './stats';
+import { isoDate } from './format';
 
 export type Post = CollectionEntry<'posts'>;
 
@@ -54,8 +55,6 @@ export function getPosts(): Promise<Post[]> {
 export async function getStats() {
   return computeStats(await getPosts());
 }
-
-const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 
 /** The series plan with each entry's published post attached. */
 export async function resolveSeries() {

@@ -1,0 +1,63 @@
+---
+import { existsSync, readFileSync } from 'node:fs';
+import { join, normalize } from 'node:path';
+import { parse } from 'csv-parse/sync';
+import { DATA_DIR } from '../../lib/paths';
+
+type Row = Record<string, string>;
+type Column = string | { label?: string; format?: (value: string) => string };
+
+interface Props {
+  /** Relative to data/<post.data>/. */
+  file: string;
+  caption?: string;
+  /** Picks, orders and renames columns; omitted means every column as-is. */
+  columns?: Record<string, Column>;
+  highlight?: (row: Row) => boolean;
+}
+
+const { file, caption, columns, highlight } = Astro.props;
+const post = Astro.locals.post;
+if (!post) throw new Error(`ResultsTable: ${file} used outside a post`);
+if (normalize(file).startsWith('..')) throw new Error(`ResultsTable: ${file} leaves data/${post.data}/ (post: ${post.slug})`);
+
+const path = join(DATA_DIR, post.data, file);
+if (!existsSync(path)) throw new Error(`ResultsTable: ${path} not found (post: ${post.slug})`);
+const rows = parse(readFileSync(path, 'utf8'), { columns: true, cast: false, skip_empty_lines: true, trim: true }) as Row[];
+if (rows.length === 0) throw new Error(`ResultsTable: ${path} has no rows (post: ${post.slug})`);
+
+const keys = columns ? Object.keys(columns) : Object.keys(rows[0]);
+const missing = keys.filter((k) => !(k in rows[0]));
+if (missing.length) throw new Error(`ResultsTable: ${path} has no column ${missing.join(', ')} (post: ${post.slug})`);
+
+const label = (k: string) => {
+  const c = columns?.[k];
+  return typeof c === 'string' ? c : (c?.label ?? k);
+};
+const format = (k: string, v: string) => {
+  const c = columns?.[k];
+  return typeof c === 'object' && c.format ? c.format(v) : v;
+};
+const isNum = (v: string) => v === '' || /^[-+]?[\d,]*\.?\d+%?$/.test(v);
+const numeric = keys.map((k, i) => i > 0 && rows.every((r) => isNum(r[k])));
+---
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr>{keys.map((k, i) => <th class:list={{ num: numeric[i] }}>{label(k)}</th>)}</tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((r) => (
+        <tr class:list={{ hl: highlight?.(r) }}>
+          {keys.map((k, i) => (
+            <td class:list={{ num: numeric[i] }}>{format(k, r[k])}</td>
+          ))}
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+</div>
+{caption && <p class="cap">{caption}</p>}

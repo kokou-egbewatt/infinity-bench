@@ -1,0 +1,5 @@
+consumer_id,label,vram_mb,stddev_mb,trials,samples,note
+dwm,"Windows DWM, one 1440p monitor",380,12,3,30,
+chrome,"Chrome, hardware acceleration on",1120,31,3,30,
+vscode,VS Code,290,9,3,30,
+k3s_cuda_ctx,Idle CUDA context in a second k3s pod,300,4,3,30,fixture value
