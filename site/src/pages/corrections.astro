@@ -1,13 +1,40 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPosts } from '../lib/posts';
+import { isoDate } from '../lib/format';
+import { url } from '../lib/url';
+
+const corrections = (await getPosts())
+  .filter((p) => !p.data.draft)
+  .flatMap((p) => p.data.corrections.map((c) => ({ ...c, post: p })))
+  .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 ---
 
 <BaseLayout title="Corrections">
   <div class="wrap">
-    <div class="simple">
+    <div class="simple corr">
       <h1>Corrections</h1>
-      <p>Every correction to a published number or claim, site-wide, newest first. If you sent one, you are credited. If you find one, <a href="mailto:kokou.egbewatt@gmail.com">email</a> is fastest.</p>
-      <p class="empty">No corrections yet.</p>
+      <p>Every correction to a published number or claim, site-wide, newest first. If you sent one, you are credited. If you find one, <a href="https://github.com/kokou-egbewatt/infinity-bench/issues/new?template=correction.yml">report it</a> or <a href="mailto:kokou.egbewatt@gmail.com">email</a> me.</p>
+      {
+        corrections.length ? (
+          <ul>
+            {corrections.map((c) => (
+              <li>
+                <span class="d">{isoDate(c.date)}</span>
+                <span>
+                  {c.text}
+                  {c.credit && ` Thanks to ${c.credit}.`}
+                  <span class="p">
+                    <a href={url(`/posts/${c.post.id}#changelog`)}>{c.post.data.title}</a>
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="empty">No corrections yet.</p>
+        )
+      }
     </div>
   </div>
 </BaseLayout>

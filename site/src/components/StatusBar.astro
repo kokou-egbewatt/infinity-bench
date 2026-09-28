@@ -1,14 +1,18 @@
 ---
-interface Props {
-  right?: string;
-}
+import { getStats } from '../lib/posts';
+import { isoDate } from '../lib/format';
 
-const { right = '' } = Astro.props;
+const { postCount, correctionCount, lastMeasured } = await getStats();
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 ---
 
 <div class="status">
   <div class="wrap">
     <span><span class="dot"></span><b>1 × RTX 5060</b> · 8 GB · Blackwell sm_120 · CUDA 13.4 · Ryzen 5 8400F</span>
-    <span>{right}</span>
+    <span>
+      {plural(postCount, 'post')} · {plural(correctionCount, 'correction')}{
+        lastMeasured && ` · last measurement ${isoDate(lastMeasured)}`
+      }
+    </span>
   </div>
 </div>

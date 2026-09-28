@@ -1,13 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { WIDGETS } from '../lib/widgets';
+import { getPosts, resolveSeries } from '../lib/posts';
+import { url } from '../lib/url';
+
+const { all } = await resolveSeries();
+const titles = new Map((await getPosts()).map((p) => [p.id, p.data.title]));
+const labs = WIDGETS.map((w) => {
+  const entry = all.find((e) => e.id === w.plan);
+  if (!entry) throw new Error(`Labs: widget ${w.id} names plan ${w.plan}, which is not in src/data/series.ts`);
+  const href = entry.slug ? url(`/posts/${entry.slug}${w.section ? `#${w.section}` : ''}`) : undefined;
+  return { ...w, title: (entry.slug && titles.get(entry.slug)) || entry.title, href };
+});
 ---
 
 <BaseLayout title="Labs">
   <div class="wrap">
-    <div class="simple">
+    <div class="simple labs">
       <h1>Labs</h1>
       <p>The interactive pieces from the posts, pulled out so you can use them without re-reading. Each is a model, not a measurement. The post it came from has the table that wins when they disagree.</p>
-      <p class="empty">Nothing here yet.</p>
+      <ul>
+        {
+          labs.map((w) => (
+            <li>
+              {w.href ? <a class="t" href={w.href}>{w.name}</a> : <span class="t">{w.name}</span>}
+              <span class="s">{w.blurb}</span>
+              <span class="f">{w.href ? `from: ${w.title}` : `planned for: ${w.title}`}</span>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </div>
 </BaseLayout>

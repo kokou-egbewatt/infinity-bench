@@ -1,8 +1,21 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { TOPICS } from '../data/series';
+import { getPosts } from '../lib/posts';
+import { readEnv, repoUrl } from '../lib/env';
+import { gb, isoDate, readTime } from '../lib/format';
+import { url } from '../lib/url';
 
 const topics = ['all', ...TOPICS];
+const posts = (await getPosts()).filter((p) => !p.data.draft);
+const elsewhere = await getCollection('elsewhere');
+
+const rig = readEnv('vram-accounting');
+const totalMb = rig?.gpu?.vram_total_mb;
+const taxMb = rig?.desktop_tax_mb;
+const measured = typeof totalMb === 'number' && typeof taxMb === 'number';
+const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
 ---
 
 <BaseLayout>
@@ -21,27 +34,71 @@ const topics = ['all', ...TOPICS];
           <dt>cpu</dt><dd>Ryzen 5 8400F, 6c/12t</dd>
           <dt>host</dt><dd>Windows 11, WSL2, k3s</dd>
         </dl>
-        <div class="vbar"><i style="width:100%;background:var(--ac)" title="8 GB nominal"></i></div>
-        <div class="cap">8 GB nominal · what the desktop takes is measured</div>
+        <div class="vbar">
+          {measured && <i style={`width:${taxPct}%;background:#3a3a42`} title="desktop"></i>}
+          <i style={`width:${100 - taxPct}%;background:var(--ac)`} title="free"></i>
+        </div>
+        <div class="cap">
+          {
+            measured
+              ? `${gb(totalMb, 1)} · ${gb(taxMb, 1)} taken by the desktop before anything loads`
+              : '8 GB nominal · what the desktop takes is measured'
+          }
+        </div>
       </div>
     </div>
 
     <div class="sec">
       <h2>Posts</h2>
-      <div class="filters">
-        {topics.map((t) => <a href={`?topic=${t}`} class:list={{ active: t === 'all' }}>{t}</a>)}
-      </div>
+      <nav class="filters" aria-label="Topics">
+        {topics.map((t) => <a href={`?topic=${t}`} data-topic={t} class:list={{ active: t === 'all' }}>{t}</a>)}
+      </nav>
     </div>
     <div class="list">
-      <p class="empty">Nothing here yet.</p>
+      {
+        posts.map((p) => {
+          const d = p.data;
+          const n = d.corrections.length;
+          return (
+            <div class="row" data-topic={d.topic}>
+              <span class="d">{isoDate(d.date)}</span>
+              <span>
+                <a class="t" href={url(`/posts/${p.id}`)}>{d.title}</a>
+                <span class="s">{d.dek}</span>
+              </span>
+              <span class="m">
+                {d.hardware.kind === 'rented' ? <span class="rent">rented {d.hardware.node}</span> : 'RTX 5060'}
+                {d.repo === 'NeuroMesh' && (
+                  <>
+                    {' · '}
+                    <a class="repo" href={repoUrl('NeuroMesh')}>NeuroMesh</a>
+                  </>
+                )}
+                <br />
+                {readTime(p.body)} min · {n ? <b>{n} correction{n > 1 && 's'}</b> : 'no corrections yet'}
+              </span>
+            </div>
+          );
+        })
+      }
+      <p class="empty" hidden={posts.length > 0}>Nothing here yet.</p>
     </div>
 
     <div class="sec"><h2>Elsewhere</h2></div>
     <div class="else">
       <ul>
-        <li><a href="https://github.com/kokou-egbewatt/infinity-bench">kokou-egbewatt/infinity-bench</a> <span>· every harness on this site, runs on k3s in WSL2</span></li>
-        <li><a href="https://github.com/kokou-egbewatt/NeuroMesh">kokou-egbewatt/NeuroMesh</a> <span>· the AI runtime mesh some posts are written from</span></li>
+        {elsewhere.map((e) => <li><a href={e.data.url}>{e.data.title}</a> <span>· {e.data.note}</span></li>)}
       </ul>
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  // Without this script every post shows and the filter links reload to the same list.
+  const topic = new URLSearchParams(location.search).get('topic') ?? 'all';
+  const rows = [...document.querySelectorAll<HTMLElement>('.list .row')];
+  for (const row of rows) row.hidden = topic !== 'all' && row.dataset.topic !== topic;
+  for (const a of document.querySelectorAll<HTMLElement>('.filters a')) a.classList.toggle('active', a.dataset.topic === topic);
+  const empty = document.querySelector<HTMLElement>('.list .empty');
+  if (empty) empty.hidden = rows.some((r) => !r.hidden);
+</script>

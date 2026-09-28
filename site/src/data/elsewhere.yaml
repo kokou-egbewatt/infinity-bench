@@ -1,0 +1,9 @@
+# The "Elsewhere" list on the home page, in order.
+- id: infinity-bench
+  title: kokou-egbewatt/infinity-bench
+  url: https://github.com/kokou-egbewatt/infinity-bench
+  note: every harness on this site, runs on k3s in WSL2
+- id: neuromesh
+  title: kokou-egbewatt/NeuroMesh
+  url: https://github.com/kokou-egbewatt/NeuroMesh
+  note: the AI runtime mesh some posts are written from

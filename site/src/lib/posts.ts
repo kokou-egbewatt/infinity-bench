@@ -2,6 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { SERIES, flatten, byPriority, type ResolvedSeries } from '../data/series';
 import { readEnv } from './env';
 import { isoDate } from './format';
+import { computeStats } from './stats';
 import { WIDGET_IDS } from './widgets';
 
 type Post = CollectionEntry<'posts'>;
@@ -50,6 +51,10 @@ export function getPosts(): Promise<Post[]> {
       .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
   });
   return cache;
+}
+
+export async function getStats() {
+  return computeStats(await getPosts());
 }
 
 /** The series plan with each entry's published post attached. */
