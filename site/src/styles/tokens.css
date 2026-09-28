@@ -1,0 +1,16 @@
+:root {
+  --bg: #0b0b0d;
+  --bg2: #101114;
+  --line: #222328;
+  --line2: #2c2d33;
+  --tx: #d6d6da;
+  --tx2: #9c9ca4;
+  --tx3: #67676f;
+  --hi: #f4f4f5;
+  --ac: #5eead4;
+  --ac2: #0f2f2b;
+  --warn: #e5b567;
+  --serif: 'Newsreader Variable', Georgia, serif;
+  --sans: 'Inter Variable', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+}

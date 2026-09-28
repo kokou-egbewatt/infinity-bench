@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About">
+  <div class="wrap">
+    <div class="simple">
+      <h1>About</h1>
+      <p>I’m Kokou. Senior DevOps and platform engineer, recently dialed into data and ML infrastructure: bare-metal and EKS GPU clusters, high-throughput model serving pipelines, and the eBPF/DCGM observability that tells you exactly which node is melting down.</p>
+      <p>My local lab runs on an RTX card, a six-core Ryzen, and WSL2. I prefer profiling and benchmarking on local hardware right away over waiting on cloud quota approvals, especially since the mechanics scale directly. Memory pressure, KV-cache sizing, scheduler behavior, and NVIDIA DRA semantics follow the same core engineering principles whether you hit limits at batch 4 on a single workstation or batch 128 across multi-node clusters.</p>
+      <p>Core stack: Kubernetes (EKS in production, k3s locally), NVIDIA GPU Operator, Kueue, vLLM, and llama.cpp. I use Ray for distributed workloads, Terraform and ArgoCD for immutable GitOps pipelines, and Prometheus with eBPF for deep runtime tracing. Python and Go for custom controllers and automation glue.</p>
+      <p>Contact: <a href="mailto:kokou.egbewatt@gmail.com">Email</a>, <a href="https://www.linkedin.com/in/kinfinity3/" target="_blank" rel="noopener">LinkedIn</a>, <a href="https://github.com/kokou-egbewatt" target="_blank" rel="noopener">GitHub</a>.</p>
+    </div>
+  </div>
+</BaseLayout>

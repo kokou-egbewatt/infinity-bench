@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const topics = ['all', 'orchestration', 'serving', 'streaming', 'observability', 'agents', 'platform'];
+---
+
+<BaseLayout>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Platform Engineering GPU Infrastructure</h1>
+        <p>I run Kubernetes with GPUs in it for a living. At home I have a single 8 GB RTX 5060, so that is what most of this is measured on. The physics is the same as an H100's; the fuse is shorter. Every post says which hardware produced its numbers, what it cost, and what I got wrong.</p>
+      </div>
+      <div class="rig">
+        <div class="t">The rig</div>
+        <dl>
+          <dt>gpu</dt><dd>GeForce RTX 5060, 8 GB GDDR7</dd>
+          <dt>arch</dt><dd>Blackwell, compute 12.0</dd>
+          <dt>driver</dt><dd>616.56, CUDA 13.4</dd>
+          <dt>cpu</dt><dd>Ryzen 5 8400F, 6c/12t</dd>
+          <dt>host</dt><dd>Windows 11, WSL2, k3s</dd>
+        </dl>
+        <div class="vbar"><i style="width:100%;background:var(--ac)" title="8 GB nominal"></i></div>
+        <div class="cap">8 GB nominal · what the desktop takes is measured</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Posts</h2>
+      <div class="filters">
+        {topics.map((t) => <a href={`?topic=${t}`} class:list={{ active: t === 'all' }}>{t}</a>)}
+      </div>
+    </div>
+    <div class="list">
+      <p class="empty">Nothing here yet.</p>
+    </div>
+
+    <div class="sec"><h2>Elsewhere</h2></div>
+    <div class="else">
+      <ul>
+        <li><a href="https://github.com/kokou-egbewatt/infinity-bench">kokou-egbewatt/infinity-bench</a> <span>· every harness on this site, runs on k3s in WSL2</span></li>
+        <li><a href="https://github.com/kokou-egbewatt/NeuroMesh">kokou-egbewatt/NeuroMesh</a> <span>· the AI runtime mesh some posts are written from</span></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>

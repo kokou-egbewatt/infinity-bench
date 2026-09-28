@@ -1,0 +1,224 @@
+---
+// The NeuroMesh gateway's answer for an unknown path, verbatim:
+// services/gateway/internal/httpapi/httpapi.go writes
+//   {"error":{"code":"not_found","message":"no such endpoint","request_id":"<uuid>"}}
+// The request path and ID are filled in by the script below; without
+// JavaScript the page still shows the error shape and the links.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ALL_POSTS } from '../data/series';
+import { REPOS } from '../lib/issues';
+import { url } from '../lib/url';
+
+const pages = [
+  { title: 'Posts', href: url('/'), tag: 'page' },
+  { title: 'Series', href: url('/series'), tag: 'page' },
+  { title: 'Labs', href: url('/labs'), tag: 'page' },
+  { title: 'Corrections', href: url('/corrections'), tag: 'page' },
+  { title: 'About', href: url('/about'), tag: 'page' },
+];
+const posts = ALL_POSTS.map((p) => ({
+  title: p.title,
+  href: p.slug ? url(`/posts/${p.slug}`) : url(`/series#${p.series.id}`),
+  tag: p.slug ? p.series.title : `planned · ${p.series.title}`,
+}));
+
+const candidates = JSON.stringify({
+  base: import.meta.env.BASE_URL.replace(/\/$/, ''),
+  newIssue: `${REPOS.ib.url}/issues/new`,
+  routes: [...pages, ...posts],
+});
+---
+
+<BaseLayout title="Not found" description="No page at this path.">
+  <div class="wrap">
+    <div class="nf">
+      <p class="req"><span id="nf-method">GET</span> <span id="nf-path">/</span></p>
+      <p class="resp">HTTP/1.1 404 Not Found</p>
+      <pre class="code"><code>{'{'}
+  <span class="k">"error"</span>: {'{'}
+    <span class="k">"code"</span>: <span class="s">"not_found"</span>,
+    <span class="k">"message"</span>: <span class="s">"no such endpoint"</span>,
+    <span class="k">"request_id"</span>: <span class="s" id="nf-rid">"00000000-0000-0000-0000-000000000000"</span>
+  {'}'}
+{'}'}</code></pre>
+      <p class="note">
+        That's the exact error the{' '}
+        <a href={`${REPOS.nm.url}/blob/main/services/gateway/internal/httpapi/httpapi.go`}>NeuroMesh gateway</a>{' '}
+        returns for a path it doesn't know. If a link on this site sent you here, it's my mistake and it goes on
+        the <a href={url('/corrections')}>Corrections</a> page.
+      </p>
+
+      <div class="sug">
+        <div class="h">Closest routes</div>
+        <div id="nf-sug">
+          {pages.slice(0, 2).map((p) => <a href={p.href}>{p.title}<span>{p.tag}</span></a>)}
+        </div>
+      </div>
+
+      <div class="links">
+        <a href={url('/')}>posts</a>
+        <a href={url('/series')}>series</a>
+        <a class="warn" id="nf-report" href={`${REPOS.ib.url}/issues/new`}>report broken link</a>
+      </div>
+    </div>
+  </div>
+  <script type="application/json" id="nf-data" set:html={candidates} />
+</BaseLayout>
+
+<script>
+  interface Route { title: string; href: string; tag: string }
+  const data = JSON.parse(document.getElementById('nf-data')!.textContent || '{}') as {
+    base: string;
+    newIssue: string;
+    routes: Route[];
+  };
+
+  const raw = location.pathname;
+  const path = (raw.startsWith(data.base) ? raw.slice(data.base.length) : raw) || '/';
+  const rid = crypto.randomUUID();
+
+  document.getElementById('nf-path')!.textContent = path;
+  document.getElementById('nf-rid')!.textContent = `"${rid}"`;
+
+  // Score each route by how many path tokens appear in its title, with spaces
+  // removed so "8gb" matches "8 GB" and "vllm" matches "vLLM".
+  const tokens = path
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t.length > 1 && t !== 'posts');
+  const scored = data.routes
+    .map((r) => {
+      const hay = r.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return { r, score: tokens.reduce((n, t) => n + (hay.includes(t) ? t.length : 0), 0) };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  if (scored.length) {
+    const box = document.getElementById('nf-sug')!;
+    box.replaceChildren(
+      ...scored.map(({ r }) => {
+        const a = document.createElement('a');
+        a.href = r.href;
+        a.textContent = r.title;
+        const s = document.createElement('span');
+        s.textContent = r.tag;
+        a.append(s);
+        return a;
+      }),
+    );
+  }
+
+  const report = document.getElementById('nf-report') as HTMLAnchorElement;
+  const q = new URLSearchParams({
+    title: `Broken link: ${path}`,
+    body: [
+      `**Path:** \`${path}\``,
+      `**Came from:** ${document.referrer || '(direct or unknown)'}`,
+      `**request_id:** \`${rid}\``,
+    ].join('\n'),
+  });
+  report.href = `${data.newIssue}?${q}`;
+  report.textContent = `report broken link (${rid.slice(0, 8)})`;
+</script>
+
+<style>
+  .nf {
+    padding: 64px 0 60px;
+    max-width: 640px;
+  }
+  .req {
+    font-family: var(--serif);
+    font-size: 30px;
+    color: var(--hi);
+    margin: 0 0 6px;
+    word-break: break-all;
+  }
+  .req #nf-method {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--tx3);
+    margin-right: 6px;
+    vertical-align: 5px;
+  }
+  .resp {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--tx3);
+    margin: 0 0 16px;
+  }
+  .code {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #08080a;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--tx);
+    overflow-x: auto;
+    margin: 0 0 18px;
+  }
+  .k {
+    color: #93c5fd;
+  }
+  .s {
+    color: #bef264;
+  }
+  .note {
+    color: var(--tx2);
+    line-height: 1.7;
+    margin: 0 0 26px;
+  }
+  .note a {
+    color: var(--hi);
+    border-bottom: 1px solid var(--line2);
+  }
+  .note a:hover {
+    border-color: var(--ac);
+  }
+  .sug {
+    margin: 0 0 22px;
+  }
+  .sug .h {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tx3);
+    margin-bottom: 8px;
+  }
+  .sug :global(a) {
+    display: block;
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--hi);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .sug :global(a:hover) {
+    color: var(--ac);
+  }
+  .sug :global(a span) {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+    margin-top: 2px;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .links a {
+    color: var(--tx2);
+    border-bottom: 1px solid var(--line2);
+  }
+  .links a.warn {
+    color: var(--warn);
+  }
+</style>
