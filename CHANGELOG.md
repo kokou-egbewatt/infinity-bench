@@ -10,6 +10,38 @@ structure.
 
 ## [Unreleased]
 
+## [0.4.0] - Post Components (2026-09-28)
+
+**A post renders like the mock, and its tables come from the harness's files.** A missing or
+empty CSV fails the build with the post and the path
+([#7](https://github.com/kokou-egbewatt/infinity-bench/issues/7)).
+
+### Added
+
+- **Post layout** (`/posts/[slug]`): back link, title, dek, meta row (dates, read time, cost,
+  repo or NeuroMesh commit, changelog), hardware block, prose, and a sticky sidebar with contents
+  and the environment.
+- **`ResultsTable`**: reads `data/<post>/<file>` at build time with `csv-parse`. Picks, renames and
+  formats columns, right-aligns numbers, highlights rows; fails on a missing file, zero rows, an
+  unknown column, or a path leaving the post's data folder. Posts use it without importing it.
+- **`HardwareBlock`**: the local card with used and free VRAM from `env.json`, or the rented node in
+  orange with provider and cost.
+- **`EnvBlock`**: GPU, driver, CUDA, k3s and package versions from `env.json`, the harness commit
+  linked in the post's repo, and a warning when the run came from uncommitted changes.
+- **`PullQuote`** and **`Changelog`** (corrections newest first, then "Published").
+- **Code blocks** highlighted by Shiki (`github-dark-dimmed`), `{2,4}` line highlights, line
+  numbers from CSS counters, and a copy button that copies the code without them.
+- **Contents** from the post's `##` headings plus the changelog, with the current section marked
+  as you scroll.
+- **`data/_example/`**: a CSV and `env.json` used only by the draft fixture, which now exercises
+  every component in `astro dev`.
+
+### Changed
+
+- Read time is computed from the post body at 230 words a minute, ignoring tags and code.
+- Dates are formatted in UTC everywhere, through `src/lib/format.ts`.
+- The home page says the physics matches an H100 or H200, not only an H100.
+
 ## [0.3.0] - Post Content Schema (2026-09-28)
 
 **Posts have a contract.** Frontmatter is typed, and a post that cites data it did not produce
@@ -102,6 +134,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.4.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/17
 [0.3.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/16
 [0.2.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/15
 [0.1.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/14

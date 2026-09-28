@@ -1,19 +1,16 @@
 ---
 title: Example post covering every frontmatter field
-dek: A draft fixture so astro check sees the whole schema. Never published.
+dek: A draft fixture so astro check sees the whole schema and dev shows every component. Never published.
 date: 2026-09-28
 updated: 2026-09-29
 topic: observability
 plan: vram-accounting
 repo: infinity-bench
 hardware:
-  kind: rented
-  node: 8 × H100 SXM 80 GB
-  provider: example
-  cost_usd: 1
-cost: "$1 · fixture"
+  kind: local
+cost: "$0 · fixture"
 harness: "0000000"
-data: example
+data: _example
 widgets: []
 corrections:
   - date: 2026-09-29
@@ -22,4 +19,31 @@ corrections:
 draft: true
 ---
 
-Fixture.
+Fixture text. Numbers below come from `data/_example/`, which exists only for this draft.
+
+## 1. Method
+
+Sampled `memory.used` through NVML from a pod on k3s.
+
+```bash {2,4}
+kubectl -n infinity-bench attach -it harness
+nvidia-smi --query-gpu=memory.used --format=csv,noheader
+# delta = open minus closed
+make vram-accounting
+```
+
+## 2. Results
+
+<ResultsTable
+  file="results.csv"
+  caption="Fixture rows, three trials each."
+  columns={{ label: 'Consumer', vram_mb: 'VRAM (MB)', stddev_mb: 'σ (MB)', note: 'Note' }}
+  highlight={(r) => r.consumer_id === 'chrome'}
+/>
+
+<PullQuote source="§2. Fixture.">A quoted finding goes here.</PullQuote>
+
+## 3. Open questions
+
+- One
+- Two

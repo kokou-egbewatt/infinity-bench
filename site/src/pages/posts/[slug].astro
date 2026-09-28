@@ -1,18 +1,93 @@
 ---
 import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import HardwareBlock from '../../components/post/HardwareBlock.astro';
+import EnvBlock from '../../components/post/EnvBlock.astro';
+import Changelog from '../../components/post/Changelog.astro';
+import ResultsTable from '../../components/post/ResultsTable.astro';
+import PullQuote from '../../components/post/PullQuote.astro';
 import { getPosts } from '../../lib/posts';
+import { readEnv, commitUrl, REPO_URLS } from '../../lib/env';
+import { isoDate, readTime } from '../../lib/format';
+import { url } from '../../lib/url';
+import '../../styles/post.css';
 
 export const getStaticPaths = (async () =>
   (await getPosts()).map((post) => ({ params: { slug: post.id }, props: { post } }))) satisfies GetStaticPaths;
 
 const { post } = Astro.props;
+const d = post.data;
+Astro.locals.post = { slug: post.id, data: d.data };
+
+const { Content, headings } = await render(post);
+const env = readEnv(d.data);
+const toc = [...headings.filter((h) => h.depth === 2), { slug: 'changelog', text: 'Changelog' }];
+const repoLink =
+  d.repo === 'NeuroMesh' ? commitUrl('NeuroMesh', d.harness) : `${REPO_URLS['infinity-bench']}/tree/main/bench/${d.data}`;
 ---
 
-<BaseLayout title={post.data.title} description={post.data.dek}>
+<BaseLayout title={d.title} description={d.dek}>
   <div class="wrap">
-    <div class="simple">
-      <h1>{post.data.title}</h1>
+    <div class="post">
+      <article>
+        <a class="back" href={url('/')}>← Posts</a>
+        <h1>{d.title}</h1>
+        <p class="dek">{d.dek}</p>
+        <div class="meta">
+          <span>{isoDate(d.date)}</span>
+          {d.updated && <span>updated {isoDate(d.updated)}</span>}
+          <span>{readTime(post.body)} min</span>
+          <span class="cost">cost: {d.cost}</span>
+          <a href={repoLink}>{d.repo === 'NeuroMesh' ? 'NeuroMesh' : 'repo'}</a>
+          <a href="#changelog">changelog</a>
+        </div>
+        <HardwareBlock hardware={d.hardware} cost={d.cost} env={env} />
+        <div class="prose">
+          <Content components={{ ResultsTable, PullQuote }} />
+          <Changelog date={d.date} corrections={d.corrections} />
+        </div>
+      </article>
+      <aside>
+        <div class="toc">
+          <div class="h">Contents</div>
+          <nav aria-label="Contents">
+            {toc.map((h) => <a href={`#${h.slug}`} data-t={h.slug}>{h.text.replace(/^\d+\.\s*/, '')}</a>)}
+          </nav>
+          <EnvBlock env={env} repo={d.repo} harness={d.harness} />
+        </div>
+      </aside>
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc nav a')];
+  const targets = links.map((a) => document.getElementById(a.dataset.t ?? '')).filter((el): el is HTMLElement => !!el);
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) links.forEach((a) => a.classList.toggle('active', a.dataset.t === e.target.id));
+      }
+    },
+    { rootMargin: '-15% 0px -75% 0px' },
+  );
+  targets.forEach((t) => observer.observe(t));
+
+  for (const pre of document.querySelectorAll<HTMLPreElement>('.prose pre.astro-code')) {
+    const box = document.createElement('div');
+    box.className = 'codebox';
+    pre.replaceWith(box);
+    box.append(pre);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'copy';
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(pre.querySelector('code')?.textContent ?? '');
+      button.textContent = 'copied';
+      setTimeout(() => (button.textContent = 'copy'), 1500);
+    });
+    box.append(button);
+  }
+</script>

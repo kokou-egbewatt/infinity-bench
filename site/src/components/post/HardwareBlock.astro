@@ -1,0 +1,73 @@
+---
+import type { Env } from '../../lib/env';
+
+type Hardware = { kind: 'local' } | { kind: 'rented'; node: string; provider: string; cost_usd: number };
+
+interface Props {
+  hardware: Hardware;
+  cost: string;
+  env: Env | null;
+}
+
+const { hardware, cost, env } = Astro.props;
+const total = env?.gpu?.vram_total_mb ?? null;
+const tax = env?.desktop_tax_mb ?? null;
+const used = total && tax !== null ? tax / total : 0;
+const gb = (mb: number) => (mb / 1024).toFixed(1);
+const nodes = [16, 44, 72, 104];
+---
+
+<div class:list={['hw', { rented: hardware.kind === 'rented' }]}>
+  {
+    hardware.kind === 'rented' ? (
+      <svg width="120" height="56" viewBox="0 0 120 56" fill="none" aria-hidden="true">
+        <g stroke="#4a3a1a"><path d="M16 14h88M16 42h88M16 14v28M44 14v28M72 14v28M104 14v28" /></g>
+        <g fill="#e5b567">
+          {nodes.map((x) => (
+            <>
+              <rect x={x - 5} y="9" width="10" height="10" rx="1.5" />
+              <rect x={x - 5} y="37" width="10" height="10" rx="1.5" />
+            </>
+          ))}
+        </g>
+      </svg>
+    ) : (
+      <svg width="120" height="56" viewBox="0 0 120 56" fill="none" aria-hidden="true">
+        <rect x="2" y="10" width="116" height="36" rx="4" stroke="#2c2d33" stroke-width="1.2" />
+        <rect x="10" y="18" width="20" height="20" rx="2" fill="#5eead4" />
+        <rect x="38" y="20" width="72" height="16" rx="2" fill="#0f2f2b" />
+        <rect x="38" y="20" width={Math.round(72 * used)} height="16" rx="2" fill="#3a3a42" />
+      </svg>
+    )
+  }
+  <div>
+    {hardware.kind === 'rented' && <div class="tag">Rented hardware</div>}
+    <dl>
+      {
+        hardware.kind === 'rented' ? (
+          <>
+            <dt>node</dt>
+            <dd>{hardware.node}, rented</dd>
+            <dt>provider</dt>
+            <dd>{hardware.provider}</dd>
+            <dt>paid</dt>
+            <dd>${hardware.cost_usd.toLocaleString('en-US')}</dd>
+          </>
+        ) : (
+          <>
+            <dt>gpu</dt>
+            <dd>1 × RTX 5060, 8 GB, the one on my desk</dd>
+            <dt>available</dt>
+            <dd>
+              {total && tax !== null
+                ? `${gb(total - tax)} GB after the desktop takes ${gb(tax)}`
+                : 'desktop share not measured for this run'}
+            </dd>
+          </>
+        )
+      }
+      <dt>cost</dt>
+      <dd>{cost}</dd>
+    </dl>
+  </div>
+</div>

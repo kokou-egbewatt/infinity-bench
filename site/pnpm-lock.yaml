@@ -26,9 +26,15 @@ importers:
       '@fontsource/ibm-plex-mono':
         specifier: ^5.3.0
         version: 5.3.0
+      '@shikijs/transformers':
+        specifier: 4.4.3
+        version: 4.4.3
       astro:
         specifier: ^7.3.5
         version: 7.3.5(@types/node@24.19.0)(yaml@2.9.1)
+      csv-parse:
+        specifier: ^7.0.3
+        version: 7.0.3
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.10
@@ -762,6 +768,10 @@ packages:
     resolution: {integrity: sha512-w8UHjeUnIR965KMWJHUPXOc2mNJUnK3vpVLYLvw5IYU2mnTTJ89E24OrJDBNiJDQ0qzb0tc4l7mrIXx5cFeIyw==}
     engines: {node: '>=20'}
 
+  '@shikijs/transformers@4.4.3':
+    resolution: {integrity: sha512-oJSARV6NaWd+rnNJbtnpAdj3Zg0ZVyzsnMgb3vi3HA+35y8lBWUCpOnWsmyiXZIikY+x1BDqrQUgmxfzWh7Jvw==}
+    engines: {node: '>=20'}
+
   '@shikijs/types@4.4.3':
     resolution: {integrity: sha512-UEJxmRR++MAGR6hugn0vgVS2W/6lWAts84FFSrnlH9sP0LNol7E5+NQ792pH8liWUhyMyjhTgSUH3k7iD7tc5g==}
     engines: {node: '>=20'}
@@ -986,6 +996,9 @@ packages:
   csso@5.0.5:
     resolution: {integrity: sha512-0LrrStPOdJj+SPCCrGhzryycLjwcgUSHBtxNA8aIDxf0GLsRh1cKYhB00Gd1lDOS4yGH69+SNn13+TWbVHETFQ==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0, npm: '>=7.0.0'}
+
+  csv-parse@7.0.3:
+    resolution: {integrity: sha512-YFd3QM/yo17vH91L1IOZuvl09zM0zEEtdfTcOCKWcMdM++MNaQSyp09slXyFCLaPXvHstQFx/xC8myiFHSMUvw==}
 
   defu@6.1.7:
     resolution: {integrity: sha512-7z22QmUWiQ/2d0KkdYmANbRUVABpZ9SNYyH5vx6PZ+nE5bcC0l7uFvEfHlyld/HcGBFTL536ClDt3DEcSlEJAQ==}
@@ -2459,6 +2472,11 @@ snapshots:
     dependencies:
       '@shikijs/types': 4.4.3
 
+  '@shikijs/transformers@4.4.3':
+    dependencies:
+      '@shikijs/core': 4.4.3
+      '@shikijs/types': 4.4.3
+
   '@shikijs/types@4.4.3':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
@@ -2764,6 +2782,8 @@ snapshots:
   csso@5.0.5:
     dependencies:
       css-tree: 2.2.1
+
+  csv-parse@7.0.3: {}
 
   defu@6.1.7: {}
 
