@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const topics = ['all', 'orchestration', 'serving', 'observability', 'platform'];
+const topics = ['all', 'orchestration', 'serving', 'streaming', 'observability', 'agents', 'platform'];
 ---
 
 <BaseLayout>
@@ -10,7 +10,6 @@ const topics = ['all', 'orchestration', 'serving', 'observability', 'platform'];
       <div>
         <h1>GPU infrastructure, measured on the one GPU I own.</h1>
         <p>I run Kubernetes with GPUs in it for a living. At home I have a single 8 GB RTX 5060, so that is what most of this is measured on. The physics is the same as an H100's; the fuse is shorter. Every post says which hardware produced its numbers, what it cost, and what I got wrong.</p>
-        <p>When a post used rented datacenter hardware, it says so in orange.</p>
       </div>
       <div class="rig">
         <div class="t">The rig</div>
@@ -22,7 +21,7 @@ const topics = ['all', 'orchestration', 'serving', 'observability', 'platform'];
           <dt>host</dt><dd>Windows 11, WSL2, k3s</dd>
         </dl>
         <div class="vbar"><i style="width:100%;background:var(--ac)" title="8 GB nominal"></i></div>
-        <div class="cap">8 GB nominal · what the desktop takes is measured in post 1</div>
+        <div class="cap">8 GB nominal · what the desktop takes is measured</div>
       </div>
     </div>
 
@@ -39,7 +38,8 @@ const topics = ['all', 'orchestration', 'serving', 'observability', 'platform'];
     <div class="sec"><h2>Elsewhere</h2></div>
     <div class="else">
       <ul>
-        <li><a href="https://github.com/kokou-egbewatt/infinity-bench">kokou-egbewatt/infinity-bench</a> <span>· every harness on this site, one Makefile target per table, runs on k3s in WSL2</span></li>
+        <li><a href="https://github.com/kokou-egbewatt/infinity-bench">kokou-egbewatt/infinity-bench</a> <span>· every harness on this site, runs on k3s in WSL2</span></li>
+        <li><a href="https://github.com/kokou-egbewatt/NeuroMesh">kokou-egbewatt/NeuroMesh</a> <span>· the AI runtime mesh some posts are written from</span></li>
       </ul>
     </div>
   </div>
