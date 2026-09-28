@@ -1,0 +1,21 @@
+---
+import { url } from '../lib/url';
+
+const links = [
+  ['/', 'writing'],
+  ['/series', 'series'],
+  ['/labs', 'labs'],
+  ['/corrections', 'corrections'],
+  ['/about', 'about'],
+  ['/rss.xml', 'rss'],
+];
+---
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Kokou · measured on one RTX 5060 unless stated</span>
+    <span>
+      {links.map(([href, label], i) => <>{i > 0 && ' · '}<a href={url(href)}>{label}</a></>)}
+    </span>
+  </div>
+</footer>

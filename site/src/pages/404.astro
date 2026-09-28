@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/url';
+---
+
+<BaseLayout title="Not found">
+  <div class="wrap">
+    <div class="simple">
+      <p style="font-family:var(--mono);color:var(--tx3)">404</p>
+      <p>No page at that path. <a href={url('/')}>Back to writing.</a></p>
+    </div>
+  </div>
+</BaseLayout>
