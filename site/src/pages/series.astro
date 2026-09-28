@@ -1,13 +1,467 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { SERIES, NEXT_UP, postStatus, type PlannedPost, type PostStatus, type Source } from '../data/series';
+import { getIssueStates, issueUrl, milestoneUrl, docUrl, REPOS } from '../lib/issues';
+import { url } from '../lib/url';
+
+const states = await getIssueStates();
+
+const links = (sources: Source[]) =>
+  sources.map((s) =>
+    'doc' in s
+      ? { href: docUrl(s.repo, s.doc), text: s.label, done: true }
+      : { href: issueUrl(s.repo, s.issue), text: `${REPOS[s.repo].short}#${s.issue}`, done: states.get(s.repo, s.issue) === 'closed' },
+  );
+
+// Only say something about status when it tells the reader something.
+// "Waiting on open issues" is the default and gets no label.
+const note = (p: PlannedPost) => {
+  const st = postStatus(p, states);
+  if (st === 'ready') return { cls: 'ready', text: 'ready to write' };
+  if (st === 'rented') return { cls: 'rented', text: 'needs rented hardware' };
+  if (st === 'no-source') return { cls: '', text: 'no issue yet' };
+  return null;
+};
+
+const fmtDate = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+const DOT_TITLE: Record<PostStatus, string> = {
+  published: 'published',
+  ready: 'ready to write',
+  waiting: 'planned',
+  rented: 'needs rented hardware',
+  'no-source': 'planned, no issue yet',
+};
+
+const isPublished = (p: PlannedPost) => postStatus(p, states) === 'published';
+const publishedBySeries = SERIES.map((s) => ({ s, posts: s.posts.filter(isPublished) })).filter((x) => x.posts.length);
+const nextUp = NEXT_UP.filter((p) => !isPublished(p));
+const NEXT_SHOWN = 2;
+
+const countLine = (posts: PlannedPost[]) => {
+  const n = posts.filter(isPublished).length;
+  const ready = posts.filter((p) => postStatus(p, states) === 'ready').length;
+  const head = n ? `${n} of ${posts.length} published` : `${posts.length} planned`;
+  return ready ? `${head}, ${ready} ready` : head;
+};
 ---
 
-<BaseLayout title="Series">
+<BaseLayout title="Series" description="What I've published, what I'm writing next, and what each post is waiting on.">
   <div class="wrap">
-    <div class="simple">
-      <h1>Twelve posts, one card</h1>
-      <p>Four areas: orchestration, serving, observability, and the developer platform on top. Eleven of twelve are measured on the RTX 5060. One needs an 8×H100 node and will say what it cost. Shipped posts are linked; the rest are titles I expect to write, without dates.</p>
-      <p class="empty">Nothing here yet.</p>
-    </div>
+    <article class="plan">
+      <h1>Series</h1>
+      <p>
+        Most of what I write here comes out of two repos. <a href={REPOS.nm.url}>NeuroMesh</a> is the AI runtime I'm
+        building; its roadmap is split into phases, and each phase below is roughly one series.{' '}
+        <a href={REPOS.ib.url}>infinity-bench</a> is this site and the harnesses behind its numbers.
+      </p>
+
+      {
+        publishedBySeries.length > 0 && (
+          <>
+            <h2 class="label">Published</h2>
+            <div class="published">
+              {publishedBySeries.map(({ s, posts }) => (
+                <div class="pgroup">
+                  <a class="sname" href={`#${s.id}`}>{s.title}</a>
+                  <ul>
+                    {posts.map((p) => (
+                      <li>
+                        <a class="t" href={url(`/posts/${p.slug}`)}>{p.title}</a>
+                        {p.published && <span class="m">{fmtDate(p.published)}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </>
+        )
+      }
+
+      {
+        nextUp.length > 0 && (
+          <>
+            <h2 class="label">Next up</h2>
+            <ul class="next">
+              {nextUp.map((p) => {
+                const n = note(p);
+                return (
+                  <li>
+                    <span class="t">{p.title}</span>
+                    {p.summary && <p class="s">{p.summary}</p>}
+                    <span class="m">
+                      <a href={`#${p.series.id}`}>{p.series.title}</a>
+                      {links(p.sources).map((l) => (
+                        <>
+                          {', '}
+                          <a href={l.href} class:list={{ done: l.done }}>{l.text}</a>
+                        </>
+                      ))}
+                      {n && <span class:list={['n', n.cls]}>{n.text}</span>}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            {nextUp.length > NEXT_SHOWN && (
+              <details class="later">
+                <summary>
+                  <span class="chev" aria-hidden="true">▸</span>
+                  <span class="closed-text">{nextUp.length - NEXT_SHOWN} more planned</span>
+                  <span class="open-text">Show fewer</span>
+                </summary>
+              </details>
+            )}
+          </>
+        )
+      }
+
+      <h2 class="label">By series</h2>
+      {
+        SERIES.map((s) => (
+          <details id={s.id} open={s.posts.some(isPublished)}>
+            <summary>
+              <span class="chev" aria-hidden="true">▸</span>
+              <span class="st">{s.title}</span>
+              <span class="sm">{countLine(s.posts)}</span>
+              <span class="dots" aria-hidden="true">
+                {s.posts.map((p) => {
+                  const st = postStatus(p, states);
+                  return <i class:list={['dot', st]} title={`${p.title}: ${DOT_TITLE[st]}`} />;
+                })}
+              </span>
+            </summary>
+            <div class="body">
+              <p class="d">
+                {s.description}
+                {s.home.repo !== 'both' && s.home.milestone && (
+                  <>
+                    {' '}
+                    <a href={milestoneUrl(s.home.repo, s.home.milestone)}>Milestone on GitHub</a>.
+                  </>
+                )}
+              </p>
+              <ul>
+                {s.posts.map((p) => {
+                  const n = note(p);
+                  const ls = links(p.sources);
+                  const pub = isPublished(p);
+                  return (
+                    <li>
+                      {pub ? <a class="t" href={url(`/posts/${p.slug}`)}>{p.title}</a> : <span class="t">{p.title}</span>}
+                      <span class="m">
+                        {pub && p.published ? (
+                          <span>{fmtDate(p.published)}</span>
+                        ) : (
+                          <>
+                            {ls.map((l, i) => (
+                              <>
+                                {i > 0 && ', '}
+                                <a href={l.href} class:list={{ done: l.done }}>{l.text}</a>
+                              </>
+                            ))}
+                            {n && <span class:list={['n', n.cls]}>{n.text}</span>}
+                          </>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </details>
+        ))
+      }
+    </article>
   </div>
 </BaseLayout>
+
+<script>
+  // Opening /series#scheduler (from Next up, the 404 page, or a shared link)
+  // should unfold that series, not scroll to a closed one.
+  const openFromHash = () => {
+    const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (el instanceof HTMLDetailsElement) {
+      el.open = true;
+      el.scrollIntoView({ block: 'start' });
+    }
+  };
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>
+
+<style>
+  .plan {
+    max-width: 680px;
+    padding: 56px 0 64px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 34px;
+    letter-spacing: -0.01em;
+    color: var(--hi);
+    margin: 0 0 20px;
+  }
+  .plan > p {
+    color: #b9b9c0;
+    line-height: 1.75;
+    margin: 0 0 18px;
+  }
+  .plan > p a,
+  .d a {
+    color: var(--hi);
+    border-bottom: 1px solid var(--line2);
+  }
+  .plan > p a:hover,
+  .d a:hover {
+    border-color: var(--ac);
+  }
+  .label {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--tx3);
+    margin: 48px 0 14px;
+  }
+
+  /* shared post line */
+  .t {
+    display: block;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.35;
+    color: var(--hi);
+  }
+  a.t:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--line2);
+    text-underline-offset: 4px;
+  }
+  .m {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--tx3);
+    margin-top: 2px;
+  }
+  .m a {
+    color: var(--tx3);
+    text-decoration: underline;
+    text-decoration-color: var(--line2);
+    text-underline-offset: 3px;
+  }
+  .m a:hover {
+    color: var(--tx);
+  }
+  .m a.done {
+    color: var(--ac);
+  }
+  .n {
+    margin-left: 10px;
+    font-style: italic;
+  }
+  .m > .n:first-child {
+    margin-left: 0;
+  }
+  .n.ready {
+    color: var(--ac);
+  }
+  .n.rented {
+    color: var(--warn);
+  }
+
+  /* published */
+  .pgroup {
+    margin: 0 0 18px;
+  }
+  .sname {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+    margin: 0 0 6px;
+  }
+  .sname:hover {
+    color: var(--tx);
+  }
+  .published ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .published li {
+    margin: 0 0 12px;
+  }
+
+  /* next up: an unordered list, no numbers, since the order isn't fixed */
+  .next {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .next li {
+    position: relative;
+    margin: 0 0 26px;
+  }
+  .s {
+    color: var(--tx2);
+    font-size: 14.5px;
+    line-height: 1.65;
+    margin: 4px 0 6px;
+  }
+
+  /* the rest of Next up, folded */
+  .later {
+    border: 0;
+    margin: 2px 0 0;
+  }
+  .later summary {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    padding: 4px 0 14px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--tx3);
+  }
+  .later summary:hover {
+    color: var(--tx);
+  }
+  .later .open-text,
+  .later[open] .closed-text {
+    display: none;
+  }
+  .later[open] .open-text {
+    display: inline;
+  }
+  /* Show the first NEXT_SHOWN items; the fold below the list reveals the rest.
+     Keep the nth-child number in sync with NEXT_SHOWN. */
+  .next li:nth-child(n + 3) {
+    display: none;
+  }
+  .plan:has(.later[open]) .next li:nth-child(n + 3) {
+    display: list-item;
+  }
+
+  /* by series: one folded line each */
+  details:not(.later) {
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 80px;
+  }
+  details:not(.later):last-of-type {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 14px 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 13px 0;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:focus-visible {
+    outline: 1px solid var(--ac);
+    outline-offset: 2px;
+  }
+  .chev {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+    transition: transform 0.15s;
+  }
+  details[open] .chev {
+    transform: rotate(90deg);
+  }
+  .st {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--hi);
+  }
+  summary:hover .st {
+    color: var(--ac);
+  }
+  .dots {
+    display: inline-flex;
+    gap: 4px;
+    justify-self: end;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--tx3);
+  }
+  .dot.published {
+    background: var(--hi);
+    border-color: var(--hi);
+  }
+  .dot.ready {
+    border-color: var(--ac);
+  }
+  .dot.rented {
+    border-color: var(--warn);
+  }
+  .dot.no-source {
+    border-style: dashed;
+  }
+  .sm {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+    white-space: nowrap;
+  }
+  .body {
+    padding: 0 0 18px 24px;
+  }
+  .d {
+    color: var(--tx2);
+    font-size: 14.5px;
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+  .body ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .body li {
+    margin: 0 0 12px;
+  }
+  .body .t {
+    font-size: 17px;
+  }
+  @media (max-width: 860px) {
+    details {
+      scroll-margin-top: 150px;
+    }
+    summary {
+      grid-template-columns: 14px 1fr auto;
+      row-gap: 4px;
+    }
+    .st {
+      grid-column: 2 / -1;
+    }
+    .sm {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    .dots {
+      grid-column: 3;
+      grid-row: 2;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chev {
+      transition: none;
+    }
+  }
+</style>
