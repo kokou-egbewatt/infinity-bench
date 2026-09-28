@@ -10,6 +10,34 @@ structure.
 
 ## [Unreleased]
 
+## [0.6.0] - Pages From Post Data (2026-09-28)
+
+**Every list on the site is built from the posts.** One correction in one post's frontmatter
+changes its changelog, its row, the Corrections page and the status bar
+([#6](https://github.com/kokou-egbewatt/infinity-bench/issues/6),
+[#21](https://github.com/kokou-egbewatt/infinity-bench/pull/21)).
+
+### Added
+
+- **Post rows** on the home page: date, title, dek, `RTX 5060` or the rented node in orange, a
+  `NeuroMesh` link for posts whose code lives there, read time, and corrections in orange. The whole
+  row opens the post.
+- **Topic filters** as `?topic=` links. A small script hides other topics; without it, every post
+  shows and each link reloads.
+- **Corrections page**: every correction, newest first, with credit and a link to the post's
+  changelog, and a link to the correction issue form.
+- **Labs page**: every registered widget, linked to its post once published, otherwise marked
+  planned.
+- **Status bar**: post count, correction count and the last measurement date.
+- **RSS**: published posts with title, dek, date and link.
+- **`src/data/elsewhere.yaml`** for the home page's Elsewhere list.
+
+### Changed
+
+- The rig card's VRAM bar reads `data/vram-accounting/env.json` once it exists, and shows 8 GB
+  nominal until then.
+- `[hidden]` always hides, even on elements that set their own `display`.
+
 ## [0.5.1] - Docs and Issue Forms (2026-09-28)
 
 **The rules the build enforces are written down, and readers have a way in**
@@ -189,6 +217,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.6.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/21
 [0.5.1]: https://github.com/kokou-egbewatt/infinity-bench/pull/19
 [0.5.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/18
 [0.4.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/17

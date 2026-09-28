@@ -1,6 +1,6 @@
 // Every widget, for the Labs page (#6). `plan` is the series.ts entry of the post it lives in;
 // `section` is the heading anchor there, filled in once the post is written.
-const WIDGETS = [
+export const WIDGETS = [
   {
     id: 'vram',
     name: 'What is stealing my VRAM',

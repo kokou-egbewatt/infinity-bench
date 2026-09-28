@@ -63,4 +63,9 @@ const models = defineCollection({
   }),
 });
 
-export const collections = { posts, models };
+const elsewhere = defineCollection({
+  loader: file('src/data/elsewhere.yaml'),
+  schema: z.object({ title: z.string(), url: z.url(), note: z.string() }),
+});
+
+export const collections = { posts, models, elsewhere };
