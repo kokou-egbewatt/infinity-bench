@@ -1,0 +1,23 @@
+# site
+node_modules/
+site/dist/
+site/.astro/
+
+# python
+.venv/
+__pycache__/
+.ruff_cache/
+
+# models
+*.gguf
+*.safetensors
+*.bin
+models/
+
+# bench
+bench/**/raw/
+
+# env / os
+.env
+.DS_Store
+Thumbs.db
