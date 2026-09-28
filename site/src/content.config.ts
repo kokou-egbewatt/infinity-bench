@@ -1,7 +1,8 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { TOPICS } from './data/series';
+import { REPO_NAMES } from './lib/env';
 
 const date = z.coerce.date().refine((d) => !Number.isNaN(d.valueOf()), 'invalid date');
 
@@ -31,7 +32,7 @@ const posts = defineCollection({
       updated: date.optional(),
       topic: z.enum(TOPICS),
       plan: z.string().optional(), // id of an entry in data/series.ts
-      repo: z.enum(['infinity-bench', 'NeuroMesh']).default('infinity-bench'),
+      repo: z.enum(REPO_NAMES).default('infinity-bench'),
       hardware,
       cost: z.string(), // display line, e.g. "$0 · 18 h of runs"
       harness: z
@@ -49,4 +50,17 @@ const posts = defineCollection({
     }),
 });
 
-export const collections = { posts };
+const models = defineCollection({
+  loader: file('src/data/models.yaml'),
+  schema: z.object({
+    name: z.string(),
+    quantization: z.string(),
+    runtime: z.enum(['llama.cpp', 'vllm']),
+    size_mb: z.number().int().positive(),
+    layers: z.number().int().positive(),
+    kv_heads: z.number().int().positive(),
+    head_dim: z.number().int().positive(),
+  }),
+});
+
+export const collections = { posts, models };

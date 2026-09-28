@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { TOPICS } from '../data/series';
 
-const topics = ['all', 'orchestration', 'serving', 'streaming', 'observability', 'agents', 'platform'];
+const topics = ['all', ...TOPICS];
 ---
 
 <BaseLayout>

@@ -1,5 +1,6 @@
 ---
 import type { Env } from '../../lib/env';
+import { gb } from '../../lib/format';
 
 type Hardware = { kind: 'local' } | { kind: 'rented'; node: string; provider: string; cost_usd: number };
 
@@ -13,7 +14,6 @@ const { hardware, cost, env } = Astro.props;
 const total = env?.gpu?.vram_total_mb ?? null;
 const tax = env?.desktop_tax_mb ?? null;
 const used = total && tax !== null ? tax / total : 0;
-const gb = (mb: number) => (mb / 1024).toFixed(1);
 const nodes = [16, 44, 72, 104];
 ---
 
@@ -60,7 +60,7 @@ const nodes = [16, 44, 72, 104];
             <dt>available</dt>
             <dd>
               {total && tax !== null
-                ? `${gb(total - tax)} GB after the desktop takes ${gb(tax)}`
+                ? `${gb(total - tax, 1)} after the desktop takes ${gb(tax, 1)}`
                 : 'desktop share not measured for this run'}
             </dd>
           </>

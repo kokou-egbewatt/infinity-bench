@@ -1,0 +1,124 @@
+---
+import { currentPost, envNumber, readCsv } from '../../lib/postData';
+import { getModels } from '../../lib/models';
+import { gb } from '../../lib/format';
+import '../../styles/widget.css';
+
+interface Props {
+  /** CSV in the post's data folder with consumer_id, label, vram_mb. */
+  file?: string;
+  /** Consumers that cannot be turned off. */
+  fixed?: string[];
+  /** Consumers unchecked at first. */
+  off?: string[];
+  /** models.yaml id selected at first. */
+  model?: string;
+  /** Runtime workspace kept free next to the KV cache; an estimate, shown in the formula. */
+  workspaceMb?: number;
+}
+
+const { file = 'results.csv', fixed = ['dwm'], off = [], model = 'llama-3.2-3b-q4km', workspaceMb = 600 } = Astro.props;
+const WHO = 'VramAccount';
+const post = currentPost(Astro.locals, WHO);
+const rows = readCsv(post.data, file, WHO, post.slug);
+const totalMb = envNumber(post.data, (e) => e.gpu?.vram_total_mb, 'gpu.vram_total_mb', WHO, post.slug);
+
+const consumers = rows.map((r) => {
+  const mb = Number(r.vram_mb);
+  if (!r.consumer_id || !Number.isFinite(mb)) throw new Error(`${WHO}: ${file} needs consumer_id and a numeric vram_mb (post: ${post.slug})`);
+  return { id: r.consumer_id, label: r.label || r.consumer_id, mb };
+});
+const models = await getModels('llama.cpp', model, WHO);
+---
+
+<div class="widget" data-widget="vram" data-total={totalMb} data-workspace={workspaceMb}>
+  <p class="wt">VRAM before the model loads · {gb(totalMb, 1)} RTX 5060</p>
+  <div class="g2">
+    <div>
+      <fieldset>
+        <legend>Running on the desktop</legend>
+        {
+          consumers.map((c) => (
+            <label class="chk">
+              <input type="checkbox" data-mb={c.mb} checked={!off.includes(c.id)} disabled={fixed.includes(c.id)} />
+              <span>
+                {c.label} · {c.mb.toLocaleString('en-US')} MB{fixed.includes(c.id) && ' · cannot turn off'}
+              </span>
+            </label>
+          ))
+        }
+      </fieldset>
+      <label class="sel">
+        Model
+        <select data-model>
+          {
+            models.map((m) => (
+              <option value={m.id} selected={m.selected} {...m.attrs}>
+                {m.label} · {gb(m.size_mb, 1)}
+              </option>
+            ))
+          }
+        </select>
+      </label>
+    </div>
+    <div>
+      <div class="sbar" aria-hidden="true">
+        <i data-bar="taken" style="background:#3a3a42"></i><i data-bar="weights" style="background:var(--ac)"></i><i
+          data-bar="left"
+          style="background:var(--ac2)"></i>
+      </div>
+      <dl aria-live="polite">
+        <dt>taken before load</dt><dd data-out="taken">–</dd>
+        <dt>model weights</dt><dd data-out="weights">–</dd>
+        <dt>left for KV cache + workspace</dt><dd data-out="left">–</dd>
+        <dt>max context, FP16 KV</dt><dd data-out="ctx">–</dd>
+      </dl>
+      <p class="note" data-out="note" aria-live="polite"></p>
+    </div>
+  </div>
+  <p class="formula">
+    left = {totalMb.toLocaleString('en-US')} MB − checked consumers − weights. context = (left − {workspaceMb} MB workspace,
+    an estimate) ÷ (2 × layers × KV heads × head dim × 2 bytes). Consumers from {file}; weights from models.yaml.
+  </p>
+  <noscript><p class="formula">This widget needs JavaScript. The results table in this post has the same numbers.</p></noscript>
+</div>
+
+<script>
+  import { modelFromOption, vramAccount } from '../../lib/kv';
+  import { gb } from '../../lib/format';
+  import { onVisible } from '../../lib/onVisible';
+
+  function init(root: HTMLElement) {
+    const totalMb = Number(root.dataset.total);
+    const workspaceMb = Number(root.dataset.workspace);
+    const boxes = [...root.querySelectorAll<HTMLInputElement>('input[type=checkbox]')];
+    const select = root.querySelector<HTMLSelectElement>('select[data-model]')!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const bar = (k: string) => root.querySelector<HTMLElement>(`[data-bar="${k}"]`)!;
+
+    const run = () => {
+      const takenMb = boxes.filter((b) => b.checked).reduce((n, b) => n + Number(b.dataset.mb), 0);
+      const model = modelFromOption(select.selectedOptions[0]);
+      const r = vramAccount({ totalMb, takenMb, model, workspaceMb });
+      const pct = (mb: number) => `${Math.max(0, Math.min(100, (mb / totalMb) * 100))}%`;
+      bar('taken').style.width = pct(takenMb);
+      bar('weights').style.width = pct(model.size_mb);
+      bar('left').style.width = pct(r.leftMb);
+      out('taken').textContent = gb(takenMb);
+      out('weights').textContent = gb(model.size_mb);
+      out('left').textContent = gb(r.leftMb);
+      out('ctx').textContent = r.tokens > 0 ? `${r.tokens.toLocaleString('en-US')} tokens` : 'none';
+      out('note').textContent = !r.fits
+        ? 'Does not fit. llama.cpp offloads layers to the CPU, and says so only in its log.'
+        : r.leftMb < 1000
+          ? 'Fits, barely. The first long prompt will spill.'
+          : '';
+    };
+
+    boxes.forEach((b) => b.addEventListener('change', run));
+    select.addEventListener('change', run);
+    run();
+  }
+
+  onVisible('[data-widget="vram"]', init);
+</script>

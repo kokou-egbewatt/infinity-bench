@@ -1,4 +1,7 @@
 /** YYYY-MM-DD in UTC, so a post dated 2026-10-06 never renders as the 5th west of Greenwich. */
+/** MiB as GB. */
+export const gb = (mb: number, digits = 2) => `${(mb / 1024).toFixed(digits)} GB`;
+
 export const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 
 /** Minutes at 230 wpm, rounded up. Tags and code fences don't count as reading. */

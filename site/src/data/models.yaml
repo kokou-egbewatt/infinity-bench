@@ -1,0 +1,59 @@
+# Weights only, in MiB (bytes / 2^20), as published on Hugging Face. Not measured here:
+# check against the actual download before a post cites a number derived from these.
+# Architecture fields are from each model's config.json.
+- id: llama-3.2-1b-q8
+  name: Llama 3.2 1B
+  quantization: Q8_0
+  runtime: llama.cpp
+  size_mb: 1259
+  layers: 16
+  kv_heads: 8
+  head_dim: 64
+- id: llama-3.2-3b-q4km
+  name: Llama 3.2 3B
+  quantization: Q4_K_M
+  runtime: llama.cpp
+  size_mb: 1926
+  layers: 28
+  kv_heads: 8
+  head_dim: 128
+- id: llama-3.1-8b-q4km
+  name: Llama 3.1 8B
+  quantization: Q4_K_M
+  runtime: llama.cpp
+  size_mb: 4692
+  layers: 32
+  kv_heads: 8
+  head_dim: 128
+- id: qwen2.5-7b-q5km
+  name: Qwen2.5 7B
+  quantization: Q5_K_M
+  runtime: llama.cpp
+  size_mb: 5188
+  layers: 28
+  kv_heads: 4
+  head_dim: 128
+- id: llama-3.2-1b-fp16
+  name: Llama 3.2 1B
+  quantization: FP16
+  runtime: vllm
+  size_mb: 2357
+  layers: 16
+  kv_heads: 8
+  head_dim: 64
+- id: llama-3.2-3b-fp16
+  name: Llama 3.2 3B
+  quantization: FP16
+  runtime: vllm
+  size_mb: 6123
+  layers: 28
+  kv_heads: 8
+  head_dim: 128
+- id: llama-3.1-8b-awq
+  name: Llama 3.1 8B
+  quantization: AWQ INT4
+  runtime: vllm
+  size_mb: 5465
+  layers: 32
+  kv_heads: 8
+  head_dim: 128

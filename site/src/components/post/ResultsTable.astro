@@ -1,10 +1,6 @@
 ---
-import { existsSync, readFileSync } from 'node:fs';
-import { join, normalize } from 'node:path';
-import { parse } from 'csv-parse/sync';
-import { DATA_DIR } from '../../lib/paths';
+import { currentPost, readCsv, type Row } from '../../lib/postData';
 
-type Row = Record<string, string>;
 type Column = string | { label?: string; format?: (value: string) => string };
 
 interface Props {
@@ -17,18 +13,12 @@ interface Props {
 }
 
 const { file, caption, columns, highlight } = Astro.props;
-const post = Astro.locals.post;
-if (!post) throw new Error(`ResultsTable: ${file} used outside a post`);
-if (normalize(file).startsWith('..')) throw new Error(`ResultsTable: ${file} leaves data/${post.data}/ (post: ${post.slug})`);
-
-const path = join(DATA_DIR, post.data, file);
-if (!existsSync(path)) throw new Error(`ResultsTable: ${path} not found (post: ${post.slug})`);
-const rows = parse(readFileSync(path, 'utf8'), { columns: true, cast: false, skip_empty_lines: true, trim: true }) as Row[];
-if (rows.length === 0) throw new Error(`ResultsTable: ${path} has no rows (post: ${post.slug})`);
+const post = currentPost(Astro.locals, 'ResultsTable');
+const rows = readCsv(post.data, file, 'ResultsTable', post.slug);
 
 const keys = columns ? Object.keys(columns) : Object.keys(rows[0]);
 const missing = keys.filter((k) => !(k in rows[0]));
-if (missing.length) throw new Error(`ResultsTable: ${path} has no column ${missing.join(', ')} (post: ${post.slug})`);
+if (missing.length) throw new Error(`ResultsTable: data/${post.data}/${file} has no column ${missing.join(', ')} (post: ${post.slug})`);
 
 const label = (k: string) => {
   const c = columns?.[k];

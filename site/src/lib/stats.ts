@@ -7,7 +7,7 @@ export interface StatsInput {
   };
 }
 
-export interface Stats {
+interface Stats {
   postCount: number;
   correctionCount: number;
   lastMeasured: Date | null;

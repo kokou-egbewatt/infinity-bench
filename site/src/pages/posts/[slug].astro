@@ -7,8 +7,10 @@ import EnvBlock from '../../components/post/EnvBlock.astro';
 import Changelog from '../../components/post/Changelog.astro';
 import ResultsTable from '../../components/post/ResultsTable.astro';
 import PullQuote from '../../components/post/PullQuote.astro';
+import VramAccount from '../../components/widgets/VramAccount.astro';
+import KvCalc from '../../components/widgets/KvCalc.astro';
 import { getPosts } from '../../lib/posts';
-import { readEnv, commitUrl, REPO_URLS } from '../../lib/env';
+import { readEnv, commitUrl, repoUrl } from '../../lib/env';
 import { isoDate, readTime } from '../../lib/format';
 import { url } from '../../lib/url';
 import '../../styles/post.css';
@@ -24,7 +26,7 @@ const { Content, headings } = await render(post);
 const env = readEnv(d.data);
 const toc = [...headings.filter((h) => h.depth === 2), { slug: 'changelog', text: 'Changelog' }];
 const repoLink =
-  d.repo === 'NeuroMesh' ? commitUrl('NeuroMesh', d.harness) : `${REPO_URLS['infinity-bench']}/tree/main/bench/${d.data}`;
+  d.repo === 'NeuroMesh' ? commitUrl('NeuroMesh', d.harness) : `${repoUrl('infinity-bench')}/tree/main/bench/${d.data}`;
 ---
 
 <BaseLayout title={d.title} description={d.dek}>
@@ -44,7 +46,7 @@ const repoLink =
         </div>
         <HardwareBlock hardware={d.hardware} cost={d.cost} env={env} />
         <div class="prose">
-          <Content components={{ ResultsTable, PullQuote }} />
+          <Content components={{ ResultsTable, PullQuote, VramAccount, KvCalc }} />
           <Changelog date={d.date} corrections={d.corrections} />
         </div>
       </article>

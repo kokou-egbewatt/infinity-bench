@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DATA_DIR } from './paths';
+import { REPOS, type RepoKey } from './issues';
 
 // Shape written by bench/_lib/capture_env.py (#9). Every field can be null.
 export interface Env {
@@ -17,11 +18,10 @@ export function readEnv(data: string): Env | null {
   return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as Env) : null;
 }
 
-export const REPO_URLS = {
-  'infinity-bench': 'https://github.com/kokou-egbewatt/infinity-bench',
-  NeuroMesh: 'https://github.com/kokou-egbewatt/NeuroMesh',
-} as const;
+/** Values of a post's `repo` frontmatter field. */
+export const REPO_NAMES = ['infinity-bench', 'NeuroMesh'] as const;
+export type Repo = (typeof REPO_NAMES)[number];
 
-export type Repo = keyof typeof REPO_URLS;
-
-export const commitUrl = (repo: Repo, sha: string) => `${REPO_URLS[repo]}/commit/${sha}`;
+const KEYS: Record<Repo, RepoKey> = { 'infinity-bench': 'ib', NeuroMesh: 'nm' };
+export const repoUrl = (repo: Repo) => REPOS[KEYS[repo]].url;
+export const commitUrl = (repo: Repo, sha: string) => `${repoUrl(repo)}/commit/${sha}`;

@@ -1,0 +1,160 @@
+---
+import { currentPost, envNumber } from '../../lib/postData';
+import { getModels } from '../../lib/models';
+import { gb } from '../../lib/format';
+import '../../styles/widget.css';
+
+interface Props {
+  /** Data folder whose env.json has desktop_tax_mb; defaults to this post's. */
+  taxFrom?: string;
+  /** models.yaml id selected at first. */
+  model?: string;
+  /** Runtime workspace (activations, CUDA graphs) kept out of the KV pool; an estimate, shown in the formula. */
+  workspaceMb?: number;
+}
+
+const WHO = 'KvCalc';
+const post = currentPost(Astro.locals, WHO);
+const { taxFrom = post.data, model = 'llama-3.2-1b-fp16', workspaceMb = 600 } = Astro.props;
+const totalMb = envNumber(post.data, (e) => e.gpu?.vram_total_mb, 'gpu.vram_total_mb', WHO, post.slug);
+const taxMb = envNumber(taxFrom, (e) => e.desktop_tax_mb, 'desktop_tax_mb', WHO, post.slug);
+const models = await getModels('vllm', model, WHO);
+const uid = `kv-${post.slug}`;
+
+const ranges = [
+  { key: 'concurrency', label: 'Concurrent sequences', min: 1, max: 32, step: 1, value: 4 },
+  { key: 'prompt', label: 'Prompt tokens', min: 128, max: 16384, step: 128, value: 1024 },
+  { key: 'output', label: 'Output tokens', min: 16, max: 2048, step: 16, value: 256 },
+  { key: 'util', label: 'gpu-memory-utilization', min: 0.4, max: 0.95, step: 0.01, value: 0.7 },
+];
+---
+
+<div class="widget" data-widget="kv" data-total={totalMb} data-tax={taxMb} data-workspace={workspaceMb}>
+  <p class="wt">KV cache · after {gb(taxMb, 1)} desktop tax</p>
+  <div class="sels">
+    <label class="sel">
+      Model
+      <select data-in="model">
+        {
+          models.map((m) => (
+            <option value={m.id} selected={m.selected} {...m.attrs}>
+              {m.label}
+            </option>
+          ))
+        }
+      </select>
+    </label>
+    <label class="sel">
+      KV dtype
+      <select data-in="dtype">
+        <option value="2">FP16</option>
+        <option value="1">FP8</option>
+      </select>
+    </label>
+  </div>
+  <div class="g2">
+    <div>
+      {
+        ranges.map((r) => (
+          <div class="rng">
+            <div class="r">
+              <label for={`${uid}-${r.key}`}>{r.label}</label>
+              <output for={`${uid}-${r.key}`} data-show={r.key}>{r.value}</output>
+            </div>
+            <input id={`${uid}-${r.key}`} type="range" data-in={r.key} min={r.min} max={r.max} step={r.step} value={r.value} />
+          </div>
+        ))
+      }
+    </div>
+    <div>
+      <div class="sbar" aria-hidden="true">
+        <i data-bar="weights" style="background:#3a3a42"></i><i data-bar="workspace" style="background:#6b6b73"></i><i
+          data-bar="kv"
+          style="background:var(--ac)"></i>
+      </div>
+      <dl aria-live="polite">
+        <dt>asked for (total × utilization)</dt><dd data-out="budget">–</dd>
+        <dt>free after the desktop</dt><dd data-out="free">–</dd>
+        <dt>weights</dt><dd data-out="weights">–</dd>
+        <dt>KV pool</dt><dd data-out="pool">–</dd>
+        <dt>KV per token</dt><dd data-out="per">–</dd>
+        <dt>KV these sequences need</dt><dd data-out="need">–</dd>
+        <dt>max sequences at this length</dt><dd data-out="max">–</dd>
+      </dl>
+      <p class="note" data-out="note" aria-live="polite"></p>
+    </div>
+  </div>
+  <p class="formula">
+    pool = {totalMb.toLocaleString('en-US')} MB × utilization − weights − {workspaceMb} MB workspace (an estimate). KV per token
+    = 2 × layers × KV heads × head dim × dtype bytes. needed = sequences × (prompt + output) × KV per token. Desktop
+    tax {taxMb.toLocaleString('en-US')} MB from data/{taxFrom}/env.json; weights from models.yaml.
+  </p>
+  <noscript><p class="formula">This widget needs JavaScript. The results table in this post has the measured numbers.</p></noscript>
+</div>
+
+<script>
+  import { kvCalc, modelFromOption, type KvStatus } from '../../lib/kv';
+  import { gb } from '../../lib/format';
+  import { onVisible } from '../../lib/onVisible';
+
+  const NOTES: Record<KvStatus, string> = {
+    'over-free': 'vLLM refuses to start: it asks for more than the desktop leaves free. Lower utilization.',
+    'no-room': 'Weights and workspace take the whole budget. No KV pool at all.',
+    preempt: 'KV pool exhausted: vLLM preempts and recomputes sequences.',
+    tight: 'Above 85% of the pool. One long prompt will preempt.',
+    ok: '',
+  };
+
+  function init(root: HTMLElement) {
+    const totalMb = Number(root.dataset.total);
+    const taxMb = Number(root.dataset.tax);
+    const workspaceMb = Number(root.dataset.workspace);
+    const input = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-in="${k}"]`)!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const bar = (k: string) => root.querySelector<HTMLElement>(`[data-bar="${k}"]`)!;
+    const num = (k: string) => Number(input<HTMLInputElement>(k).value);
+    const fmt: Record<string, (v: number) => string> = {
+      concurrency: (v) => String(v),
+      prompt: (v) => v.toLocaleString('en-US'),
+      output: (v) => v.toLocaleString('en-US'),
+      util: (v) => v.toFixed(2),
+    };
+
+    const run = () => {
+      for (const [k, f] of Object.entries(fmt)) {
+        const text = f(num(k));
+        root.querySelector<HTMLElement>(`[data-show="${k}"]`)!.textContent = text;
+        input<HTMLInputElement>(k).setAttribute('aria-valuetext', text);
+      }
+      const model = modelFromOption(input<HTMLSelectElement>('model').selectedOptions[0]);
+      const r = kvCalc({
+        totalMb,
+        taxMb,
+        model,
+        dtypeBytes: Number(input<HTMLSelectElement>('dtype').value),
+        concurrency: num('concurrency'),
+        promptTokens: num('prompt'),
+        outputTokens: num('output'),
+        utilization: num('util'),
+        workspaceMb,
+      });
+      const pct = (mb: number) => `${Math.max(0, Math.min(100, (mb / totalMb) * 100))}%`;
+      bar('weights').style.width = pct(model.size_mb);
+      bar('workspace').style.width = pct(workspaceMb);
+      bar('kv').style.width = pct(Math.min(r.neededMb, Math.max(0, r.poolMb)));
+      out('budget').textContent = gb(r.budgetMb);
+      out('free').textContent = gb(r.freeMb);
+      out('weights').textContent = gb(model.size_mb);
+      out('pool').textContent = gb(Math.max(0, r.poolMb));
+      out('per').textContent = `${(r.perToken / 1024).toFixed(0)} KB`;
+      out('need').textContent = gb(r.neededMb);
+      out('max').textContent = r.maxSequences.toLocaleString('en-US');
+      out('note').textContent = NOTES[r.status];
+    };
+
+    root.querySelectorAll('input, select').forEach((el) => el.addEventListener('input', run));
+    run();
+  }
+
+  onVisible('[data-widget="kv"]', init);
+</script>

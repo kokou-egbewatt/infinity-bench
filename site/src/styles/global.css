@@ -73,3 +73,5 @@ footer a:hover { color: var(--tx); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+:focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
