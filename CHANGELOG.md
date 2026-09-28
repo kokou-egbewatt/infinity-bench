@@ -4,7 +4,9 @@ All notable changes to infinity-bench are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-Every merged pull request adds a version here, and `site/package.json` carries the same number.
+Every merged pull request adds a version here, and `site/package.json` carries the same number;
+`ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
+structure.
 
 ## [Unreleased]
 
@@ -31,6 +33,16 @@ fails the build instead of rendering wrong
   `pnpm test` runs them.
 - **Draft fixture** `_example.mdx` covering every field, so `astro check` sees the whole schema.
 - **About profile card** with a photo, role and contact links.
+- **CHANGELOG.md** covering every release so far.
+- **CI workflow** (`.github/workflows/ci.yml`) on pull requests and `main`, with the version and its
+  changelog entry in the job summary:
+  - `ci/scripts/version-gate.sh`: a change under `site`, `bench`, `deploy`, `data`, `ci`,
+    `.github` or the Makefile needs a version bump in `site/package.json` and a new changelog
+    entry against `origin/main`.
+  - `ci/scripts/changelog-integrity.sh`: no duplicate versions, newest first, no skipped
+    versions, and the newest entry is the version in `site/package.json`.
+  - `ci/scripts/check-doc-links.sh`: every relative link in a tracked Markdown file resolves
+    inside the repository.
 
 ### Changed
 
