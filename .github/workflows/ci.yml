@@ -1,0 +1,46 @@
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  version_control:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Version and changelog updated
+        run: bash ci/scripts/version-gate.sh
+
+      - name: Changelog is sound
+        run: bash ci/scripts/changelog-integrity.sh
+
+      - name: Summary
+        if: always()
+        run: |
+          version=$(grep -m1 -E '^\s*"version":' site/package.json | sed -E 's/.*"version":\s*"([^"]+)".*/\1/')
+          {
+            echo "### 📦 infinity-bench \`$version\`"
+            echo
+            awk -v h="## [$version]" 'index($0, h) == 1 {p=1; print; next} p && /^## \[/ {exit} p' CHANGELOG.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Relative links resolve
+        run: bash ci/scripts/check-doc-links.sh

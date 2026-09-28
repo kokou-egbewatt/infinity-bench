@@ -1,10 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SERIES, NEXT_UP, postStatus, type PlannedPost, type PostStatus, type Source } from '../data/series';
+import { postStatus, type PlanEntry, type PostStatus, type Source } from '../data/series';
+import { resolveSeries } from '../lib/posts';
 import { getIssueStates, issueUrl, milestoneUrl, docUrl, REPOS } from '../lib/issues';
 import { url } from '../lib/url';
 
 const states = await getIssueStates();
+const { series: SERIES, nextUp: NEXT_UP } = await resolveSeries();
 
 const links = (sources: Source[]) =>
   sources.map((s) =>
@@ -15,7 +17,7 @@ const links = (sources: Source[]) =>
 
 // Only say something about status when it tells the reader something.
 // "Waiting on open issues" is the default and gets no label.
-const note = (p: PlannedPost) => {
+const note = (p: PlanEntry) => {
   const st = postStatus(p, states);
   if (st === 'ready') return { cls: 'ready', text: 'ready to write' };
   if (st === 'rented') return { cls: 'rented', text: 'needs rented hardware' };
@@ -34,12 +36,12 @@ const DOT_TITLE: Record<PostStatus, string> = {
   'no-source': 'planned, no issue yet',
 };
 
-const isPublished = (p: PlannedPost) => postStatus(p, states) === 'published';
+const isPublished = (p: PlanEntry) => postStatus(p, states) === 'published';
 const publishedBySeries = SERIES.map((s) => ({ s, posts: s.posts.filter(isPublished) })).filter((x) => x.posts.length);
 const nextUp = NEXT_UP.filter((p) => !isPublished(p));
 const NEXT_SHOWN = 2;
 
-const countLine = (posts: PlannedPost[]) => {
+const countLine = (posts: PlanEntry[]) => {
   const n = posts.filter(isPublished).length;
   const ready = posts.filter((p) => postStatus(p, states) === 'ready').length;
   const head = n ? `${n} of ${posts.length} published` : `${posts.length} planned`;

@@ -5,7 +5,7 @@
 // The request path and ID are filled in by the script below; without
 // JavaScript the page still shows the error shape and the links.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { ALL_POSTS } from '../data/series';
+import { resolveSeries } from '../lib/posts';
 import { REPOS } from '../lib/issues';
 import { url } from '../lib/url';
 
@@ -16,7 +16,8 @@ const pages = [
   { title: 'Corrections', href: url('/corrections'), tag: 'page' },
   { title: 'About', href: url('/about'), tag: 'page' },
 ];
-const posts = ALL_POSTS.map((p) => ({
+const { all } = await resolveSeries();
+const posts = all.map((p) => ({
   title: p.title,
   href: p.slug ? url(`/posts/${p.slug}`) : url(`/series#${p.series.id}`),
   tag: p.slug ? p.series.title : `planned · ${p.series.title}`,
