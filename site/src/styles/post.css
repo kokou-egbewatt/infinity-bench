@@ -17,7 +17,7 @@
 .hw .tag { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--warn); margin-bottom: 6px; }
 
 .prose { margin-top: 24px; }
-.prose p { color: #b9b9c0; line-height: 1.75; margin: 0 0 18px; font-size: 15.5px; }
+.prose p:not(.cap) { color: #b9b9c0; line-height: 1.75; margin: 0 0 18px; font-size: 15.5px; }
 .prose h2 { font-family: var(--serif); font-weight: 500; font-size: 24px; color: var(--hi); margin: 44px 0 12px; letter-spacing: -.01em; }
 .prose ul, .prose ol { color: #b9b9c0; margin: 0 0 18px 20px; padding: 0; line-height: 1.7; }
 .prose li { margin-bottom: 8px; }
@@ -32,7 +32,6 @@
 .prose td:first-child { font-family: var(--sans); font-size: 13.5px; }
 .prose th.num, .prose td.num { text-align: right; }
 .prose tr.hl td { background: rgba(94, 234, 212, .06); }
-.prose .cap { font-size: 12.5px; color: var(--tx3); margin: 0 0 22px; line-height: 1.55; }
 .pull { border-left: 2px solid var(--ac); padding: 4px 0 4px 16px; margin: 26px 0; font-family: var(--serif); font-size: 20px; line-height: 1.35; color: var(--hi); }
 .pull small { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--tx3); margin-top: 6px; }
 

@@ -10,6 +10,42 @@ structure.
 
 ## [Unreleased]
 
+## [0.5.0] - Widgets (2026-09-28)
+
+**The mock's two widgets, driven by the harness's files.** Rerunning a harness changes what a
+widget shows without a code edit
+([#8](https://github.com/kokou-egbewatt/infinity-bench/issues/8)).
+
+### Added
+
+- **`VramAccount`**: consumers and their MB from the post's `results.csv`, card size from its
+  `env.json`, model weights from `models.yaml`. Shows what is taken before load, the weights, what
+  is left, and the FP16 context that fits.
+- **`KvCalc`**: model, KV dtype, concurrency, prompt and output tokens, and
+  `gpu-memory-utilization`, against the desktop tax from `env.json`. Shows the pool, KV per token,
+  what the sequences need, and the most that fit, with the formula printed under it.
+- **`src/data/models.yaml`** as a `models` collection: weight sizes and the architecture fields the
+  KV arithmetic needs. Sizes are published figures, flagged for checking against the download.
+- **`src/lib/kv.ts`**: the arithmetic both widgets use, with Vitest tests.
+- **Widget registry** (`src/lib/widgets.ts`) for the Labs page; an unknown id in a post's
+  `widgets` fails the build.
+- Plain TypeScript, no framework: each widget initialises when it scrolls into view, and a post
+  with both ships about 3 KB of gzipped JavaScript. Every control has a label, ranges announce
+  their value, results are in a live region, and focus is visible site-wide. axe reports no
+  violations on either widget.
+
+### Changed
+
+- `noUnusedLocals` and `noUnusedParameters` are on, so dead code fails `pnpm check`.
+- One source for repository URLs (`src/lib/issues.ts`), topics (`TOPICS`) and GB formatting
+  (`src/lib/format.ts`); CSV and `env.json` reading shared by `ResultsTable`, the widgets and the
+  build checks.
+- `site/.gitignore` removed; the root `.gitignore` covers the site.
+
+### Removed
+
+- `getStats()`, unused until the status bar lands (#6); `computeStats()` stays with its tests.
+
 ## [0.4.0] - Post Components (2026-09-28)
 
 **A post renders like the mock, and its tables come from the harness's files.** A missing or
@@ -134,6 +170,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.5.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/18
 [0.4.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/17
 [0.3.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/16
 [0.2.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/15

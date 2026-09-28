@@ -1,12 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { SERIES, flatten, byPriority, type ResolvedSeries } from '../data/series';
-import { DATA_DIR } from './paths';
-import { computeStats } from './stats';
+import { readEnv } from './env';
 import { isoDate } from './format';
+import { WIDGET_IDS } from './widgets';
 
-export type Post = CollectionEntry<'posts'>;
+type Post = CollectionEntry<'posts'>;
 
 const planIds = new Set(SERIES.flatMap((s) => s.posts.map((p) => p.id).filter(Boolean)));
 
@@ -17,6 +15,8 @@ function check(posts: Post[]): void {
     const where = `post ${p.id} (${p.filePath ?? 'unknown file'})`;
     const { plan, data, harness, repo, draft } = p.data;
 
+    const unknown = p.data.widgets.filter((w) => !WIDGET_IDS.has(w));
+    if (unknown.length) throw new Error(`${where}: unknown widget ${unknown.join(', ')}; see src/lib/widgets.ts`);
     if (plan && !planIds.has(plan)) throw new Error(`${where}: plan "${plan}" is not an id in src/data/series.ts`);
 
     if (draft) continue;
@@ -26,9 +26,9 @@ function check(posts: Post[]): void {
       claimed.set(plan, p.id);
     }
 
-    const envPath = join(DATA_DIR, data, 'env.json');
-    if (!existsSync(envPath)) throw new Error(`${where}: ${envPath} not found`);
-    const git = JSON.parse(readFileSync(envPath, 'utf8')).git ?? {};
+    const env = readEnv(data);
+    if (!env) throw new Error(`${where}: data/${data}/env.json not found`);
+    const git = env.git ?? {};
     const sha = String(git.sha ?? '');
     if (!sha || !(sha.startsWith(harness) || harness.startsWith(sha))) {
       throw new Error(`${where}: harness ${harness} does not match env.json git.sha ${sha || '(missing)'}`);
@@ -50,10 +50,6 @@ export function getPosts(): Promise<Post[]> {
       .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
   });
   return cache;
-}
-
-export async function getStats() {
-  return computeStats(await getPosts());
 }
 
 /** The series plan with each entry's published post attached. */

@@ -11,7 +11,7 @@ hardware:
 cost: "$0 · fixture"
 harness: "0000000"
 data: _example
-widgets: []
+widgets: [vram, kv]
 corrections:
   - date: 2026-09-29
     text: Example correction, dated after the post.
@@ -43,7 +43,15 @@ make vram-accounting
 
 <PullQuote source="§2. Fixture.">A quoted finding goes here.</PullQuote>
 
-## 3. Open questions
+## 3. What is stealing it
+
+<VramAccount />
+
+## 4. KV-cache arithmetic
+
+<KvCalc />
+
+## 5. Open questions
 
 - One
 - Two

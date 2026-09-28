@@ -21,3 +21,7 @@ bench/**/raw/
 .env
 .DS_Store
 Thumbs.db
+
+# logs, local env variants
+*.log
+.env.*

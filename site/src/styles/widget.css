@@ -1,0 +1,27 @@
+/* Ported from the mock; dimmest labels use --tx2 so widget text meets 4.5:1. */
+.widget { border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin: 0 0 22px; background: var(--bg2); }
+.widget .wt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--tx2); margin: 0 0 12px; }
+.widget .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.widget fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.widget legend { padding: 0; margin-bottom: 8px; font-size: 12.5px; color: var(--tx2); }
+.widget .chk { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; margin-bottom: 6px; color: var(--tx); }
+.widget .chk input { margin-top: 3px; accent-color: var(--ac); }
+.widget label.sel { display: block; font-size: 12.5px; color: var(--tx2); margin-top: 10px; }
+.widget select { background: #08080a; border: 1px solid var(--line2); border-radius: 4px; color: var(--tx); font-family: var(--mono); font-size: 12px; padding: 4px 8px; margin-left: 6px; }
+.widget .sels { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.widget .sels label.sel { margin-top: 0; }
+.rng { font-size: 13px; margin-bottom: 12px; }
+.rng .r { display: flex; justify-content: space-between; color: var(--tx2); margin-bottom: 5px; }
+.rng output { font-family: var(--mono); color: var(--tx); }
+.widget input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: var(--line2); border-radius: 9px; margin: 8px 0; }
+.widget input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--hi); cursor: pointer; }
+.widget input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--hi); border: 0; cursor: pointer; }
+.widget dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-family: var(--mono); font-size: 12px; }
+.widget dt { color: var(--tx2); }
+.widget dd { margin: 0; color: var(--tx); text-align: right; }
+.widget .note { font-size: 12.5px; color: var(--warn); margin: 10px 0 0; min-height: 1.2em; }
+.widget .formula { font-family: var(--mono); font-size: 11px; color: var(--tx2); margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--line); line-height: 1.6; }
+.sbar { height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; display: flex; margin-bottom: 10px; }
+.sbar i { display: block; height: 100%; width: 0; transition: width .25s; }
+@media (prefers-reduced-motion: reduce) { .sbar i { transition: none; } }
+@media (max-width: 860px) { .widget .g2 { grid-template-columns: 1fr; } }

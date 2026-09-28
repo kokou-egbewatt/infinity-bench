@@ -5,7 +5,7 @@
 // Set GITHUB_TOKEN in CI to avoid the 60 requests/hour anonymous limit.
 
 export type RepoKey = 'nm' | 'ib';
-export type IssueState = 'open' | 'closed' | 'unknown';
+type IssueState = 'open' | 'closed' | 'unknown';
 
 export const REPOS: Record<RepoKey, { slug: string; short: string; url: string }> = {
   nm: { slug: 'kokou-egbewatt/NeuroMesh', short: 'NM', url: 'https://github.com/kokou-egbewatt/NeuroMesh' },

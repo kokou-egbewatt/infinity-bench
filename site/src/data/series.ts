@@ -12,13 +12,13 @@
 import type { IssueStates, RepoKey } from '../lib/issues';
 
 export const TOPICS = ['orchestration', 'serving', 'streaming', 'observability', 'agents', 'platform'] as const;
-export type Topic = (typeof TOPICS)[number];
+type Topic = (typeof TOPICS)[number];
 
 export type Source =
   | { repo: RepoKey; issue: number }
   | { repo: RepoKey; doc: string; label: string };
 
-export interface PlannedPost {
+interface PlannedPost {
   title: string;
   /** One or two sentences: the problem and what gets measured. Shown under Next up. */
   summary?: string;
