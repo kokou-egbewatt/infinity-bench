@@ -1,0 +1,26 @@
+name: Topic request
+description: Something you'd like measured or explained on the blog.
+title: "Topic: "
+labels: [topic-request]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: The question
+      description: What you want to know, as specifically as you can.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters to you
+      description: What you'd do differently with the answer. Helps me pick what to measure.
+  - type: dropdown
+    id: hardware
+    attributes:
+      label: Hardware
+      description: Most posts run on one RTX 5060 with 8 GB. Some questions need more.
+      options:
+        - Fits on a single consumer GPU
+        - Needs datacenter hardware
+        - Not sure

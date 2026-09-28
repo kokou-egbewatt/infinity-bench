@@ -10,6 +10,25 @@ structure.
 
 ## [Unreleased]
 
+## [0.5.1] - Docs and Issue Forms (2026-09-28)
+
+**The rules the build enforces are written down, and readers have a way in**
+([#20](https://github.com/kokou-egbewatt/infinity-bench/issues/20),
+[#19](https://github.com/kokou-egbewatt/infinity-bench/pull/19)).
+
+### Added
+
+- **`docs/writing-a-post.md`**: plan ids, data folders, frontmatter, what the build checks, the
+  components and their props, and the steps to publish.
+- **`CONTRIBUTING.md`**: readers report corrections and request topics through issues; pull
+  requests are not taken. Below that, notes for working on the repo: setup, the dev loop, the CI
+  checks, versioning.
+- **Issue forms** for a correction (page, what is wrong, evidence, how to be credited) and a topic
+  request, with `correction` and `topic-request` labels.
+- **ADRs** in `docs/adr/`: [0001](docs/adr/0001-series-plan-in-typescript.md) the series plan in
+  TypeScript, [0002](docs/adr/0002-data-outside-the-site.md) data outside the site,
+  [0003](docs/adr/0003-neuromesh-code-there-numbers-here.md) NeuroMesh code there, numbers here.
+
 ## [0.5.0] - Widgets (2026-09-28)
 
 **The mock's two widgets, driven by the harness's files.** Rerunning a harness changes what a
@@ -170,6 +189,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.5.1]: https://github.com/kokou-egbewatt/infinity-bench/pull/19
 [0.5.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/18
 [0.4.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/17
 [0.3.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/16

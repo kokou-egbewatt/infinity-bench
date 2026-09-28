@@ -1,0 +1,32 @@
+name: Correction
+description: A number, claim or page on the blog is wrong.
+title: "Correction: "
+labels: [correction]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Page
+      description: The post or page, as a link.
+      placeholder: https://kokou-egbewatt.github.io/infinity-bench/posts/...
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong
+      description: Quote the sentence or table row.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Why you think so
+      description: Your measurement, hardware, versions, a source. Anything that lets me check.
+    validations:
+      required: true
+  - type: input
+    id: credit
+    attributes:
+      label: Credit as
+      description: How to name you on the Corrections page. Leave empty to not be credited.
