@@ -3,7 +3,8 @@
 // Status is derived, never typed: a post is "ready" when every source issue
 // is closed (or the source is a doc that exists), "waiting" otherwise,
 // "rented" when it needs hardware beyond the RTX 5060, and "no source" when
-// neither repo has an issue for it yet. When a post publishes, set `slug`.
+// neither repo has an issue for it yet. An entry is published when a post's
+// frontmatter `plan` names its `id`; the link and date come from that post.
 //
 // `priority` puts a post under Next up on the Series page. Lower sorts first.
 // It is never shown: it's a rough intent, not a schedule or a promise of order.
@@ -24,7 +25,12 @@ export interface PlannedPost {
   sources: Source[];
   priority?: number;
   rented?: boolean;
-  /** Set both when the post goes live. */
+  /** Stable key a post's frontmatter `plan` points at. */
+  id?: string;
+}
+
+/** A planned post with its published post attached, if there is one. */
+export interface PlanEntry extends PlannedPost {
   slug?: string;
   published?: string; // YYYY-MM-DD
 }
@@ -38,9 +44,13 @@ export interface Series {
   posts: PlannedPost[];
 }
 
+export interface ResolvedSeries extends Omit<Series, 'posts'> {
+  posts: PlanEntry[];
+}
+
 export type PostStatus = 'published' | 'ready' | 'waiting' | 'rented' | 'no-source';
 
-export function postStatus(post: PlannedPost, states: IssueStates): PostStatus {
+export function postStatus(post: PlanEntry, states: IssueStates): PostStatus {
   if (post.slug) return 'published';
   if (post.rented) return 'rented';
   if (post.sources.length === 0) return 'no-source';
@@ -62,6 +72,7 @@ export const SERIES: Series[] = [
     posts: [
       {
         priority: 1,
+        id: 'vram-accounting',
         title: 'VRAM accounting on Windows: how much of the 8 GB is actually free',
         summary:
           'Before any model loads, the desktop, the browser and WSL2 already hold part of the card. I measure each one, so every later post can say how much memory it really had.',
@@ -69,6 +80,7 @@ export const SERIES: Series[] = [
       },
       {
         priority: 3,
+        id: 'dcgm-geforce',
         title: 'dcgm-exporter on a GeForce card: which fields report',
         summary:
           'Most GPU monitoring guides assume datacenter cards. A month of scraping every DCGM field on the 5060, sorted into works, always zero, and not supported, with GPU_UTIL against SM_ACTIVE as the comparison that matters.',
@@ -76,6 +88,7 @@ export const SERIES: Series[] = [
       },
       {
         priority: 4,
+        id: 'k3s-wsl2-gpu',
         title: 'k3s in WSL2 with a GPU, up and torn down by one command',
         summary:
           'The local cluster the rest of the series runs on: GPU Operator, device plugin and a GPU pod, timed from nothing to the first scheduled pod, and torn down again when it sits idle.',
@@ -83,6 +96,7 @@ export const SERIES: Series[] = [
       },
       {
         priority: 5,
+        id: 'timeslice-mps',
         title: 'Time-slicing vs MPS on one card',
         summary:
           'Three small services share the GPU two ways. I compare latency and SM use, and what happens to the other two when one of them runs out of memory. MIG doesn\'t exist on this card, so it\'s out of scope here.',
@@ -90,6 +104,7 @@ export const SERIES: Series[] = [
       },
       {
         priority: 7,
+        id: 'ebpf-cuda-launch',
         title: 'eBPF on the CUDA launch path under WSL2',
         summary:
           'Tracing where the time goes between a kernel launch in Python and work starting on the GPU, and how much of it WSL2\'s GPU passthrough adds.',
@@ -113,6 +128,7 @@ export const SERIES: Series[] = [
       { title: 'Gateway overhead with a stub backend', sources: nm(13) },
       {
         priority: 2,
+        id: 'vllm-8gb',
         title: 'vLLM on 8 GB: KV cache dtype, chunked prefill, and where it falls over',
         summary:
           'A 3B model hits the KV-cache wall after a handful of concurrent requests, the same wall an H100 hits much later. I sweep FP16 against FP8 KV cache and chunked prefill on and off, and report p99 time to first token and the batch size where preemption starts.',
@@ -122,6 +138,7 @@ export const SERIES: Series[] = [
       { title: 'Retrying failed inference calls at the gateway', sources: nm(5) },
       {
         priority: 10,
+        id: 'serving-70b-rented',
         title: 'Triton vs vLLM vs TensorRT-LLM at 70B',
         summary:
           'The one post that needs a rented 8×H100 node. Same model, same FP8 quantization and the same concurrency sweep on all three servers, compared on goodput at a fixed latency target, with the rental cost stated.',
@@ -167,6 +184,7 @@ export const SERIES: Series[] = [
       { title: 'Modelling GPU inventory', sources: nm(48, 49) },
       {
         priority: 6,
+        id: 'dra-one-device',
         title: 'DRA on k3s with one device',
         summary:
           'Dynamic Resource Allocation lets a pod ask for a GPU by its properties instead of by count. With a single device the scheduling is trivial, which makes the API and the move off the device plugin easy to see.',
@@ -175,6 +193,7 @@ export const SERIES: Series[] = [
       { title: 'KV-cache-aware routing', sources: nm(50) },
       {
         priority: 8,
+        id: 'kuberay-gang',
         title: 'KubeRay gang scheduling with one GPU and three jobs',
         summary:
           'Three Ray jobs that each want the whole GPU, run with and without gang admission. Partial scale-ups, deadlocks, and the GPU time they waste.',
@@ -182,6 +201,7 @@ export const SERIES: Series[] = [
       },
       {
         priority: 9,
+        id: 'kueue-fair-share',
         title: 'Kueue fair share with one GPU',
         summary:
           'Two tenants, one GPU. Quotas, borrowing and preemption in Kueue, and how long each tenant waits under each policy.',
@@ -189,6 +209,7 @@ export const SERIES: Series[] = [
       },
       {
         priority: 11,
+        id: 'goodput-keda',
         title: 'Goodput SLOs, and scaling on KV-cache utilization with KEDA',
         summary:
           'Autoscaling LLM serving on CPU scales on the wrong thing. I set an SLO on goodput and scale from one replica to two on KV-cache utilization and queue depth instead.',
@@ -234,6 +255,7 @@ export const SERIES: Series[] = [
     posts: [
       {
         priority: 12,
+        id: 'blueprint',
         title: 'The blueprint: Terraform, Argo CD and Backstage',
         summary:
           'The rest of this list, packaged so a new GPU workload can be requested from a template: Terraform modules underneath, Argo CD for the cluster add-ons, and Backstage in front.',
@@ -246,5 +268,7 @@ export const SERIES: Series[] = [
   },
 ];
 
-export const ALL_POSTS = SERIES.flatMap((s) => s.posts.map((p) => ({ ...p, series: s })));
-export const NEXT_UP = ALL_POSTS.filter((p) => p.priority).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
+export const flatten = (series: ResolvedSeries[]) => series.flatMap((s) => s.posts.map((p) => ({ ...p, series: s })));
+
+export const byPriority = <T extends PlannedPost>(posts: T[]) =>
+  posts.filter((p) => p.priority).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
