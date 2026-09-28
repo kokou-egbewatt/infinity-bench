@@ -8,7 +8,7 @@ const topics = ['all', 'orchestration', 'serving', 'streaming', 'observability',
   <div class="wrap">
     <div class="hero">
       <div>
-        <h1>GPU infrastructure, measured on the one GPU I own.</h1>
+        <h1>Platform Engineering GPU Infrastructure</h1>
         <p>I run Kubernetes with GPUs in it for a living. At home I have a single 8 GB RTX 5060, so that is what most of this is measured on. The physics is the same as an H100's; the fuse is shorter. Every post says which hardware produced its numbers, what it cost, and what I got wrong.</p>
       </div>
       <div class="rig">
@@ -26,7 +26,7 @@ const topics = ['all', 'orchestration', 'serving', 'streaming', 'observability',
     </div>
 
     <div class="sec">
-      <h2>Writing</h2>
+      <h2>Posts</h2>
       <div class="filters">
         {topics.map((t) => <a href={`?topic=${t}`} class:list={{ active: t === 'all' }}>{t}</a>)}
       </div>

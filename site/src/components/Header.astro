@@ -3,7 +3,7 @@ import { url, stripBase } from '../lib/url';
 
 const path = stripBase(Astro.url.pathname);
 const links = [
-  { href: '/', label: 'Writing', active: path === '/' || path.startsWith('/posts/') },
+  { href: '/', label: 'Posts', active: path === '/' || path.startsWith('/posts/') },
   { href: '/series', label: 'Series', active: path === '/series' },
   { href: '/labs', label: 'Labs', active: path === '/labs' },
   { href: '/corrections', label: 'Corrections', active: path === '/corrections' },

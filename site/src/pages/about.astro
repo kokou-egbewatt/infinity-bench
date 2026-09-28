@@ -6,12 +6,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <div class="wrap">
     <div class="simple">
       <h1>About</h1>
-      <p>I am Kokou. Eight-plus years of SRE and platform work, the last few on data and ML infrastructure: Kubernetes clusters with GPUs, model serving, the pipelines that feed them, and the observability that tells you which one is on fire.</p>
-      <p>At work the hardware is someone else's. At home it is one RTX 5060 with 8 GB, a six-core Ryzen, and WSL2. I decided to measure on that rather than wait for access to something bigger, and to be explicit about what transfers. Memory pressure, scheduler behaviour, KV-cache arithmetic, device plugin and DRA semantics, DCGM's field set: all of that is the same physics on a consumer card, it just arrives at batch 4 instead of batch 128. NVLink, MIG, and anything inter-node do not exist here, and each post says so in one sentence when it matters.</p>
-      <p>One opinion, so you know where I stand: most inference latency problems I have been called in on were scheduler problems wearing a memory problem's clothes. Look at the queue depth before you look at the allocator.</p>
-      <p>Stack, in the order I reach for it: Kubernetes (EKS, GKE, and k3s on this desk) with the NVIDIA GPU Operator, Kueue for admission, vLLM and llama.cpp for serving, Ray for anything that does not fit in one pod, Terraform and ArgoCD underneath, DCGM and Prometheus and a growing amount of eBPF on top. Python and Go for the glue.</p>
-      <p>Contact: <a href="mailto:hello@kokou.dev">hello@kokou.dev</a>, <a href="https://www.linkedin.com/in/kinfinity3/" target="_blank" rel="noopener">LinkedIn</a>, <a href="https://github.com/kokou-egbewatt" target="_blank" rel="noopener">GitHub</a>.</p>
-      <p class="cap">This site is static, built with Astro from the same repo as the harnesses. The interactive pieces are plain JavaScript. Type is Newsreader, Inter, and IBM Plex Mono.</p>
+      <p>I’m Kokou. Senior DevOps and platform engineer, recently dialed into data and ML infrastructure: bare-metal and EKS GPU clusters, high-throughput model serving pipelines, and the eBPF/DCGM observability that tells you exactly which node is melting down.</p>
+      <p>My local lab runs on an RTX card, a six-core Ryzen, and WSL2. I prefer profiling and benchmarking on local hardware right away over waiting on cloud quota approvals, especially since the mechanics scale directly. Memory pressure, KV-cache sizing, scheduler behavior, and NVIDIA DRA semantics follow the same core engineering principles whether you hit limits at batch 4 on a single workstation or batch 128 across multi-node clusters.</p>
+      <p>Core stack: Kubernetes (EKS in production, k3s locally), NVIDIA GPU Operator, Kueue, vLLM, and llama.cpp. I use Ray for distributed workloads, Terraform and ArgoCD for immutable GitOps pipelines, and Prometheus with eBPF for deep runtime tracing. Python and Go for custom controllers and automation glue.</p>
+      <p>Contact: <a href="mailto:kokou.egbewatt@gmail.com">Email</a>, <a href="https://www.linkedin.com/in/kinfinity3/" target="_blank" rel="noopener">LinkedIn</a>, <a href="https://github.com/kokou-egbewatt" target="_blank" rel="noopener">GitHub</a>.</p>
     </div>
   </div>
 </BaseLayout>

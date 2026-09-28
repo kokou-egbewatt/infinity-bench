@@ -2,7 +2,7 @@
 import { url } from '../lib/url';
 
 const links = [
-  ['/', 'writing'],
+  ['/', 'posts'],
   ['/series', 'series'],
   ['/labs', 'labs'],
   ['/corrections', 'corrections'],
@@ -13,7 +13,7 @@ const links = [
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Kokou · measured on one RTX 5060 unless stated</span>
+    <span>© 2026 Kokou</span>
     <span>
       {links.map(([href, label], i) => <>{i > 0 && ' · '}<a href={url(href)}>{label}</a></>)}
     </span>
