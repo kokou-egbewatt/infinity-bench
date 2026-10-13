@@ -10,6 +10,43 @@ structure.
 
 ## [Unreleased]
 
+## [0.7.0] - CI Runners (2026-10-13)
+
+**A post can be measured with the GPU idle.** Platform posts get a hardware kind of their own, and
+the first of them lands as a draft while its harness is still to be written
+([#23](https://github.com/kokou-egbewatt/infinity-bench/issues/23),
+[#24](https://github.com/kokou-egbewatt/infinity-bench/pull/24)).
+
+### Added
+
+- **`kind: cpu` hardware** with a required `host` string, for posts measured on the desktop with
+  the card idle. `HardwareBlock` draws a CPU die and records that the 5060 sat idle; home rows read
+  `no GPU` instead of `RTX 5060`.
+- **`ci-runners` series**: the runner fleet post, and a planned runner lab with a public copy of
+  the Compose file. The runner repository is private, so the series cites the harness here rather
+  than linking issues in it.
+- **The runner fleet post**, as a draft: a Docker daemon per runner so parallel jobs stop colliding
+  on fixed host ports, a registrar container so no job can read the GitHub App key, and what
+  `privileged: true` still costs. Section 11 is still to measure, so it stays out of production.
+- **The namespace pairs figure** for that post, stacking to one column under 760px.
+- **An SM grid** on the home page's rig card: 30 cells for the card's 30 SMs, a few drifting on. A
+  picture of the chip, not a readout.
+- **A `site` CI job** running `pnpm check`, `pnpm test` and `pnpm build`. The three `ci/scripts`
+  checks never touched the site, so a post that broke the build could merge green
+  ([#12](https://github.com/kokou-egbewatt/infinity-bench/issues/12)).
+
+### Changed
+
+- `EnvBlock` falls back to the host OS and distro when `env.json` records no GPU.
+- Markdown tables in a post are set in sans, not the mono `ResultsTable` uses for measurements, and
+  scroll in place on a narrow screen.
+- Home page rows fade in, staggered to the eighth row. Both it and the SM grid honour
+  `prefers-reduced-motion`.
+- The rig card's arch line names `sm_120` and the SM count.
+- **Drafts show in the home list under `pnpm dev`**, with a draft badge. They were filtered out
+  there too, so a draft had no link anywhere and the list read "Nothing here yet". Production is
+  unchanged.
+
 ## [0.6.0] - Pages From Post Data (2026-09-28)
 
 **Every list on the site is built from the posts.** One correction in one post's frontmatter
@@ -217,6 +254,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.7.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.6.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/21
 [0.5.1]: https://github.com/kokou-egbewatt/infinity-bench/pull/19
 [0.5.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/18
