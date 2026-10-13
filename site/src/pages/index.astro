@@ -67,7 +67,7 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
                 <span class="s">{d.dek}</span>
               </span>
               <span class="m">
-                {d.hardware.kind === 'rented' ? <span class="rent">rented {d.hardware.node}</span> : 'RTX 5060'}
+                {d.hardware.kind === 'rented' ? <span class="rent">rented {d.hardware.node}</span> : d.hardware.kind === 'cpu' ? 'no GPU' : 'RTX 5060'}
                 {d.repo === 'NeuroMesh' && (
                   <>
                     {' · '}

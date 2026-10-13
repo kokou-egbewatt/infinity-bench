@@ -22,6 +22,7 @@ const packages = Object.entries(env?.packages ?? {}).filter(([, v]) => v);
             <br />
           </>
         )}
+        {!env.gpu?.name && env.host?.os && <><b>{env.host.os}</b>{env.host.distro && <>, {env.host.distro}</>}<br /></>}
         {env.cluster?.k3s && <>k3s {env.cluster.k3s}<br /></>}
         {packages.map(([k, v]) => <>{k} {v}<br /></>)}
       </>
