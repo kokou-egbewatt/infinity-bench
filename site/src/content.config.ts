@@ -14,6 +14,8 @@ const correction = z.object({
 
 const hardware = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('local') }),
+  // Platform posts measured on the same machine with the GPU idle.
+  z.object({ kind: z.literal('cpu'), host: z.string() }), // e.g. "Ryzen 5 8400F, Windows 11, WSL2"
   z.object({
     kind: z.literal('rented'),
     node: z.string(), // e.g. "8 × H100 SXM 80 GB"

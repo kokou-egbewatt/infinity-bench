@@ -247,6 +247,30 @@ export const SERIES: Series[] = [
     ],
   },
   {
+    id: 'ci-runners',
+    title: 'CI runners',
+    description:
+      'Platform work, not GPU work. The self-hosted GitHub Actions fleet on the same desktop, measured with the card idle. The runner repository is private, so these posts cite the harness here rather than issues.',
+    topic: 'platform',
+    home: { repo: 'ib', label: 'infinity-bench' },
+    posts: [
+      {
+        priority: 2,
+        id: 'desktop-runner-fleet',
+        title: 'My desktop as a GitHub Actions runner fleet',
+        summary:
+          'CI stopped starting for every repository. One machine, two runner classes, a Docker daemon per runner, and a registrar so no job can read a credential.',
+        sources: [],
+      },
+      {
+        title: 'Runner lab: break the fleet three ways',
+        summary:
+          'A public copy of the Compose file with three exercises: collide two jobs on port 5432, read the key out of /proc, and see what a restarted container keeps.',
+        sources: [],
+      },
+    ],
+  },
+  {
     id: 'operations',
     title: 'Running it for real',
     description: 'Phase 7. Terraform and Argo CD environments, canaries, SLOs that page someone, and a game day.',

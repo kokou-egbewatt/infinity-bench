@@ -8,7 +8,9 @@ import { gb, isoDate, readTime } from '../lib/format';
 import { url } from '../lib/url';
 
 const topics = ['all', ...TOPICS];
-const posts = (await getPosts()).filter((p) => !p.data.draft);
+// getPosts() keeps drafts in dev; list them here too, marked, so a draft is reachable from the
+// home page instead of only by typing its URL. Production is unchanged.
+const posts = (await getPosts()).filter((p) => import.meta.env.DEV || !p.data.draft);
 const elsewhere = await getCollection('elsewhere');
 
 const rig = readEnv('vram-accounting');
@@ -29,11 +31,12 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
         <div class="t">The rig</div>
         <dl>
           <dt>gpu</dt><dd>GeForce RTX 5060, 8 GB GDDR7</dd>
-          <dt>arch</dt><dd>Blackwell, compute 12.0</dd>
+          <dt>arch</dt><dd>Blackwell sm_120, 30 SMs</dd>
           <dt>driver</dt><dd>616.56, CUDA 13.4</dd>
           <dt>cpu</dt><dd>Ryzen 5 8400F, 6c/12t</dd>
           <dt>host</dt><dd>Windows 11, WSL2, k3s</dd>
         </dl>
+        <div class="sms" aria-hidden="true">{Array.from({ length: 30 }, () => <i class="sm" />)}</div>
         <div class="vbar">
           {measured && <i style={`width:${taxPct}%;background:#3a3a42`} title="desktop"></i>}
           <i style={`width:${100 - taxPct}%;background:var(--ac)`} title="free"></i>
@@ -56,18 +59,19 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
     </div>
     <div class="list">
       {
-        posts.map((p) => {
+        posts.map((p, i) => {
           const d = p.data;
           const n = d.corrections.length;
           return (
-            <div class="row" data-topic={d.topic}>
+            <div class="row" data-topic={d.topic} style={`--i:${i}`}>
               <span class="d">{isoDate(d.date)}</span>
               <span>
                 <a class="t" href={url(`/posts/${p.id}`)}>{d.title}</a>
+                {d.draft && <span class="draft">draft</span>}
                 <span class="s">{d.dek}</span>
               </span>
               <span class="m">
-                {d.hardware.kind === 'rented' ? <span class="rent">rented {d.hardware.node}</span> : 'RTX 5060'}
+                {d.hardware.kind === 'rented' ? <span class="rent">rented {d.hardware.node}</span> : d.hardware.kind === 'cpu' ? 'no GPU' : 'RTX 5060'}
                 {d.repo === 'NeuroMesh' && (
                   <>
                     {' · '}
@@ -101,4 +105,18 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
   for (const a of document.querySelectorAll<HTMLElement>('.filters a')) a.classList.toggle('active', a.dataset.topic === topic);
   const empty = document.querySelector<HTMLElement>('.list .empty');
   if (empty) empty.hidden = rows.some((r) => !r.hidden);
+
+  // The rig card's 30 SMs: a few drift on and off. A picture of the chip, not a readout.
+  const sms = [...document.querySelectorAll<HTMLElement>('.sms .sm')];
+  if (sms.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const tick = () => {
+      if (document.hidden) return;
+      for (const c of sms) {
+        const r = Math.random();
+        c.className = 'sm' + (r < 0.05 ? ' hot' : r < 0.22 ? ' on' : '');
+      }
+    };
+    setTimeout(tick, 900);
+    setInterval(tick, 2200);
+  }
 </script>
