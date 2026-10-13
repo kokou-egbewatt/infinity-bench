@@ -1,0 +1,171 @@
+---
+title: My desktop as a GitHub Actions runner fleet
+dek: CI stopped starting for every repository in the organisation. I moved it onto self-hosted runners on the desktop I already had, and this is what that took.
+date: 2026-10-13
+topic: platform
+plan: desktop-runner-fleet
+repo: infinity-bench
+hardware:
+  kind: cpu
+  host: Ryzen 5 8400F, 6c/12t, Windows 11, WSL2, Docker Compose
+cost: "$0 · one machine, GPU idle"
+harness: "0000000"
+data: gha-runners
+draft: true
+---
+
+Every job across ten private repositories stopped starting on GitHub-hosted runners. Self-hosted runners consume no Actions minutes, so I built a small fleet on the one machine I had. Each runner that needs Docker gets its own daemon and shares its network namespace, so two jobs publishing port 5432 don't fight. One container holds the GitHub App key and runs no job; runners ask it for a single-use config over a unix socket. The dind class is still `privileged: true` and the shared tool cache is a channel between jobs. Both are written down here rather than left out.
+
+## 1. Why this exists
+
+<PullQuote>A CI system you do not control is a dependency like any other. It can go away on a Tuesday.</PullQuote>
+
+Every workflow in the organisation started failing the same way. A job would queue, run for about two seconds, execute zero steps and stop. That was 27 workflows and 83 jobs across ten repositories, none of it caused by the code. GitHub-hosted runners had stopped being available to the account, and with branch protection on every repository nothing merged without CI.
+
+Self-hosted runners consume no Actions minutes. I had a desktop with a Ryzen 5 8400F, Windows 11 and WSL2, and it was already running the local Kubernetes nodes for everything else. So the question became how to put ten repositories' CI on one machine without handing every job the keys to it.
+
+Two things we had been working around rather than fixing also fell out of owning the runners:
+
+- **Fixed host ports stop colliding.** The identity service has a contract suite and an integration suite that both publish Postgres on 5432 and Redis on 6379, and they run in parallel. On a shared host they fight. I hit this under `act` twice before I understood it.
+- **Toolchains stop being re-downloaded.** Every job rebuilt its toolchain from nothing. The Rust media service compiled in release mode twice per run with no cache at all.
+
+## 2. What I needed
+
+Jobs with a `services:` block have to run in parallel without colliding. Workflows don't change beyond the `runs-on` line. No job can read a credential that outlives it. Toolchains download once. And one change has to move every repository back to GitHub-hosted runners, because the day this fleet breaks that is the thing I will want.
+
+Not in scope: Kubernetes, more than one machine, and being safe against a job that is actively trying to break out. With one host and no budget that last one isn't available, and I would rather say so than imply it.
+
+## 3. The options
+
+Most jobs lint, run unit tests or render a Helm chart and need no Docker at all. Six of them start containers, and those six are where the options differ. If you are about to self-host, this table is the decision you are actually making, whether or not you write it down.
+
+| Option | Published ports | Shared by concurrent jobs | Reaches root outside the job | Why not |
+| --- | --- | --- | --- | --- |
+| Mount the host's Docker socket | collide on the host | one daemon for all of them | yes, the socket is the API | the port collisions that started this, plus an unauthenticated root API shared by every job |
+| **A `docker:dind` daemon per runner** | contained in the pair | nothing in common | yes, one step further, via the privileged daemon | chosen |
+| Rootless dind | contained | nothing in common | mostly closed | `kind` and buildx are fragile under it, and the two jobs that need a daemon most are a kind cluster and an image build |
+| Actions Runner Controller on Kubernetes | per pod | nothing in common | depends on the dind mode | needs a cluster to be healthy before CI can run; Compose moves to any machine with Docker on it |
+| GitHub larger runners | per VM | nothing in common | no | billed by the minute, which is the thing that had just stopped working |
+
+The comparison is not isolated against not isolated. Three of the five reach root somewhere. The chosen row buys per-pair containment and the port fix, not safety from a determined job.
+
+## 4. Why a daemon per runner, and not the host's socket
+
+Each runner that needs Docker is paired with its own `docker:28-dind` sidecar, and the runner joins the sidecar's network namespace with `network_mode: "service:dind-1"`. A job's `services:` block publishes 5432, the job connects to `localhost:5432`, and `localhost` means the same thing to the job and to the containers started for it. A second pair publishes 5432 too and neither notices, because the port is published inside the pair's namespace, not on the host.
+
+<div class="pairs">
+  <div class="pair">
+    <div class="t">pair 1 · one network namespace</div>
+    <div class="box r">runner · network_mode: service:dind-1</div>
+    <div class="box priv">dind-1 · privileged</div>
+    <div class="box svc">postgres:15 · published 5432</div>
+    <div class="box svc">redis:7 · published 6379</div>
+  </div>
+  <div class="pair">
+    <div class="t">pair 2 · its own namespace</div>
+    <div class="box r">runner · network_mode: service:dind-2</div>
+    <div class="box priv">dind-2 · privileged</div>
+    <div class="box svc">postgres:15 · published 5432</div>
+  </div>
+  <div class="host">one Docker host · both pairs publish 5432 · no collision</div>
+</div>
+
+The light class, which serves most jobs, has no daemon at all. The split exists so that a one-line changelog check does not run beside a privileged daemon.
+
+The daemon's TCP port is bound to the loopback and nothing else:
+
+```yaml
+command: ["dockerd", "--host=tcp://127.0.0.1:2375", "--host=unix:///var/run/docker.sock"]
+```
+
+`DOCKER_TLS_CERTDIR` is empty, so that port has no authentication. Only the paired runner needs it and it shares the namespace, so loopback is enough; bound to `0.0.0.0` it would be one `ports:` entry away from leaving the host. Naming `dockerd` first is load-bearing rather than tidy. `dockerd-entrypoint.sh` prepends its own `--host=tcp://0.0.0.0:2375` whenever the first argument starts with a dash, and skips that only when the first argument is the command itself. Pass only the addresses and both listeners are configured, they collide on 2375, and the daemon dies with "port is already allocated" in a restart loop. The earlier config had survived only because its `0.0.0.0` was an exact duplicate of what the entrypoint was adding anyway.
+
+## 5. Where the credential lives
+
+<PullQuote>Anything a job can read, a job will eventually read.</PullQuote>
+
+Nowhere a job can reach it. The first version put the GitHub App private key in every runner's environment, which is what most of the guides do.
+
+Held there it was readable by every job. The environment is inherited by every step, and unsetting the variable would not have helped, because a job runs as the same uid as PID 1 and `/proc/1/environ` keeps the original block. The key registers runners anywhere in the organisation with any label. A job could have registered a runner with the light label, waited for another repository's job, and read its secrets. The key is long-lived and works from anywhere, so it outlived the container, the fleet and the host.
+
+So one container holds it and runs no job. A runner sends its hostname over a unix socket and gets back a single-use JIT config. GitHub deletes a JIT runner when its job finishes, which is why nothing here registers or deregisters, and why there is no registration token to expire by lunchtime.
+
+```bash
+# the whole of what a runner can do about registering
+JIT_CONFIG=$(hostname | socat -t 30 - "UNIX-CONNECT:${JIT_SOCKET}")
+./run.sh --jitconfig "$JIT_CONFIG"
+```
+
+Two details do most of the work:
+
+- **A unix socket on a volume, not HTTP on a network.** A dind runner shares its sidecar's namespace and cannot be given a network of its own. HTTP is possible, since the sidecar can join one, but it buys a TCP listener that everything on that network can reach. A volume reaches both classes the same way with no listener at all.
+- **One socket per class, each on its own volume.** A runner mounts only its own class's socket, so a light runner cannot mint itself a dind runner. Permissions could not do this job: the base image gives `runner` passwordless sudo, so anything in the container can become root and ignore the mode bits. The separate volumes are the boundary, and the mount is read-only so a job cannot unlink the socket or plant one of its own.
+
+The runner image carries no App key, no registration token and no PAT, and CI asserts that on the built image so a regression fails the build.
+
+## 6. What is ephemeral, and what is not
+
+`restart: always` restarts a container. It does not recreate it. If you take one thing from this section, take that.
+
+GitHub treats the runner as ephemeral, because it is: one job, then the registration is gone. On disk it is not, and the difference cost me twice. One container had run 21 jobs holding checkouts from seven repositories, each readable by the next, and a half-installed Python from an earlier job failed a later one with `libpython3.12.so.1.0: cannot open shared object file`.
+
+The entrypoint now clears `_work` on every start, from an absolute path, never a variable that could be empty. That is what makes the checkout per-job. The rest of the container filesystem still carries over. Making it fresh needs `read_only: true` plus tmpfs, which is tracked and not done.
+
+The caches are shared on purpose. Re-fetching a Go toolchain or a 115 MB browser for every job is the cost GitHub-hosted runners already imposed on us, so `/opt/hostedtoolcache`, the cargo registry, Go's module cache, uv, pnpm and Playwright's browsers live in named volumes shared by every runner of both classes. cargo, go, uv and pnpm all lock their caches, so concurrent access is safe. What locking does not give is integrity. These volumes outlive the container, and they are the one place a job can leave something behind for a job in another repository to execute:
+
+| Cache | If a job poisons it |
+| --- | --- |
+| cargo registry, Go modules, pnpm store | content hashes are checked against a lockfile; a bad entry fails rather than runs |
+| `/opt/hostedtoolcache`, Playwright browsers | plain binaries, executed with no verification once cached |
+
+A per-repository volume is not available as a fix. A runner registers before GitHub assigns it a job, so the repository is unknowable at mount time. Resetting the caches on a schedule, to bound how long a poisoned one survives, is tracked.
+
+## 7. What broke
+
+Three of these cost me an evening each. I am listing them so you do not have to.
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| every dind replica saw the same ports and the same hostname | `network_mode: service:dind` resolves to the first replica, so `replicas: 3` put three runners in one namespace | write the pairs out, one Compose profile each, so `make up DIND=2` starts two |
+| runner got an empty config; registrar log said `jq: writing output failed: Broken pipe` | the runner sends its hostname and half-closes; socat tears down the other direction 0.5 s later, and minting takes several API calls | `socat -t 30` |
+| a config that didn't parse | the mint script logged to stdout, and stdout was the config | log to stderr, everywhere |
+
+One more, a limit rather than a bug. Docker container actions work on neither class. The light class has no daemon. On a dind runner the action's container is created by the sidecar daemon, which has its own filesystem and cannot bind-mount the runner's workspace, so the action starts and cannot see the checkout. hadolint and shellcheck both ship as container actions, so both are baked into the image as binaries instead.
+
+## 8. What this does not buy
+
+A daemon per runner is `privileged: true`. A privileged container can mount host devices and load kernel modules, so a job on the dind class still reaches root outside its own container. On this machine the blast radius is the WSL2 VM, which also holds every local Kubernetes node and everything else running in Docker. Two things follow. The dind list stays as short as it is, because that is the population running beside a privileged daemon. And nothing on this host holds a credential the fleet is not allowed to reach.
+
+The registrar removes the stealable key. It does not close every path. A job can open its own class's socket and mint a config for that same class while the fleet is up. There is no long-lived secret in that, nothing that works after `make down`, and no way across classes, but it is not zero. Closing it completely means minting outside any job-reachable container, which trades away Compose's `restart: always` and the portability Compose was chosen for.
+
+The fleet registers into a named runner group with an explicit repository list, not `Default`, which is visible to every repository in the organisation including the ones created after you stop looking. Public repositories are blocked on the group and the organisation does not allow private repositories to be forked. What that does not cover is anyone with write access to one of the listed repositories, who can push a branch and run code here.
+
+## 9. Going back
+
+Every workflow's `runs-on` line reads one organisation variable with a fallback:
+
+```yaml
+runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+```
+
+Set this up before the first runner comes online, not after. Unset the variable and ten repositories are back on GitHub-hosted runners without a commit. The repository that builds the fleet also runs on the fleet. The first version kept it on GitHub-hosted runners to avoid a broken image being the thing that prevents fixing the image, but those runners were the ones that had stopped, so that pipeline never ran once. The escape hatch is local instead: `make ci` runs every check on a laptop with no GitHub at all, which is how the fleet was built in the first place.
+
+## 10. What I would change
+
+- Rootless dind, once `kind` and buildx are reliable under it. That closes most of section 8.
+- Actions Runner Controller if the fleet ever outgrows one machine, with a cache per tenant and a runner group per trust level.
+- Dropping passwordless sudo from the runner image. It needs an audit of which jobs still install their own packages, so it is tracked rather than done.
+
+## 11. Numbers
+
+Still to measure: job pickup latency p50 and p95 against GitHub-hosted, cold versus warm cache on the Rust build and the Playwright suite, and host memory with three dind pairs up. The harness lives in this site's repository so the run can be repeated, and if your numbers disagree with mine I want to hear it.
+
+And in case of a fire at the office: unset the variable, then run to safety.
+
+## 12. Sources
+
+- [GitHub: security hardening for self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/security-hardening-for-self-hosted-runners)
+- [GitHub REST: create configuration for a just-in-time runner](https://docs.github.com/en/rest/actions/self-hosted-runners#create-configuration-for-a-just-in-time-runner-for-an-organization)
+- [Compose file reference: network_mode](https://docs.docker.com/reference/compose-file/services/#network_mode)
+- [docker-library: dockerd-entrypoint.sh](https://github.com/docker-library/docker/blob/master/dockerd-entrypoint.sh)
+- [actions/runner-images](https://github.com/actions/runner-images), the base the runner image is built from
