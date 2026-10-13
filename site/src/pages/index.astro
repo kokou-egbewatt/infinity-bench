@@ -8,7 +8,9 @@ import { gb, isoDate, readTime } from '../lib/format';
 import { url } from '../lib/url';
 
 const topics = ['all', ...TOPICS];
-const posts = (await getPosts()).filter((p) => !p.data.draft);
+// getPosts() keeps drafts in dev; list them here too, marked, so a draft is reachable from the
+// home page instead of only by typing its URL. Production is unchanged.
+const posts = (await getPosts()).filter((p) => import.meta.env.DEV || !p.data.draft);
 const elsewhere = await getCollection('elsewhere');
 
 const rig = readEnv('vram-accounting');
@@ -65,6 +67,7 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
               <span class="d">{isoDate(d.date)}</span>
               <span>
                 <a class="t" href={url(`/posts/${p.id}`)}>{d.title}</a>
+                {d.draft && <span class="draft">draft</span>}
                 <span class="s">{d.dek}</span>
               </span>
               <span class="m">
