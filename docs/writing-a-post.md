@@ -67,8 +67,7 @@ A broken post fails `pnpm build` with the file and the reason:
 | Every `ResultsTable` file exists, has rows, and has the columns it names | `ResultsTable.astro` |
 
 Drafts skip the `env.json` check and never reach a production build. `pnpm dev` shows them at
-`/posts/<file name>`. `site/src/content/posts/_example.mdx` is a draft using every field and
-component, backed by `data/_example/`.
+`/posts/<file name>`, and lists them on the home page with a draft badge.
 
 ## 5. Components
 

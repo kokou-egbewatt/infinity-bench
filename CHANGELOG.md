@@ -47,6 +47,13 @@ the first of them lands as a draft while its harness is still to be written
   there too, so a draft had no link anywhere and the list read "Nothing here yet". Production is
   unchanged.
 
+### Removed
+
+- **The `_example.mdx` draft fixture and `data/_example/`.** It was the only post exercising
+  `ResultsTable`, `VramAccount`, `KvCalc`, `corrections` and `widgets`, so `astro check` no longer
+  type-checks those through a post until a real one uses them. `docs/writing-a-post.md` and
+  [ADR-0002](docs/adr/0002-data-outside-the-site.md) no longer point at it.
+
 ## [0.6.0] - Pages From Post Data (2026-09-28)
 
 **Every list on the site is built from the posts.** One correction in one post's frontmatter
