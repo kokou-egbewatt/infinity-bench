@@ -6,10 +6,18 @@ import { REPO_NAMES } from './lib/env';
 
 const date = z.coerce.date().refine((d) => !Number.isNaN(d.valueOf()), 'invalid date');
 
-const correction = z.object({
+// An erratum: a published number or claim that was wrong. `credit` names the reader who found it.
+const erratum = z.object({
   date,
   text: z.string().min(10),
   credit: z.string().optional(),
+});
+
+// A change that is not an error: new results, a re-run harness, a section added. Typos and wording
+// fixes do not get one; an entry is for something that changes what a reader takes away.
+const change = z.object({
+  date,
+  text: z.string().min(10),
 });
 
 const hardware = z.discriminatedUnion('kind', [
@@ -42,13 +50,18 @@ const posts = defineCollection({
         .regex(/^[0-9a-f]{7,40}$/), // commit in `repo`
       data: z.string(), // folder under /data
       widgets: z.array(z.string()).default([]),
-      corrections: z.array(correction).default([]),
+      errata: z.array(erratum).default([]),
+      changes: z.array(change).default([]),
       draft: z.boolean().default(false),
     })
     .refine((p) => !p.updated || p.updated >= p.date, { message: 'updated is before date', path: ['updated'] })
-    .refine((p) => p.corrections.every((c) => c.date >= p.date), {
-      message: 'correction dated before the post',
-      path: ['corrections'],
+    .refine((p) => p.errata.every((c) => c.date >= p.date), {
+      message: 'erratum dated before the post',
+      path: ['errata'],
+    })
+    .refine((p) => p.changes.every((c) => c.date >= p.date), {
+      message: 'change dated before the post',
+      path: ['changes'],
     }),
 });
 

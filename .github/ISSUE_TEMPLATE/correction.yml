@@ -8,7 +8,7 @@ body:
     attributes:
       label: Page
       description: The post or page, as a link.
-      placeholder: https://kokou-egbewatt.github.io/infinity-bench/posts/...
+      placeholder: https://kokou.dev/posts/...
     validations:
       required: true
   - type: textarea
@@ -29,4 +29,4 @@ body:
     id: credit
     attributes:
       label: Credit as
-      description: How to name you on the Corrections page. Leave empty to not be credited.
+      description: How to name you in the Errata. Leave empty to not be credited.
