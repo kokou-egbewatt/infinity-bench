@@ -13,7 +13,8 @@ const pages = [
   { title: 'Posts', href: url('/'), tag: 'page' },
   { title: 'Series', href: url('/series'), tag: 'page' },
   { title: 'Labs', href: url('/labs'), tag: 'page' },
-  { title: 'Corrections', href: url('/corrections'), tag: 'page' },
+  { title: 'Changelog', href: url('/changelog'), tag: 'page' },
+  { title: 'Errata', href: url('/errata'), tag: 'page' },
   { title: 'About', href: url('/about'), tag: 'page' },
 ];
 const { all } = await resolveSeries();
@@ -46,7 +47,7 @@ const candidates = JSON.stringify({
         That's the exact error the{' '}
         <a href={`${REPOS.nm.url}/blob/main/services/gateway/internal/httpapi/httpapi.go`}>NeuroMesh gateway</a>{' '}
         returns for a path it doesn't know. If a link on this site sent you here, it's my mistake and it goes on
-        the <a href={url('/corrections')}>Corrections</a> page.
+        the <a href={url('/errata')}>Errata</a>.
       </p>
 
       <div class="sug">

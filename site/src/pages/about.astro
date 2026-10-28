@@ -1,6 +1,55 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { url } from '../lib/url';
+import SocialIcons from '../components/SocialIcons.astro';
+
+// The tools I work in, grouped by what they do for me. Each badge links to the project.
+const STACK = [
+  {
+    role: 'Orchestration',
+    tools: [
+      { name: 'Kubernetes', href: 'https://kubernetes.io/' },
+      { name: 'EKS', note: 'production', href: 'https://aws.amazon.com/eks/' },
+      { name: 'k3s', note: 'locally', href: 'https://k3s.io/' },
+    ],
+  },
+  {
+    role: 'GPUs and scheduling',
+    tools: [
+      { name: 'NVIDIA GPU Operator', href: 'https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/' },
+      { name: 'Kueue', href: 'https://kueue.sigs.k8s.io/' },
+    ],
+  },
+  {
+    role: 'Serving',
+    tools: [
+      { name: 'vLLM', href: 'https://docs.vllm.ai/' },
+      { name: 'llama.cpp', href: 'https://github.com/ggml-org/llama.cpp' },
+    ],
+  },
+  { role: 'Distributed workloads', tools: [{ name: 'Ray', href: 'https://www.ray.io/' }] },
+  {
+    role: 'Immutable GitOps',
+    tools: [
+      { name: 'Terraform', href: 'https://developer.hashicorp.com/terraform' },
+      { name: 'Argo CD', href: 'https://argo-cd.readthedocs.io/' },
+    ],
+  },
+  {
+    role: 'Runtime tracing',
+    tools: [
+      { name: 'Prometheus', href: 'https://prometheus.io/' },
+      { name: 'eBPF', href: 'https://ebpf.io/' },
+    ],
+  },
+  {
+    role: 'Controllers and glue',
+    tools: [
+      { name: 'Python', href: 'https://www.python.org/' },
+      { name: 'Go', href: 'https://go.dev/' },
+    ],
+  },
+];
 ---
 
 <BaseLayout title="About">
@@ -13,19 +62,32 @@ import { url } from '../lib/url';
         <div>
           <div class="name">Kokou Egbewatt</div>
           <div class="role">Senior DevOps and Platform Engineer</div>
-          <div class="links">
-            <a href="mailto:kokou.egbewatt@gmail.com">email</a>
-            <a href="https://www.linkedin.com/in/kinfinity3/" target="_blank" rel="noopener">linkedin</a>
-            <a href="https://github.com/kokou-egbewatt" target="_blank" rel="noopener">github</a>
-          </div>
+          <div class="links"><SocialIcons email size={20} /></div>
         </div>
       </div>
 
       <p>These days I mostly work on data and ML infrastructure: bare-metal and EKS GPU clusters, high-throughput model serving pipelines, and the eBPF/DCGM observability that tells you exactly which node is melting down.</p>
       <p>My local lab runs on an RTX 5060 with 8 GB, a six-core Ryzen, and WSL2. We would be profiling and benchmarking on local hardware over waiting on cloud quota approvals, especially since the mechanics scale directly. Memory pressure, KV-cache sizing, scheduler behavior, and NVIDIA DRA semantics follow the same core engineering principles whether you hit limits at batch 4 on a single workstation or batch 128 across multi-node clusters.</p>
       <p>Most of what I write here comes out of <a href="https://github.com/kokou-egbewatt/NeuroMesh" target="_blank" rel="noopener">NeuroMesh</a>, the AI runtime I'm building, and <a href="https://github.com/kokou-egbewatt/infinity-bench" target="_blank" rel="noopener">infinity-bench</a>, which holds this site and the harnesses behind its numbers.</p>
-      <p>Core stack: Kubernetes (EKS in production, k3s locally), NVIDIA GPU Operator, Kueue, vLLM, and llama.cpp. I use Ray for distributed workloads, Terraform and Argo CD for immutable GitOps pipelines, and Prometheus with eBPF for deep runtime tracing. Python and Go for custom controllers and automation glue.</p>
-      <p>If something I published is wrong, <a href="mailto:kokou.egbewatt@gmail.com">email me</a>. I'll fix it and credit you on the <a href={url('/corrections')}>Corrections</a> page.</p>
+      <h2 class="sh">Core stack</h2>
+      <div class="corestack">
+        {
+          STACK.map((g) => (
+            <div class="cs-row">
+              <span class="cs-role">{g.role}</span>
+              <span class="cs-tools">
+                {g.tools.map((t) => (
+                  <a href={t.href} target="_blank" rel="noopener">
+                    {t.name}
+                    {t.note && <small>{t.note}</small>}
+                  </a>
+                ))}
+              </span>
+            </div>
+          ))
+        }
+      </div>
+      <p>If something I published is wrong, <a href="mailto:kokou.egbewatt@gmail.com">email me</a>. I'll fix it and credit you in the <a href={url('/errata')}>Errata</a>.</p>
     </div>
   </div>
 </BaseLayout>
@@ -58,18 +120,10 @@ import { url } from '../lib/url';
   }
   .links {
     display: flex;
-    gap: 14px;
-    font-family: var(--mono);
-    font-size: 11.5px;
+    margin-top: 2px;
   }
-  .links a {
-    color: var(--tx3);
-    text-decoration: underline;
-    text-decoration-color: var(--line2);
-    text-underline-offset: 3px;
-  }
-  .links a:hover {
-    color: var(--tx);
+  .links :global(.social) {
+    gap: 16px;
   }
   @media (max-width: 480px) {
     .me img {

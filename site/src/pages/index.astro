@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { TOPICS } from '../data/series';
 import { getPosts } from '../lib/posts';
 import { readEnv, repoUrl } from '../lib/env';
-import { gb, isoDate, readTime } from '../lib/format';
+import { errataCount, gb, isoDate, readTime } from '../lib/format';
 import { url } from '../lib/url';
 
 const topics = ['all', ...TOPICS];
@@ -61,7 +61,7 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
       {
         posts.map((p, i) => {
           const d = p.data;
-          const n = d.corrections.length;
+          const n = d.errata.length;
           return (
             <div class="row" data-topic={d.topic} style={`--i:${i}`}>
               <span class="d">{isoDate(d.date)}</span>
@@ -79,7 +79,7 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
                   </>
                 )}
                 <br />
-                {readTime(p.body)} min · {n ? <b>{n} correction{n > 1 && 's'}</b> : 'no corrections yet'}
+                {readTime(p.body)} min · {n ? <b>{errataCount(n)}</b> : 'no errata'}
               </span>
             </div>
           );
