@@ -69,6 +69,22 @@ pull request, and the whole configuration lives in the repository
   cycle short. It also notes that from fleet 0.5.6 the tool cache is per runner and seeded by the
   image, so a cold run no longer re-downloads the pinned toolchains and cold setup times are not
   comparable across that version.
+- **The runner fleet post carries re-measured numbers and per-dataset provenance.** All six pickup
+  latency targets were run again on the corrected harness and reproduced the published figures, so
+  those tables are the October ones. The memory table is new, measured on fleet 0.5.6 with six light
+  runners and three dind pairs. The cold-versus-warm numbers stay as measured on 0.5.4, because
+  0.5.6 moved the tool cache into the image and a cold run there no longer re-downloads the pinned
+  toolchains. `env.json` now records what each dataset was taken on, in `fleet.measured_on`, rather
+  than one environment standing for all three, and the provenance line no longer reports a run from
+  uncommitted changes.
+- **An erratum on the post**: it said the Docker VM has 12 threads. It has 10, which the post's own
+  `env.json` had recorded all along. The host has 12; the VM is given 10.
+- **`FleetSizing` takes the pickup line's runner count from the run that produced it.** The fleet has
+  six light runners now and `latency.csv` was measured on four, so the widget had started reading
+  "8 jobs on 6 runners" beside a p95 measured with four of the eight queued.
+- **The harness README says how to take the fleet back down to two dind pairs.** The pairs are compose
+  profiles, so `up DIND=2` only ever adds: the third pair keeps running, and holding its memory,
+  until it is removed by name.
 
 ### Removed
 
