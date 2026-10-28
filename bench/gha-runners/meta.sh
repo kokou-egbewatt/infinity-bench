@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The setup a result came from. Keep it next to the results.
-#   bench/gha-runners/meta.sh > data/gha-runners/meta-$(date -u +%Y%m%d).txt
+#   bench/gha-runners/meta.sh > data/gha-runners/$(date -u +%F)/meta.txt
 set -uo pipefail
 
 # Compose project the fleet runs under, and the prefix on its container and volume names.

@@ -1,7 +1,7 @@
 # Runner fleet benchmarks
 
 How the numbers in [the runner fleet post](../../site/src/content/posts/my-desktop-as-a-github-actions-runner-fleet.mdx)
-were measured, so you can measure them again. Results go to [`data/gha-runners/`](../../data/gha-runners/),
+were measured, so you can measure them again. Results go to [`data/gha-runners/`](../../data/gha-runners/README.md),
 which the post reads. If yours disagree with mine, open an issue with your CSVs and `meta.sh` output.
 
 Needs bash, [gh](https://cli.github.com/) logged in with `repo` and `workflow` scope, and docker on the
@@ -18,6 +18,20 @@ arguments that look like paths, such as `--tmpfs /m` and `-w /w`.
 
 Run `meta.sh` alongside every measurement and keep its output with the results.
 
+## One folder per run
+
+Raw output goes to `data/gha-runners/<date>/`, a folder per measuring campaign, so re-measuring a
+target never lands on an earlier run's file. The scripts default the folder to today in UTC; set
+`RUN` to add to an existing one:
+
+```bash
+RUN=2026-10-28 bench/gha-runners/latency.sh acme/identity-service fleet-light 30 1
+```
+
+The summaries the post reads stay one level up, in `data/gha-runners/` itself, because the three
+datasets are not all from the same campaign.
+[`data/gha-runners/README.md`](../../data/gha-runners/README.md) says which run each one came from.
+
 ## Naming your fleet
 
 The scripts read container, volume and image names from one variable, `PROJECT`, which is the
@@ -27,7 +41,7 @@ CSVs were sanitised to. If your fleet runs under another name, pass it:
 ```bash
 PROJECT=my-ci bench/gha-runners/meta.sh
 PROJECT=my-ci bench/gha-runners/memory.sh
-PROJECT=my-ci bench/gha-runners/memory-summary.sh data/gha-runners/memory-dind3.csv
+PROJECT=my-ci bench/gha-runners/memory-summary.sh data/gha-runners/2026-10-28/memory-dind3.csv
 PROJECT=my-ci FLEET=/path/to/fleet bench/gha-runners/cache.sh cold owner/repo <run_id> <job>
 ```
 
@@ -55,7 +69,7 @@ bench/gha-runners/latency.sh acme/identity-service         fleet-dind  20 1
 bench/gha-runners/latency.sh acme/identity-service         fleet-dind  10 4
 bench/gha-runners/latency.sh kokou-egbewatt/runner-pickup-probe ubuntu-24.04 30 1
 bench/gha-runners/latency.sh kokou-egbewatt/runner-pickup-probe ubuntu-24.04 10 4
-bench/gha-runners/summarize.sh --csv data/gha-runners/latency-*.csv > data/gha-runners/latency.csv
+bench/gha-runners/summarize.sh --csv data/gha-runners/$RUN/latency-*.csv > data/gha-runners/latency.csv
 ```
 
 The last argument is how many jobs queue at once, and it splits two cases:
@@ -74,8 +88,8 @@ FLEET=../runner-fleet LIGHT=4 DIND=2 bench/gha-runners/cache.sh cold acme/media-
 bench/gha-runners/cache.sh                                    warm acme/media-service    <run> build_n_test
 FLEET=../runner-fleet LIGHT=4 DIND=2 bench/gha-runners/cache.sh cold acme/web-app <run> "End-to-end smoke"
 bench/gha-runners/cache.sh                                    warm acme/web-app <run> "End-to-end smoke"
-bench/gha-runners/cache-summary.sh data/gha-runners/cache-round*.csv > data/gha-runners/cache.csv
-bench/gha-runners/cache-summary.sh --steps data/gha-runners/cache-round*.csv > data/gha-runners/cache-steps.csv
+bench/gha-runners/cache-summary.sh data/gha-runners/$RUN/cache-round*.csv > data/gha-runners/cache.csv
+bench/gha-runners/cache-summary.sh --steps data/gha-runners/$RUN/cache-round*.csv > data/gha-runners/cache-steps.csv
 ```
 
 `FLEET` is the path to the fleet's checkout. `ROUND=2` writes `cache-round2.csv` instead of round 1.
@@ -95,13 +109,13 @@ A cold run stops the whole fleet. Every repository queues until it is back.
 
 ```bash
 make -C ../runner-fleet up DIND=3
-OUT=data/gha-runners/memory-dind3.csv bench/gha-runners/memory.sh 5 &
+OUT=data/gha-runners/$RUN/memory-dind3.csv bench/gha-runners/memory.sh 5 &
 gh run rerun 38431511901 -R acme/identity-service          # every job: contract-tests and integration-tests together
 # once both are in progress, re-run infra's integration job, which brings up a kind cluster
 gh run rerun 38175763426 -R acme/infra --job <integration job id>
 # when all three have finished
-touch data/gha-runners/memory-dind3.csv.stop
-bench/gha-runners/memory-summary.sh data/gha-runners/memory-dind3.csv > data/gha-runners/memory.csv
+touch data/gha-runners/$RUN/memory-dind3.csv.stop
+bench/gha-runners/memory-summary.sh data/gha-runners/$RUN/memory-dind3.csv > data/gha-runners/memory.csv
 # back to two pairs: the dind pairs are compose profiles, so `up DIND=2` only ever adds
 docker compose --profile dind3 rm -sf runner-dind-3 dind-3
 make -C ../runner-fleet prune

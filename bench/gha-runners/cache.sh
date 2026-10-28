@@ -10,7 +10,10 @@ mode=${1:?cold or warm}; repo=${2:?owner/repo}; run=${3:?run id}; job=${4:?job n
 # Volume prefix, which is the compose project name. Wrong value means cold is not cold:
 # the volumes are not found, nothing is removed, and the run is warm with a cold label.
 project=${PROJECT:-runner-fleet}
-out=${OUT:-data/gha-runners/cache-round${ROUND:-1}.csv}
+# Raw output goes in a folder named for the run, so re-measuring never overwrites an earlier
+# campaign. Override with RUN=2026-10-28 to add to one.
+run=${RUN:-$(date -u +%F)}
+out=${OUT:-data/gha-runners/$run/cache-round${ROUND:-1}.csv}
 export MODE=$mode REPO=$repo JOB=$job
 
 branch=$(gh api "repos/$repo/actions/runs/$run" --jq .head_branch)

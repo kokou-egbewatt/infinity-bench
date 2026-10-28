@@ -7,7 +7,10 @@ set -euo pipefail
 
 interval=${1:-5}
 project=${PROJECT:-runner-fleet}
-out=${OUT:-data/gha-runners/memory-$(date -u +%Y%m%dT%H%M%SZ).csv}
+# Raw output goes in a folder named for the run, so re-measuring never overwrites an earlier
+# campaign. Override with RUN=2026-10-28 to add to one.
+run=${RUN:-$(date -u +%F)}
+out=${OUT:-data/gha-runners/$run/memory-$(date -u +%H%M%SZ).csv}
 probe=bench-meminfo
 mkdir -p "$(dirname "$out")"
 echo "ts,source,name,bytes" >"$out"

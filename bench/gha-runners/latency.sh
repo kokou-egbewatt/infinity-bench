@@ -7,7 +7,10 @@ set -euo pipefail
 
 repo=${1:?owner/repo}; target=${2:?runs-on label}; runs=${3:-20}; width=${4:-1}
 settle=${SETTLE:-60}  # let runners re-register between runs
-out=${OUT:-data/gha-runners/latency-$(date -u +%Y%m%dT%H%M%SZ)-${target}-w${width}.csv}
+# Raw output goes in a folder named for the run, so re-measuring never overwrites an earlier
+# campaign. Override with RUN=2026-10-28 to add to one.
+run=${RUN:-$(date -u +%F)}
+out=${OUT:-data/gha-runners/$run/latency-${target}-w${width}.csv}
 
 export REPO=$repo TARGET=$target WIDTH=$width
 matrix="[$(seq -s, 1 "$width")]"
