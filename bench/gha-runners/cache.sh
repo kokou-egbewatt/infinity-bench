@@ -29,7 +29,9 @@ if [ "$mode" = cold ]; then
     docker volume rm "${project}_$v" >/dev/null 2>&1 || true
   done
   gh cache delete --all -R "$repo" || true
-  make -C "$FLEET" up DIND="${DIND:-1}"
+  # LIGHT is passed only when set, so the fleet returns to the shape it was measured in.
+  # Without it the Makefile default (LIGHT=2) silently shrinks the fleet mid-measurement.
+  make -C "$FLEET" up ${LIGHT:+LIGHT="$LIGHT"} DIND="${DIND:-1}"
 fi
 
 job_id=$(gh api "repos/$repo/actions/runs/$run/jobs?filter=latest&per_page=100" \

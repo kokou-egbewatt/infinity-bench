@@ -18,6 +18,17 @@ latest() {
   gh run list -R "$repo" -w probe.yml -e workflow_dispatch -L1 --json databaseId --jq '.[0].databaseId // 0'
 }
 
+# One CSV row per successful job in a run.
+jobs_csv() {
+  gh api --paginate "repos/$repo/actions/runs/$1/jobs?per_page=100" --jq '
+    .jobs[] | select(.conclusion == "success")
+    | [env.REPO, env.TARGET, env.WIDTH, .run_id, .id, .created_at, .started_at,
+       ((.started_at | fromdate) - (.created_at | fromdate)), .runner_name]
+    | @csv'
+}
+
+rows=$(mktemp); trap 'rm -f "$rows"' EXIT
+
 for i in $(seq 1 "$runs"); do
   before=$(latest)
   gh workflow run probe.yml -R "$repo" -f target="$target" -f matrix="$matrix"
@@ -27,11 +38,19 @@ for i in $(seq 1 "$runs"); do
   [ "$id" != "$before" ] || { echo "run $i never appeared" >&2; exit 1; }
   echo "run $i/$runs: $id" >&2
   gh run watch "$id" -R "$repo" --interval 5 >/dev/null 2>&1 || true
-  gh api --paginate "repos/$repo/actions/runs/$id/jobs?per_page=100" --jq '
-    .jobs[] | select(.conclusion == "success")
-    | [env.REPO, env.TARGET, env.WIDTH, .run_id, .id, .created_at, .started_at,
-       ((.started_at | fromdate) - (.created_at | fromdate)), .runner_name]
-    | @csv' >>"$out"
+  # watch returns early on a transient error, leaving jobs still queued. Appending then
+  # drops them, and a sweep quietly missing its slowest samples reports a better tail than
+  # it measured. Wait for all $width to land, and fail rather than record a short run.
+  for _ in $(seq 1 60); do
+    jobs_csv "$id" >"$rows"
+    [ "$(wc -l <"$rows")" -eq "$width" ] && break
+    sleep 5
+  done
+  [ "$(wc -l <"$rows")" -eq "$width" ] || {
+    echo "run $i ($id): $(wc -l <"$rows") of $width jobs succeeded" >&2
+    exit 1
+  }
+  cat "$rows" >>"$out"
   [ "$i" -lt "$runs" ] && sleep "$settle"
 done
 
