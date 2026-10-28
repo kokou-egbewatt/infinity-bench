@@ -1,0 +1,19 @@
+{
+  // Must match the Worker in the Cloudflare dashboard exactly, or the build fails.
+  "name": "infinity-bench",
+  "compatibility_date": "2026-10-01",
+  // Wrangler builds the site itself, so `wrangler deploy` is self-contained and the build does
+  // not depend on a command typed into the Cloudflare dashboard. Leave that field empty.
+  // Cloudflare clones the whole repository and runs this from `site/`, so `../data` is there.
+  "build": { "command": "pnpm build" },
+  // Assets only: no `main`, so there is no Worker script and nothing runs per request.
+  // Astro writes `dist/404.html`, which `404-page` serves for anything that does not match.
+  "assets": {
+    "directory": "./dist/",
+    "not_found_handling": "404-page",
+  },
+  // Required for `wrangler preview`, which builds every pull request. Empty because a preview
+  // needs no settings of its own: previews do not inherit from the top level, but assets,
+  // compatibility settings and the build stay up there and are shared.
+  "previews": {},
+}

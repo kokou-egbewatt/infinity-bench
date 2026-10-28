@@ -60,10 +60,10 @@ jobs:
           cache: true
           cache_dependency_path: site/pnpm-lock.yaml
 
-      # Pinned, not engines.node: that range would float onto each new major.
+      # site/.nvmrc is the one Node version, read here and by Cloudflare's build.
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: site/.nvmrc
 
       - run: pnpm install --frozen-lockfile
 
@@ -73,6 +73,8 @@ jobs:
       - name: Tests
         run: pnpm test
 
-      # Drafts are left out here, so this is what a merge to main would publish.
-      - name: Production build
-        run: pnpm build
+      # wrangler deploy --dry-run: builds through the build block in wrangler.jsonc, exactly as
+      # the deploy does, then checks the deployment. Drafts are left out of that build, so this is
+      # also what a merge to main would publish. A separate pnpm build would build the site twice.
+      - name: Build and deployment config
+        run: pnpm deploy:check
