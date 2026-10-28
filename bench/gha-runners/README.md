@@ -42,15 +42,17 @@ recorded under, which for the committed ones is the default.
 `latency.sh` dispatches [`probe.yml`](probe.yml), which has to live in `.github/workflows/` of a repository
 the runners serve, on its default branch. It is kept here and not in this repository's workflows, where it
 would only ever meet GitHub-hosted runners. My fleet serves only the private repositories in its runner group,
-so its copy is in `acme/runner-fleet`; the GitHub-hosted half ran from a public copy,
-[`kokou-egbewatt/runner-pickup-probe`](https://github.com/kokou-egbewatt/runner-pickup-probe), where those
-minutes are free.
+so I commit it to one of them for the sweep and delete it afterwards, rather than leave a foreign workflow in
+a repository that is not mine to decorate. I used `acme/identity-service`. Be aware that both the commit and
+its removal trigger that repository's own CI on its default branch. The GitHub-hosted half ran from a public
+copy, [`kokou-egbewatt/runner-pickup-probe`](https://github.com/kokou-egbewatt/runner-pickup-probe), where
+those minutes are free and the workflow can stay.
 
 ```bash
-bench/gha-runners/latency.sh acme/runner-fleet              fleet-light 30 1
-bench/gha-runners/latency.sh acme/runner-fleet              fleet-light 10 8
-bench/gha-runners/latency.sh acme/runner-fleet              fleet-dind  20 1
-bench/gha-runners/latency.sh acme/runner-fleet              fleet-dind  10 4
+bench/gha-runners/latency.sh acme/identity-service         fleet-light 30 1
+bench/gha-runners/latency.sh acme/identity-service         fleet-light 10 8
+bench/gha-runners/latency.sh acme/identity-service         fleet-dind  20 1
+bench/gha-runners/latency.sh acme/identity-service         fleet-dind  10 4
 bench/gha-runners/latency.sh kokou-egbewatt/runner-pickup-probe ubuntu-24.04 30 1
 bench/gha-runners/latency.sh kokou-egbewatt/runner-pickup-probe ubuntu-24.04 10 4
 bench/gha-runners/summarize.sh --csv data/gha-runners/latency-*.csv > data/gha-runners/latency.csv
