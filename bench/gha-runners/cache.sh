@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # Cold vs warm: re-run one job of an existing run, record per-step seconds.
 #   bench/gha-runners/cache.sh cold|warm <owner/repo> <run_id> <job name>
-# Cold recreates the fleet without its cache volumes (FLEET=path to runner-fleet,
+# Cold recreates the fleet without its cache volumes (FLEET=path to the fleet checkout,
 # LIGHT/DIND as normally run) and deletes the repo's GitHub caches. It stops every
 # job on the fleet. Runs from main are refused: re-runs bring dependents, e.g. a tag job.
 set -euo pipefail
 
 mode=${1:?cold or warm}; repo=${2:?owner/repo}; run=${3:?run id}; job=${4:?job name}
+# Volume prefix, which is the compose project name. Wrong value means cold is not cold:
+# the volumes are not found, nothing is removed, and the run is warm with a cold label.
+project=${PROJECT:-runner-fleet}
 out=${OUT:-data/gha-runners/cache-round${ROUND:-1}.csv}
 export MODE=$mode REPO=$repo JOB=$job
 
@@ -14,10 +17,16 @@ branch=$(gh api "repos/$repo/actions/runs/$run" --jq .head_branch)
 [ "$branch" != main ] || { echo "run $run is from main, and re-running it re-runs whatever depends on the job" >&2; exit 1; }
 
 if [ "$mode" = cold ]; then
-  : "${FLEET:?set FLEET to the runner-fleet checkout, cold recreates the fleet}"
+  : "${FLEET:?set FLEET to the fleet checkout, cold recreates the fleet}"
+  # Cold has to actually clear the caches. A wrong prefix finds no volumes, removes nothing,
+  # and yields a warm run wearing a cold label, so fail here instead of recording that.
+  docker volume ls -q | grep -q "^${project}_" || {
+    echo "no volumes named ${project}_*: set PROJECT to the fleet's compose project name" >&2
+    exit 1
+  }
   make -C "$FLEET" down
   for v in toolcache cargo-registry cargo-target gomod gobuild uvcache pnpmstore playwright; do
-    docker volume rm "runner-fleet_$v" >/dev/null 2>&1 || true
+    docker volume rm "${project}_$v" >/dev/null 2>&1 || true
   done
   gh cache delete --all -R "$repo" || true
   make -C "$FLEET" up DIND="${DIND:-1}"

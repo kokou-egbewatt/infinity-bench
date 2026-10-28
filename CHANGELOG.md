@@ -49,6 +49,12 @@ pull request, and the whole configuration lives in the repository
   became one `SocialIcons` component.
 - **The home page's opening paragraph and the About page are rewritten**, plainer and without the
   editorial "we".
+- **The runner fleet harness takes the fleet's name as `PROJECT`** instead of hardcoding it. The
+  committed scripts were sanitised to `runner-fleet`, which is still the default, but that meant
+  they matched nothing on a fleet named anything else: `meta.sh` recorded no containers, the memory
+  summaries matched no rows, and `cache.sh cold` removed no volumes and produced a warm run wearing
+  a cold label. `cache.sh` now refuses a cold run when no volume matches the prefix, so that failure
+  cannot be silent again.
 
 ### Removed
 

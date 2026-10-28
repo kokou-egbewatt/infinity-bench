@@ -2,12 +2,15 @@
 # Peak MiB per fleet container, the fleet's largest single sample, and the VM's peak use,
 # from memory.sh output.
 #   bench/gha-runners/memory-summary.sh data/gha-runners/memory-dind3.csv
+#   PROJECT=my-ci bench/gha-runners/memory-summary.sh <csv>   for a differently named fleet
 set -euo pipefail
 
+project=${PROJECT:-runner-fleet}
+
 echo name,peak_mib
-tail -n +2 "$1" | awk -F, '
-  $2 == "container" && $3 ~ /^runner-fleet-/ {
-    n = $3; sub(/^runner-fleet-/, "", n); if (n !~ /^light-/) sub(/-1$/, "", n)
+tail -n +2 "$1" | awk -F, -v pfx="$project-" '
+  $2 == "container" && index($3, pfx) == 1 {
+    n = substr($3, length(pfx) + 1); if (n !~ /^light-/) sub(/-1$/, "", n)
     if ($4 > pk[n]) pk[n] = $4
     fleet[$1] += $4
   }

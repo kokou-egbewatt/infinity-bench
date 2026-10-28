@@ -18,6 +18,25 @@ arguments that look like paths, such as `--tmpfs /m` and `-w /w`.
 
 Run `meta.sh` alongside every measurement and keep its output with the results.
 
+## Naming your fleet
+
+The scripts read container, volume and image names from one variable, `PROJECT`, which is the
+fleet's Docker Compose project name. It defaults to `runner-fleet`, which is what the committed
+CSVs were sanitised to. If your fleet runs under another name, pass it:
+
+```bash
+PROJECT=my-ci bench/gha-runners/meta.sh
+PROJECT=my-ci bench/gha-runners/memory.sh
+PROJECT=my-ci bench/gha-runners/memory-summary.sh data/gha-runners/memory-dind3.csv
+PROJECT=my-ci FLEET=/path/to/fleet bench/gha-runners/cache.sh cold owner/repo <run_id> <job>
+```
+
+`docker compose ls` prints the name. Getting it wrong used to be silent: `meta.sh` recorded no
+containers, the memory summaries matched nothing, and worst of all `cache.sh cold` removed no
+volumes and produced a warm run labelled cold. `cache.sh` now refuses to start a cold run when no
+volume matches the prefix. Re-running an existing summary needs the same `PROJECT` the CSV was
+recorded under, which for the committed ones is the default.
+
 ## Pickup latency
 
 `latency.sh` dispatches [`probe.yml`](probe.yml), which has to live in `.github/workflows/` of a repository

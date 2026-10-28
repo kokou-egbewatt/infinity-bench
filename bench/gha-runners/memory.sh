@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Memory per container (docker stats) and for the Docker VM (/proc/meminfo), with peaks.
 #   bench/gha-runners/memory.sh [interval_s]     stop with Ctrl-C, or `touch <out>.stop` from a script
+#   PROJECT=my-ci bench/gha-runners/memory.sh    for a differently named fleet
 # Prefer the stop file: on Git Bash a signal during docker.exe kills it before the trap.
 set -euo pipefail
 
 interval=${1:-5}
+project=${PROJECT:-runner-fleet}
 out=${OUT:-data/gha-runners/memory-$(date -u +%Y%m%dT%H%M%SZ).csv}
 probe=bench-meminfo
 mkdir -p "$(dirname "$out")"
@@ -13,8 +15,8 @@ echo "ts,source,name,bytes" >"$out"
 summarize() {
   docker rm -f "$probe" >/dev/null 2>&1 || true
   echo; echo "$out, peaks in MiB:"
-  tail -n +2 "$out" | awk -F, '
-    $2 == "container" { if ($4 > pk[$3]) pk[$3] = $4; if ($3 ~ /^runner-fleet-/) fleet[$1] += $4 }
+  tail -n +2 "$out" | awk -F, -v pfx="$project-" '
+    $2 == "container" { if ($4 > pk[$3]) pk[$3] = $4; if (index($3, pfx) == 1) fleet[$1] += $4 }
     $2 == "vm" && $3 == "used"  { if ($4 > vm) vm = $4 }
     $2 == "vm" && $3 == "total" { tot = $4 }
     END {
