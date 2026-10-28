@@ -4,13 +4,21 @@ import { WIDGETS } from '../lib/widgets';
 import { getPosts, resolveSeries } from '../lib/posts';
 import { url } from '../lib/url';
 
+// A lab is listed only once its post exists. getPosts() includes drafts in dev only,
+// so a production build lists labs from published posts and nothing else.
 const { all } = await resolveSeries();
-const titles = new Map((await getPosts()).map((p) => [p.id, p.data.title]));
-const labs = WIDGETS.map((w) => {
-  const entry = all.find((e) => e.id === w.plan);
-  if (!entry) throw new Error(`Labs: widget ${w.id} names plan ${w.plan}, which is not in src/data/series.ts`);
-  const href = entry.slug ? url(`/posts/${entry.slug}${w.section ? `#${w.section}` : ''}`) : undefined;
-  return { ...w, title: (entry.slug && titles.get(entry.slug)) || entry.title, href };
+const byPlan = new Map((await getPosts()).filter((p) => p.data.plan).map((p) => [p.data.plan!, p]));
+const labs = WIDGETS.flatMap((w) => {
+  if (!all.some((e) => e.id === w.plan)) {
+    throw new Error(`Labs: widget ${w.id} names plan ${w.plan}, which is not in src/data/series.ts`);
+  }
+  const post = byPlan.get(w.plan);
+  if (!post) return [];
+  const postHref = url(`/posts/${post.id}`);
+  const href = w.page ? url(`/labs/${w.id}`) : `${postHref}${w.section ? `#${w.section}` : ''}`;
+  // a lab page lists its tools; a widget inside a post is a single tool
+  const tools = w.page ? w.sections.map((s) => ({ name: s.name, href: `${href}#${s.id}` })) : [{ name: w.name, href }];
+  return [{ ...w, title: post.data.title, href, postHref, tools }];
 });
 ---
 
@@ -18,18 +26,46 @@ const labs = WIDGETS.map((w) => {
   <div class="wrap">
     <div class="simple labs">
       <h1>Labs</h1>
-      <p>The interactive pieces from the posts, pulled out so you can use them without re-reading. Each is a model, not a measurement. The post it came from has the table that wins when they disagree.</p>
-      <ul>
-        {
-          labs.map((w) => (
-            <li>
-              {w.href ? <a class="t" href={w.href}>{w.name}</a> : <span class="t">{w.name}</span>}
-              <span class="s">{w.blurb}</span>
-              <span class="f">{w.href ? `from: ${w.title}` : `planned for: ${w.title}`}</span>
-            </li>
-          ))
-        }
-      </ul>
+      <p>These are the interactive pieces from the posts.</p>
+      {
+        labs.length ? (
+          <ul class="lablist">
+            {labs.map((w) => (
+              <li>
+                <div>
+                  <a class="t" href={w.href}>{w.name}</a>
+                  <span class="chips">
+                    {w.tools.map((t) => <a href={t.href}>{t.name}</a>)}
+                  </span>
+                </div>
+                <span class="side">
+                  {w.tools.length} {w.tools.length === 1 ? 'tool' : 'tools'}
+                  <br />
+                  from <a href={w.postHref}>{w.title}</a>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="empty">No labs yet.</p>
+        )
+      }
     </div>
   </div>
 </BaseLayout>
+
+<style>
+  /* the list uses the full width, like the home page's posts, so tools sit on one line */
+  .simple.labs { max-width: none; }
+  .lablist li { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 6px 28px; align-items: start; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chips a { font-family: var(--mono); font-size: 11.5px; color: var(--tx2); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 11px; }
+  .chips a:hover { color: var(--hi); border-color: var(--ac); }
+  .side { text-align: right; font-family: var(--mono); font-size: 11.5px; line-height: 1.8; color: var(--tx3); }
+  .side a { color: var(--tx2); border-bottom: 1px solid var(--line2); }
+  .side a:hover { color: var(--hi); border-color: var(--ac); }
+  @media (max-width: 760px) {
+    .lablist li { grid-template-columns: minmax(0, 1fr); }
+    .side { text-align: left; }
+  }
+</style>
