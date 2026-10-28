@@ -102,7 +102,14 @@ gh run rerun 38175763426 -R acme/infra --job <integration job id>
 # when all three have finished
 touch data/gha-runners/memory-dind3.csv.stop
 bench/gha-runners/memory-summary.sh data/gha-runners/memory-dind3.csv > data/gha-runners/memory.csv
+# back to two pairs: the dind pairs are compose profiles, so `up DIND=2` only ever adds
+docker compose --profile dind3 rm -sf runner-dind-3 dind-3
+make -C ../runner-fleet prune
 ```
+
+`up DIND=2` will not take the fleet back down to two pairs. The pairs are compose profiles rather
+than replicas, and a profile that is not selected is left alone rather than stopped, so the third
+pair keeps running and holding its memory until it is removed by name.
 
 Load it with the heaviest dind jobs at once: identity-service's `contract-tests` and `integration-tests`, and
 infra's `integration`. Check from the jobs' timestamps that all three overlapped. An idle fleet of
