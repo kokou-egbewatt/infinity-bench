@@ -45,6 +45,10 @@ pull request, and the whole configuration lives in the repository
 - **Corrections are errata, as in a journal.** The page is `/errata`, the frontmatter field is
   `errata`, and the status bar and post list count errata. Each post's changelog now lists its
   updates and labs too, with errata marked.
+- **Header and footer carry Labs, Errata and Changelog**, and the repeated inline social SVGs
+  became one `SocialIcons` component.
+- **The home page's opening paragraph and the About page are rewritten**, plainer and without the
+  editorial "we".
 
 ### Removed
 
