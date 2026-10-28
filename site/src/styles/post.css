@@ -25,18 +25,22 @@
 .prose :not(pre) > code { font-family: var(--mono); font-size: .86em; color: var(--tx); background: #1a1b1f; padding: .1em .38em; border-radius: 3px; }
 .prose a { color: var(--hi); border-bottom: 1px solid var(--line2); }
 .prose a:hover { border-color: var(--ac); }
-.tablewrap { overflow-x: auto; margin: 0 0 6px; }
+.tablewrap { overflow-x: auto; margin: 4px 0 8px; }
 .prose table { width: 100%; border-collapse: collapse; margin: 0 0 6px; font-size: 13.5px; }
 .prose th { text-align: left; font-family: var(--mono); font-weight: 500; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--tx3); padding: 8px; border-bottom: 1px solid var(--line2); }
-.prose td { padding: 9px 8px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; color: var(--tx); }
+.prose td { padding: 9px 8px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; color: var(--tx); vertical-align: top; }
+/* numbers, ranges and single tokens never wrap; the wrapper scrolls instead */
+.prose td.num, .prose th.num, .prose td.nw { white-space: nowrap; }
 .prose td:first-child { font-family: var(--sans); font-size: 13.5px; }
 .prose th.num, .prose td.num { text-align: right; }
+.prose th + th.num, .prose td + td.num { padding-left: 14px; }
+@media (max-width: 600px) { .prose th + th.num, .prose td + td.num { padding-left: 8px; } .prose td:first-child { min-width: 7em; } }
 .prose tr.hl td { background: rgba(94, 234, 212, .06); }
 .pull { border-left: 2px solid var(--ac); padding: 4px 0 4px 16px; margin: 26px 0; font-family: var(--serif); font-size: 20px; line-height: 1.35; color: var(--hi); }
 .pull small { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--tx3); margin-top: 6px; }
 
 /* code: Shiki output, line numbers from CSS counters */
-.codebox { position: relative; margin: 0 0 8px; }
+.codebox { position: relative; margin: 4px 0 20px; }
 .prose pre.astro-code { margin: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; background: #08080a !important; overflow: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; }
 .prose pre.astro-code code { counter-reset: line; display: block; }
 .prose pre.astro-code .line { display: inline-block; min-width: 100%; padding-left: 2.6rem; position: relative; }
@@ -44,10 +48,18 @@
 .prose pre.astro-code .line.highlighted { background: rgba(94, 234, 212, .06); box-shadow: inset 2px 0 0 var(--ac); }
 .copy { position: absolute; top: 6px; right: 6px; font-family: var(--mono); font-size: 10.5px; color: var(--tx3); background: var(--bg2); border: 1px solid var(--line2); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
 .copy:hover, .copy:focus-visible { color: var(--hi); }
+@media (hover: hover) and (pointer: fine) {
+  .copy { opacity: 0; transition: opacity .15s; }
+  .codebox:hover .copy, .codebox:focus-within .copy, .copy:focus-visible { opacity: 1; }
+}
 
 .chg ul { list-style: none; margin: 0; padding: 0; }
 .chg li { font-family: var(--mono); font-size: 12.5px; color: #b9b9c0; margin-bottom: 8px; }
 .chg span { color: var(--tx3); margin-right: 8px; }
+.chg em { font-style: normal; color: var(--tx3); margin-right: 8px; text-transform: uppercase; font-size: 10.5px; letter-spacing: .06em; }
+.chg .erratum em { color: var(--warn); }
+.chg .lab em { color: var(--ac); }
+.chg a { color: var(--hi); border-bottom: 1px solid var(--line2); }
 
 aside .toc { position: sticky; top: 96px; }
 aside .h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--tx3); margin-bottom: 10px; }
@@ -61,23 +73,76 @@ aside .h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; t
 
 @media (max-width: 860px) {
   .post { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  /* without the sidebar, hold the column to a comfortable line length */
+  .post > article { max-width: 640px; }
   .hw { grid-template-columns: 1fr; }
   aside { display: none; }
 }
 
 
-/* namespace pairs figure (CI runners posts) */
-.pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg2); padding: 16px; margin: 6px 0 20px; }
-.pair { border: 1px dashed var(--line2); border-radius: 6px; padding: 12px; font-family: var(--mono); font-size: 11px; }
-.pair .t { color: var(--tx3); margin-bottom: 10px; letter-spacing: .04em; }
-.pair .box { border: 1px solid var(--line2); border-radius: 4px; padding: 6px 8px; margin: 0 0 6px; color: var(--tx); background: var(--bg); }
-.pair .box.priv { border-color: #4a3a1a; color: var(--warn); }
-.pair .box.svc { color: var(--tx2); margin-left: 18px; }
-.pair .box.r { border-color: var(--ac2); }
-.pairs .host { grid-column: 1 / -1; font-family: var(--mono); font-size: 11px; color: var(--tx3); text-align: center; }
-@media (max-width: 760px) { .pairs { grid-template-columns: 1fr; } }
+/* animated figures (CI runners posts): SVG driven by CSS keyframes, see scripts/figures */
+.prose figure.fig { margin: 8px 0 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg2); overflow: hidden; }
+.fig svg { display: block; width: 100%; height: auto; }
+.fig .b { fill: #0e0f12; stroke: var(--line2); stroke-width: 1.2; }
+.fig .ns { fill: none; stroke: #3a3b42; stroke-width: 1.2; stroke-dasharray: 5 5; }
+.fig .hl { fill: rgba(94, 234, 212, .06); stroke: var(--ac); stroke-width: 1.5; opacity: 0; }
+.fig .hlw { fill: rgba(229, 181, 103, .07); stroke: var(--warn); stroke-width: 1.5; opacity: 0; }
+.fig .hlb { fill: rgba(248, 113, 113, .08); stroke: var(--bad, #f87171); stroke-width: 1.5; opacity: 0; }
+.fig .wire { fill: none; stroke: #34353c; stroke-width: 1.3; }
+.fig .wire.d { stroke-dasharray: 4 4; }
+.fig .t { font-family: var(--mono); font-size: 11px; letter-spacing: .05em; fill: var(--tx3); }
+.fig .tx { font-family: var(--mono); font-size: 13px; fill: var(--tx); }
+.fig .sm { font-family: var(--mono); font-size: 11px; fill: var(--tx3); }
+.fig .big { font-family: var(--mono); font-size: 15px; fill: var(--hi); }
+.fig .pkt { opacity: 0; }
+.fig .spin { transform-box: view-box; }
+.fig figcaption { border-top: 1px solid var(--line); background: var(--bg); padding: 12px 16px 14px; }
+.fig .caps { display: grid; }
+.prose .fig .caps p { grid-area: 1 / 1; margin: 0; font-size: 14px; line-height: 1.5; color: var(--tx); opacity: 0; }
+.fig .caps b { color: var(--hi); font-weight: 500; }
+.fig .figbar { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.fig .track { flex: 1; height: 3px; background: var(--line2); border-radius: 2px; overflow: hidden; position: relative; }
+.fig .track i { position: absolute; inset: 0; background: var(--ac); transform-origin: left; transform: scaleX(0); animation: fig-prog var(--dur) linear infinite; }
+@keyframes fig-prog { to { transform: scaleX(1); } }
+.fig .ticks { position: absolute; inset: 0; display: flex; }
+.fig .ticks span { flex: 1; border-right: 2px solid var(--bg); }
+.fig .ticks span:last-child { border: 0; }
+.fig .ctl { white-space: nowrap; }
+.fig .ctl button { font-family: var(--mono); font-size: 11px; color: var(--tx2); background: var(--bg2); border: 1px solid var(--line2); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
+.fig .ctl button:hover, .fig .ctl button:focus-visible { color: var(--hi); }
+.fig.paused *, .fig.off * { animation-play-state: paused !important; }
+.fig.reset * { animation: none !important; }
+@media (max-width: 860px), (pointer: coarse) {
+  .fig .ctl button { padding: 6px 12px; }
+  .copy { padding: 5px 10px; }
+}
+@media (max-width: 600px) {
+  .prose figure.fig { margin-left: -24px; margin-right: -24px; border-radius: 0; border-left: 0; border-right: 0; }
+  .prose .fig .caps p { font-size: 13.5px; }
+}
+/* result figures: a key under the drawing, and the tables folded beneath; on a phone the drawing scrolls sideways rather than shrinking its labels */
+.fig.res .draw { overflow-x: auto; }
+@media (max-width: 600px) { .fig.res .draw svg { min-width: 520px; } }
+.fig .key { display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--mono); font-size: 11px; color: var(--tx2); margin: 0 0 10px; }
+.fig .key span { display: inline-flex; align-items: center; gap: 6px; }
+.fig .key i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; box-sizing: border-box; }
+.fig .key i + i { margin-left: -3px; }
+.prose details.fold { margin: -14px 0 24px; }
+.prose details.fold summary { cursor: pointer; font-family: var(--mono); font-size: 11px; color: var(--tx3); list-style: none; }
+.prose details.fold summary::before { content: '+ '; }
+.prose details.fold[open] summary::before { content: '− '; }
+.prose details.fold summary:hover { color: var(--tx); }
+.prose details.fold > :not(summary) { margin-top: 12px; }
+/* reduced motion: hold one representative frame and list every caption */
+@media (prefers-reduced-motion: reduce) {
+  .fig * { animation-play-state: paused !important; animation-delay: var(--freeze) !important; }
+  .fig .caps { display: block; }
+  .prose .fig .caps p { opacity: 1 !important; margin-bottom: 6px; }
+  .fig .figbar { display: none; }
+}
 
 /* markdown tables are prose, not results: sans, not mono */
+.prose > table { margin: 4px 0 22px; }
 .prose > table td { font-family: var(--sans); font-size: 13.5px; color: #b9b9c0; line-height: 1.5; }
 .prose > table td:first-child { color: var(--tx); }
 /* markdown tables have no .tablewrap: on narrow screens they scroll in place */
