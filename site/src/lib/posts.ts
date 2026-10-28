@@ -64,7 +64,7 @@ export async function resolveSeries() {
     ...s,
     posts: s.posts.map((entry) => {
       const post = entry.id ? byPlan.get(entry.id) : undefined;
-      return post ? { ...entry, slug: post.id, published: isoDate(post.data.date) } : entry;
+      return post ? { ...entry, title: post.data.title, slug: post.id, published: isoDate(post.data.date) } : entry;
     }),
   }));
   const all = flatten(series);
