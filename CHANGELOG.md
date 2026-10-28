@@ -70,9 +70,10 @@ the first of them lands as a draft while its harness is still to be written
 - **`ci-runners` series**: the runner fleet post, and a planned runner lab with a public copy of
   the Compose file. The runner repository is private, so the series cites the harness here rather
   than linking issues in it.
-- **The runner fleet post**, as a draft: a Docker daemon per runner so parallel jobs stop colliding
+- **The runner fleet post**, published: a Docker daemon per runner so parallel jobs stop colliding
   on fixed host ports, a registrar container so no job can read the GitHub App key, and what
-  `privileged: true` still costs. Section 11 is still to measure, so it stays out of production.
+  `privileged: true` still costs. Section 10 reads the measured CSVs, and the env block says the
+  numbers were captured from an uncommitted tree until the harness is re-run from a clean one.
 - **The namespace pairs figure** for that post, stacking to one column under 760px.
 - **An SM grid** on the home page's rig card: 30 cells for the card's 30 SMs, a few drifting on. A
   picture of the chip, not a readout.
