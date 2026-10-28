@@ -9,9 +9,23 @@ hardware:
   kind: cpu
   host: Ryzen 5 8400F, 6c/12t, Windows 11, WSL2, Docker Compose
 cost: "$0 · one machine, GPU idle"
-harness: "b249bb6"
+harness: "ad4dee4"
 data: gha-runners
 draft: false
+errata:
+  - date: 2026-10-28
+    text: >-
+      Section 10 said the Docker VM has 12 threads. It has 10: `docker info` reports ten, and this
+      post's own env.json recorded ten all along. The host has 12 threads, the VM is given 10.
+      Nothing in the results depends on the count.
+changes:
+  - date: 2026-10-28
+    text: >-
+      Re-measured on the fixed harness. All six pickup latency targets were run again and
+      reproduced the published figures, so those tables are unchanged. The memory test is new,
+      run on fleet 0.5.6 with six light runners and three dind pairs. The cold-versus-warm
+      numbers still come from the October run on fleet 0.5.4, because 0.5.6 moved the tool cache
+      into the image and a cold run there no longer re-downloads the pinned toolchains.
 ---
 
 Every job across ten private repositories stopped when billing blocked the organisation's GitHub-hosted runners. Self-hosted runners use no Actions minutes, so the desktop I already had became a small fleet for all of it.
@@ -172,7 +186,7 @@ export const rank = (name) => {
 
 ## 10. Results
 
-I measured the fleet on 14 and 15 October 2026 (UTC), in the Docker VM where it runs. The VM has 12 threads and 31 GiB of memory; during the runs, I had 4 light runners and 2 dind pairs running, except for the memory test, which used 3 pairs. The latency, memory and first cache round used runner image `8ec0588b`; the second cache round used `67e271dc`. Both were from fleet 0.5.4. The harness is in [`bench/gha-runners/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/gha-runners), and the figures and tables below come from the raw CSVs in [`data/gha-runners/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/gha-runners). I refer to the repositories by what they do, rather than by their names.
+I measured the fleet in the Docker VM where it runs, which has 10 threads and 31 GiB of memory. Pickup latency and the cold-versus-warm numbers come from 14 and 15 October 2026 (UTC), on fleet 0.5.4 with 4 light runners and 2 dind pairs: latency and the first cache round used runner image `8ec0588b`, the second cache round `67e271dc`. The memory numbers come from 28 October, on fleet 0.5.6 with 6 light runners and 3 dind pairs, runner image `59bc005c`. I re-ran all six latency targets that day too, on the corrected harness, and they reproduced the October figures, so those tables are the October ones. The harness is in [`bench/gha-runners/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/gha-runners), and the figures and tables below come from the raw CSVs in [`data/gha-runners/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/gha-runners). I refer to the repositories by what they do, rather than by their names.
 
 **Pickup latency.** I measured how long a queued job waited for a runner: `started_at` minus `created_at` in the Actions API. Each test job only echoed the runner's name. GitHub records timestamps to the nearest second, so each result is accurate to about ±1 s. Percentiles use the nearest-rank method.
 
@@ -196,7 +210,7 @@ I measured the fleet on 14 and 15 October 2026 (UTC), in the Docker VM where it 
 
 </details>
 
-With a runner already idle, the fleet picked up jobs in about a second in either class. GitHub-hosted runners took about two seconds. In the eight-job run on four light runners, and the four-job run on two dind pairs, the jobs split evenly between the fleet and GitHub-hosted runners. For the fleet, p95 mostly comes down to whether the queue is longer than the number of runners. The comparison is not perfectly even: a fleet runner is guaranteed to be idle when I submit one job, while GitHub-hosted runners come from a shared pool. That makes queue width less informative for GitHub-hosted runners.
+With a runner already idle, the fleet picked up jobs in about a second in either class. GitHub-hosted runners took about two seconds. In the eight-job run on four light runners, and the four-job run on two dind pairs, the jobs split evenly between runners that were already idle and runners that had to finish and re-register first. For the fleet, p95 mostly comes down to whether the queue is longer than the number of runners: re-running the eight-job case on six light runners left two jobs queued instead of four, and p95 moved from 11 to 13 seconds. The comparison is not perfectly even: a fleet runner is guaranteed to be idle when I submit one job, while GitHub-hosted runners come from a shared pool. That makes queue width less informative for GitHub-hosted runners.
 
 I ran the GitHub-hosted tests from a public repository, so these results are for free-tier standard runners. They were the only GitHub-hosted runners I could still start while billing blocked the organisation's private repositories. Larger or paid runners may behave differently; I did not test them.
 
@@ -250,7 +264,9 @@ Cold runs improved too, because they no longer upload caches to GitHub at the en
 
 There is a cost, as I noted in section 6: `cargo-target` keeps growing, and it contains compiled artefacts that tests execute. The volume is shared across repositories and has no integrity check.
 
-**Memory with three dind pairs.** I ran my three heaviest dind jobs together on a fleet with 4 light runners and 3 dind pairs: the identity service's contract and integration suites, rerun together from one workflow run, and the infra repository's integration job, which starts a kind cluster. All three overlapped for about a minute. I sampled `docker stats` and the VM's `/proc/meminfo` every 5 seconds, so shorter spikes may not show up. Also, `docker stats` reports cgroup memory, not a process's resident set. I discarded the first attempt because the identity service's concurrency setting cancelled one of its two reruns; only two of the three jobs overlapped.
+I did not re-run this pair of rounds, and on a current fleet they would not reproduce. Fleet 0.5.6 moved the tool cache out of a shared volume and into each runner's own container, seeded by the image with the toolchains the repositories pin. A cold run there starts with Go, Node, uv and Python already in place, so it skips downloads that every cold run above paid for. Cold is still cold for the package and build caches, but the cold setup times are specific to 0.5.4.
+
+**Memory with three dind pairs.** I ran my three heaviest dind jobs together on a fleet with 6 light runners and 3 dind pairs: the identity service's contract and integration suites, rerun together from one workflow run, and the infra repository's integration job, which starts a kind cluster. All three overlapped for about a minute. I sampled `docker stats` and the VM's `/proc/meminfo` every 5 seconds, so shorter spikes may not show up. Also, `docker stats` reports cgroup memory, not a process's resident set. I discarded the first attempt because the identity service's concurrency setting cancelled one of its two reruns; only two of the three jobs overlapped.
 
 <RunnerFigure scene="memory-load" />
 
@@ -277,9 +293,9 @@ There is a cost, as I noted in section 6: `cargo-target` keeps growing, and it c
 
 </details>
 
-A sidecar's memory figure includes all the containers its daemon starts. I checked this by writing 400 MiB to a tmpfs in a nested container; the sidecar's reported use grew by about the same amount. Light runner 4 was running the identity service's unit tests, which were included in the rerun.
+A sidecar's memory figure includes all the containers its daemon starts. I checked this by writing 400 MiB to a tmpfs in a nested container; the sidecar's reported use grew by about the same amount. Light runner 6 was running the identity service's unit tests, which were included in the rerun, and light runner 4 its version job. Which runner picks up which job varies per run, so read the shape of the table rather than the row names: one sidecar holding a kind cluster, two runner halves on the heavier suites, one light runner on unit tests, and the rest idle at about 50 MiB. The whole-VM figure is far below October's 11.9 GiB because that run shared the VM with roughly 9 GiB of unrelated work, where this one had it nearly to itself.
 
-At the time, the configured memory limits totalled 54 GiB: 24 GiB for the light runners and 30 GiB for the sidecars. The VM has 31 GiB, and the runner containers themselves had no limits. None of the measured containers came close to its limit. Since then, I have capped each runner container at 3 GiB, bringing the same fleet's total configured limits to 63 GiB. I also left several demanding jobs out of this test: the graph service's rebuild and live ingest, which run Fuseki with a 4 GiB heap in the sidecar; the streaming service's integration tests and image build; and the gateway's integration tests. I have not measured those jobs.
+The configured memory limits total 75 GiB on a VM with 31 GiB: 36 GiB across the six light runners, 30 GiB across the three sidecars, and 9 GiB across the three runner halves, capped at 3 GiB each after the first round of measuring found them uncapped. Nothing came close to its ceiling; the heaviest container was the sidecar holding the kind cluster, at 705 MiB of its 10 GiB. Overcommitting the VM this far only works because the limits are ceilings rather than reservations, and because the jobs I actually run stay far below them. I also left several demanding jobs out of this test: the graph service's rebuild and live ingest, which run Fuseki with a 4 GiB heap in the sidecar; the streaming service's integration tests and image build; and the gateway's integration tests. I have not measured those jobs.
 
 **What measuring found.** The measurements uncovered three problems, and an audit turned up a fourth. I have deployed the fixes in fleet 0.5.4 and 0.5.5, and checked each one on the running fleet.
 
