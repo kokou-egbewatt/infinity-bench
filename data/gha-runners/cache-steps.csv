@@ -1,0 +1,25 @@
+round,repo,step,cold_n,cold_median_s,cold_range_s,warm_n,warm_median_s,warm_range_s
+1,acme/media-service,Install Rust toolchain,3,10,7-16,6,11,0-16
+1,acme/media-service,Cache cargo registry and target,3,0,0-1,6,33.5,31-57
+1,acme/media-service,Lint,3,88,88-92,6,33.5,26-53
+1,acme/media-service,Build,3,300,297-332,6,124,100-221
+1,acme/media-service,Run tests,3,197,99-239,6,1,1-1
+1,acme/media-service,Post Cache cargo registry and target,3,75,74-76,6,0.5,0-1
+1,acme/web-app,Run actions/setup-node@v6,3,11,11-12,6,7.5,7-8
+1,acme/web-app,Cache the browser,3,1,0-1,6,14.5,14-49
+1,acme/web-app,Install the browser,3,32,29-32,6,0,0-0
+1,acme/web-app,Run pnpm build,3,24,20-26,6,19.5,19-25
+1,acme/web-app,Run pnpm e2e,3,28,28-33,6,30,28-36
+1,acme/web-app,Post Cache the browser,3,36,35-39,6,0,0-0
+1,acme/web-app,Post Run actions/setup-node@v6,3,15,13-23,6,0,0-0
+2,acme/media-service,Install Rust toolchain,3,9,9-13,6,9,1-10
+2,acme/media-service,Cache cargo registry and target,3,0,0-0,6,0,0-0
+2,acme/media-service,Lint,3,91,90-91,6,3,3-4
+2,acme/media-service,Build,3,306,305-307,6,103.5,102-104
+2,acme/media-service,Run tests,3,1,1-1,6,1,1-1
+2,acme/web-app,Run actions/setup-node@v6,3,9,9-10,6,0,0-1
+2,acme/web-app,Cache the browser,3,0,0-0,6,0,0-0
+2,acme/web-app,Install the browser,3,23,23-23,6,1,1-1
+2,acme/web-app,Run pnpm build,3,21,20-24,6,21,21-23
+2,acme/web-app,Run pnpm e2e,3,32,31-32,6,33.5,31-39
+2,acme/web-app,Post Run actions/setup-node@v6,3,0,0-1,6,0,0-0

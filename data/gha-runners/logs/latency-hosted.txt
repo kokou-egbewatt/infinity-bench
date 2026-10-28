@@ -1,0 +1,86 @@
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662568642
+run 1/30: 38662568642
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662621199
+run 2/30: 38662621199
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662673334
+run 3/30: 38662673334
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662724603
+run 4/30: 38662724603
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662779106
+run 5/30: 38662779106
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662848882
+run 6/30: 38662848882
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662894801
+run 7/30: 38662894801
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662945623
+run 8/30: 38662945623
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38662997991
+run 9/30: 38662997991
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663049782
+run 10/30: 38663049782
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663100510
+run 11/30: 38663100510
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663152344
+run 12/30: 38663152344
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663212072
+run 13/30: 38663212072
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663268234
+run 14/30: 38663268234
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663323415
+run 15/30: 38663323415
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663375653
+run 16/30: 38663375653
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663430635
+run 17/30: 38663430635
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663478089
+run 18/30: 38663478089
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663532792
+run 19/30: 38663532792
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663585893
+run 20/30: 38663585893
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663639920
+run 21/30: 38663639920
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663697381
+run 22/30: 38663697381
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663748359
+run 23/30: 38663748359
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663807240
+run 24/30: 38663807240
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663861921
+run 25/30: 38663861921
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663915455
+run 26/30: 38663915455
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38663969506
+run 27/30: 38663969506
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664024178
+run 28/30: 38664024178
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664076644
+run 29/30: 38664076644
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664130111
+run 30/30: 38664130111
+results/latency-hosted-w1.csv
+target           width     n   p50   p95   max
+ubuntu-24.04         1    30     2     3     3
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664150823
+run 1/10: 38664150823
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664208594
+run 2/10: 38664208594
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664265980
+run 3/10: 38664265980
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664318894
+run 4/10: 38664318894
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664368950
+run 5/10: 38664368950
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664420590
+run 6/10: 38664420590
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664476027
+run 7/10: 38664476027
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664530372
+run 8/10: 38664530372
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664577364
+run 9/10: 38664577364
+https://github.com/kokou-egbewatt/runner-pickup-probe/actions/runs/38664634430
+run 10/10: 38664634430
+results/latency-hosted-w4.csv
+target           width     n   p50   p95   max
+ubuntu-24.04         4    40     2     3     3
