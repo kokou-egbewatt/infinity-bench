@@ -85,6 +85,18 @@ pull request, and the whole configuration lives in the repository
 - **The harness README says how to take the fleet back down to two dind pairs.** The pairs are compose
   profiles, so `up DIND=2` only ever adds: the third pair keeps running, and holding its memory,
   until it is removed by name.
+- **Raw harness output is filed one folder per run**, `data/gha-runners/<date>/`, so re-measuring a
+  target never lands on an earlier campaign's file. The scripts default the folder to today in UTC
+  and take `RUN` to add to an existing one. The summaries the post and the lab read stay a level up,
+  because the three datasets are not all from one campaign, and a new
+  `data/gha-runners/README.md` says which run each came from.
+- **The 28 October reproduction is committed** next to the October campaign it checks, including the
+  one dind sweep that did not reproduce and the re-run that did, with what is and is not known about
+  why. `env.json` names the folder each dataset came from.
+- **A second erratum on the post**: section 1 said branch protection stopped anything merging without
+  a passing CI. Branch protection needs a paid plan for private repositories, and the lapsed billing
+  that blocked the runners is the same lapse that would have removed it. Not merging on red is a rule
+  kept by hand, which is what the section now says.
 
 ### Removed
 
