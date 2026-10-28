@@ -262,12 +262,6 @@ export const SERIES: Series[] = [
           'CI stopped starting for every repository. One machine, two runner classes, a Docker daemon per runner, and a registrar so no job can read a credential.',
         sources: [],
       },
-      {
-        title: 'Runner lab: break the fleet three ways',
-        summary:
-          'A public copy of the Compose file with three exercises: collide two jobs on port 5432, read the key out of /proc, and see what a restarted container keeps.',
-        sources: [],
-      },
     ],
   },
   {
