@@ -15,7 +15,14 @@ draft: false
 errata:
   - date: 2026-10-28
     text: >-
-      Section 10 said the Docker VM has 12 threads. It has 10: `docker info` reports ten, and this
+      Section 1 said branch protection on every repository stopped anything merging without a
+      passing CI. There is no branch protection on them: it needs a paid plan for private
+      repositories, and the lapsed billing that blocked the runners is the same lapse that would
+      have removed it. Not merging on red is a rule I keep by hand. The incident is unchanged,
+      since either way no check could run.
+  - date: 2026-10-28
+    text: >-
+      Section 10 said the Docker VM has 12 threads. It has 10: docker info reports ten, and this
       post's own env.json recorded ten all along. The host has 12 threads, the VM is given 10.
       Nothing in the results depends on the count.
 changes:
@@ -36,7 +43,7 @@ The product is at a very early stage and has no production environment yet, so t
 <PullQuote>A runner you do not control is a dependency like any other and it can go away on a random Tuesday.</PullQuote>
 
 Every workflow in the organisation started failing the same way; a job would queue, run for about two seconds, execute zero steps and stop. That was all of 27 workflows and 83 jobs across ten repositories, and none of it was caused by code.
-The organisation's private repositories had been blocked on billing, so GitHub-hosted runners no longer started for them, and with branch protection on every repository nothing could be merged without a passing CI.
+The organisation's private repositories had been blocked on billing, so GitHub-hosted runners no longer started for them. Nothing merges here on a red build, which is a rule I keep rather than one GitHub enforces: branch protection needs a paid plan for private repositories, and the plan was what had lapsed. So nothing was blocked by GitHub, it was blocked by me: no change could show a passing build, and I was not going to merge ten repositories' worth of work on trust.
 
 My desktop was already running Kubernetes nodes for local development of all the services. The question became how to put ten repositories' CI on the same machine without handing every job the keys to it.
 
