@@ -8,7 +8,7 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
-## [Unreleased]
+## [0.8.0] - Live at kokou.dev (2026-10-28)
 
 **The site deploys to Cloudflare at kokou.dev.** It deploys the way the AA Grace Counseling site
 does: Cloudflare's Git integration builds and deploys on every push, with a preview URL for every
@@ -55,6 +55,14 @@ pull request, and the whole configuration lives in the repository
   summaries matched no rows, and `cache.sh cold` removed no volumes and produced a warm run wearing
   a cold label. `cache.sh` now refuses a cold run when no volume matches the prefix, so that failure
   cannot be silent again.
+- **`latency.sh` fails rather than record a short sweep.** `gh run watch` returns early on a
+  transient error, and the job query kept only jobs that had already succeeded, so a job still in
+  flight was dropped and the CSV came up a sample short of the runs dispatched. The samples at risk
+  are the ones slowest to land, so a short sweep can report a better tail than it measured. It now
+  waits for every job in a run to land and exits non-zero if they do not.
+- **`cache.sh` passes `LIGHT` through to the fleet** when it is set, so a cold round brings the
+  fleet back up in the shape it was measured in. Without it the Makefile default took over and
+  shrank the fleet midway through a measurement.
 
 ### Removed
 
@@ -313,6 +321,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.8.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.7.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.6.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/21
 [0.5.1]: https://github.com/kokou-egbewatt/infinity-bench/pull/19
