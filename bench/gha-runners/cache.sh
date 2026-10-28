@@ -25,6 +25,11 @@ if [ "$mode" = cold ]; then
     exit 1
   }
   make -C "$FLEET" down
+  # `toolcache` is here for fleets that still share one. From fleet 0.5.6 the tool cache is
+  # per runner, inside the container and seeded by the image, so there is no volume to drop
+  # and a cold run starts with the pinned toolchains already present. Cold is cold for the
+  # package and build caches either way, but it no longer re-downloads Go, Node, uv or
+  # Python, which is why cold setup times are not comparable across that version.
   for v in toolcache cargo-registry cargo-target gomod gobuild uvcache pnpmstore playwright; do
     docker volume rm "${project}_$v" >/dev/null 2>&1 || true
   done
@@ -49,6 +54,17 @@ gh run watch "$run" -R "$repo" --interval 10 >/dev/null 2>&1 || true
 
 attempt=$(gh api "repos/$repo/actions/runs/$run" --jq .run_attempt)
 export ATTEMPT=$attempt
+# watch returns early on a transient error. An unfinished job has a null completed_at, which
+# makes the timings below a jq error on a line whose exit status `tee` hides, so the cycle
+# records nothing and the round is quietly a cycle short. Wait for the conclusion instead.
+for _ in $(seq 1 120); do
+  concl=$(gh api "repos/$repo/actions/runs/$run/attempts/$attempt/jobs?per_page=100" \
+    --jq '.jobs[] | select(.name == env.JOB) | .conclusion // empty' | head -1)
+  [ -n "$concl" ] && break
+  sleep 10
+done
+[ -n "$concl" ] || { echo "job '$job' in run $run attempt $attempt never finished" >&2; exit 1; }
+
 mkdir -p "$(dirname "$out")"
 [ -s "$out" ] || echo "mode,repo,run_id,attempt,job,runner_name,conclusion,step,seconds" >"$out"
 gh api "repos/$repo/actions/runs/$run/attempts/$attempt/jobs?per_page=100" --jq '

@@ -63,6 +63,12 @@ pull request, and the whole configuration lives in the repository
 - **`cache.sh` passes `LIGHT` through to the fleet** when it is set, so a cold round brings the
   fleet back up in the shape it was measured in. Without it the Makefile default took over and
   shrank the fleet midway through a measurement.
+- **`cache.sh` waits for a re-run to finish before recording it.** `gh run watch` returns early on
+  a transient error, and an unfinished job has a null `completed_at`, which made the timings a jq
+  error on a line whose status `tee` hid: the cycle recorded nothing and the round was quietly a
+  cycle short. It also notes that from fleet 0.5.6 the tool cache is per runner and seeded by the
+  image, so a cold run no longer re-downloads the pinned toolchains and cold setup times are not
+  comparable across that version.
 
 ### Removed
 
