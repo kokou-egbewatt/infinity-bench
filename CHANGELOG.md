@@ -10,6 +10,47 @@ structure.
 
 ## [Unreleased]
 
+**The site deploys to Cloudflare at kokou.dev.** It deploys the way the AA Grace Counseling site
+does: Cloudflare's Git integration builds and deploys on every push, with a preview URL for every
+pull request, and the whole configuration lives in the repository
+([ADR-0004](docs/adr/0004-static-site-on-cloudflare-workers.md)).
+
+### Added
+
+- **`site/wrangler.jsonc`**: Worker `infinity-bench`, static assets from `dist/`, the 404 page for
+  unmatched paths, the build command, and an empty `previews` block for pull request previews.
+- **`pnpm deploy:check`** (`wrangler deploy --dry-run`) and **`pnpm verify`**, with `wrangler` as a
+  dev dependency; `workerd` is kept from running install scripts, since deploying assets never
+  needs it.
+- **`site/.nvmrc`**, read by CI and by Cloudflare's build.
+- **ADR-0004** and a Deploy section in the README with the dashboard settings and a launch list.
+- **A Changelog page** at `/changelog`: every post published, updated or corrected and every new
+  lab, newest first, with chips to filter by kind. Changes to the site's code stay in this file.
+- **`changes`** in post frontmatter, `{ date, text }`, for updates that are not errors. They show
+  in the post's changelog and on the Changelog page.
+
+### Changed
+
+- **`site` is `https://kokou.dev`, with no `base`.** Pages, the sitemap and the RSS feed serve
+  from the root; `url()` already carried every internal link, so no page changed.
+- **CI's `site` job runs `pnpm deploy:check`** in place of `pnpm build`, and takes Node from
+  `site/.nvmrc`.
+- **The dev server is at `http://localhost:4321/`**, and the correction form's example link points
+  at `kokou.dev`.
+- **The menu starts with About**, then Posts and Series; the footer follows the same order.
+- **GitHub, LinkedIn and email are icons**, in the header and under the name on the About page,
+  from one `SocialIcons` component.
+- **The About page's core stack is badges**, grouped by what each tool does, each linking to the
+  project.
+- **Corrections are errata, as in a journal.** The page is `/errata`, the frontmatter field is
+  `errata`, and the status bar and post list count errata. Each post's changelog now lists its
+  updates and labs too, with errata marked.
+
+### Removed
+
+- **`/corrections`**, replaced by `/errata`. The site was never deployed at that path, so nothing
+  redirects.
+
 ## [0.7.0] - CI Runners (2026-10-13)
 
 **A post can be measured with the GPU idle.** Platform posts get a hardware kind of their own, and
