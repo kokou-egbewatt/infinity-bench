@@ -20,6 +20,10 @@ const pickup = (target: string, width: string) => {
 };
 const idle = pickup('fleet-light', '1');
 const busy = pickup('fleet-light', '8');
+// The pickup line describes the run it came from, so it takes that run's runner count. The
+// fleet has six light runners now; latency.csv was measured on four, and saying 8 jobs on 6
+// runners next to a p95 measured with four of them queued would misreport the measurement.
+const busyRunners = fleet?.measured_on?.latency?.light_runners ?? fleet?.light?.runners;
 // Memory defaults: the peaks under the heaviest dind jobs, rounded up to the field's 0.5 GiB step.
 const peaks = new Map(readCsv(DATA, 'memory.csv', WHO, AT).map((x) => [x.name, Number(x.peak_mib)]));
 const peak = (name: string) => {
@@ -34,9 +38,9 @@ const upHalf = (mib: number) => Math.max(0.5, Math.ceil((mib / 1024) * 2) / 2);
 const measured =
   `Machine: the Docker VM my fleet runs in, ${vmCpus} CPU threads and ${Math.round(vmGib)} GiB, with ${othersGib} GiB already taken by other things. ` +
   `Measured pickup on the light class: p50 ${idle.p50_s} s and p95 ${idle.p95_s} s with a runner idle, which the wait above leaves out; ` +
-  `p95 ${busy.p95_s} s with ${busy.width} jobs on ${fleet?.light?.runners ?? '?'} runners, where the jobs past the first ${fleet?.light?.runners ?? '?'} wait for a runner to restart. ` +
+  `p95 ${busy.p95_s} s with ${busy.width} jobs on ${busyRunners ?? '?'} runners, where the jobs past the first ${busyRunners ?? '?'} wait for a runner to restart. ` +
   `Memory per runner: the peaks with ${pairs.length} dind pairs under the heaviest dind jobs I measured, ${lightPeak} MiB for a light runner and ${pairPeak} MiB for a pair (sidecar plus runner half, each at its own peak), rounded up. ` +
-  `They are peaks, not ceilings: the fleet's configured limits are ${fleet?.light?.memory_gb} GiB per light runner and ${fleet?.dind?.sidecar_memory_gb} GiB per dind sidecar plus ${fleet?.dind?.runner_limits?.memory_gb} GiB for its runner half, which was added after the measurement. CPUs per runner are not measured.`;
+  `They are peaks, not ceilings: the fleet's configured limits are ${fleet?.light?.memory_gb} GiB per light runner and ${fleet?.dind?.sidecar_memory_gb} GiB per dind sidecar plus ${fleet?.dind?.runner_limits?.memory_gb} GiB for its runner half, which was uncapped when pickup was measured and capped by the time memory was. CPUs per runner are not measured.`;
 
 const uid = 'fleet';
 const workload = [

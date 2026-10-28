@@ -17,6 +17,8 @@ export interface Env {
     light?: { runners?: number; cpus?: number; memory_gb?: number };
     dind?: { pairs?: number; sidecar_cpus?: number; sidecar_memory_gb?: number; runner_limits?: { cpus?: number; memory_gb?: number } | null };
     vm_in_use_by_others_gib?: number[];
+    /** Per measurement, the fleet it was taken on. The datasets are not all from one run. */
+    measured_on?: Record<string, { light_runners?: number; dind_pairs?: number; captured?: string }>;
   };
   packages?: Record<string, string | null>;
 }
