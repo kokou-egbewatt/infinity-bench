@@ -8,6 +8,25 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.9.1] - Posts fit the screen (2026-10-29)
+
+**The post page scrolled sideways on a phone.** The article was 640px wide inside a 358px column,
+so every page was 672px wide on a 390px screen and the header and status bar ended two thirds of
+the way across.
+
+### Fixed
+
+- **An auto inline margin stopped the article stretching to its grid track.** With
+  `margin-inline: auto` the item is no longer stretched, so its width came from its content and
+  `max-width: 640px` only clamped it, giving 640px in a 358px column. The track holds the line
+  length now, `minmax(0, 640px)` with `justify-content: center`, and the article has neither
+  declaration. Measured at 320, 360, 390, 412, 480, 600, 768 and 860px.
+- **The contents column collapsed between 861 and 1199px.** Three tracks need 640 plus two 56px
+  gaps plus 200 a side plus the wrapper's padding, which is 1200. Below that the two spacers left
+  the contents about 30px and its headings spilled 97px past the page. The centred three-track
+  layout now starts at 1200, and between 861 and 1199 the contents sits beside the text, which is
+  the shape this had before it was centred. The contents itself is capped at 300px.
+
 ## [0.9.0] - Reads on a phone (2026-10-28)
 
 **The nav fits one row and the text column is centred.** The header hid six links and three icons
@@ -420,6 +439,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.9.1]: https://github.com/kokou-egbewatt/infinity-bench/pull/27
 [0.9.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/26
 [0.8.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.7.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
