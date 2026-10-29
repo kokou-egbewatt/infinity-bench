@@ -8,6 +8,34 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.9.0] - Reads on a phone (2026-10-28)
+
+**The nav fits one row and the text column is centred.** The header hid six links and three icons
+behind nothing on a phone, so it wrapped to three rows; the narrow pages sat against the left edge
+of a wrapper almost twice their width.
+
+### Added
+
+- **A menu button in the header below 860px.** It opens the full nav, closes on Escape, on a link
+  and on a tap outside, and its links are 38px tall. The button is hidden until the script unhides
+  it, so without JavaScript the nav stays inline and wraps as before.
+
+### Changed
+
+- **The post's reading column is centred.** `.post` is `1fr minmax(0, 640px) 1fr` with the
+  contents in the third track, so the text is centred at every width instead of sitting 176px left
+  of it. The wrapper is 1200px, which is what gives the contents a usable 200px.
+- **`.simple` pages are centred**: About, Labs, Changelog, Errata and the 404 page, which were
+  640px columns pinned to the left of a 1040px wrapper. The lab pages are capped at 900px rather
+  than stretching across the full width.
+- **Anchors and the sticky contents follow the header height** through `--hdr`, rather than a
+  96px offset fixed for a header that is 52px tall on a phone.
+- **The header background is `var(--bg)`** through `color-mix`, not a hard-coded rgba.
+- **A 16px gutter below 600px**, down from 24px, which gives the result tables that much more room.
+  Figures bleed to the new edge.
+- **The status bar keeps the post counts on phones** and drops the hardware string, which was
+  ellipsised to nothing anyway and is on the home page.
+
 ## [0.8.0] - Live at kokou.dev (2026-10-28)
 
 **The site deploys to Cloudflare at kokou.dev.** It deploys the way the AA Grace Counseling site
@@ -355,6 +383,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.9.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/26
 [0.8.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.7.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.6.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/21
