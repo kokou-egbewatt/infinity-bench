@@ -2,7 +2,10 @@
 import type { Env } from '../../lib/env';
 import { gb } from '../../lib/format';
 
-type Hardware = { kind: 'local' } | { kind: 'rented'; node: string; provider: string; cost_usd: number };
+type Hardware =
+  | { kind: 'local' }
+  | { kind: 'cpu'; host: string }
+  | { kind: 'rented'; node: string; provider: string; cost_usd: number };
 
 interface Props {
   hardware: Hardware;
@@ -31,6 +34,14 @@ const nodes = [16, 44, 72, 104];
           ))}
         </g>
       </svg>
+    ) : hardware.kind === 'cpu' ? (
+      <svg width="120" height="56" viewBox="0 0 120 56" fill="none" aria-hidden="true">
+        <rect x="2" y="10" width="116" height="36" rx="4" stroke="#2c2d33" stroke-width="1.2" />
+        <rect x="10" y="18" width="20" height="20" rx="2" stroke="#2c2d33" stroke-width="1.2" />
+        <rect x="38" y="20" width="22" height="16" rx="2" fill="#5eead4" />
+        <rect x="64" y="20" width="22" height="16" rx="2" fill="#5eead4" />
+        <rect x="90" y="20" width="20" height="16" rx="2" fill="#0f2f2b" />
+      </svg>
     ) : (
       <svg width="120" height="56" viewBox="0 0 120 56" fill="none" aria-hidden="true">
         <rect x="2" y="10" width="116" height="36" rx="4" stroke="#2c2d33" stroke-width="1.2" />
@@ -52,6 +63,13 @@ const nodes = [16, 44, 72, 104];
             <dd>{hardware.provider}</dd>
             <dt>paid</dt>
             <dd>${hardware.cost_usd.toLocaleString('en-US')}</dd>
+          </>
+        ) : hardware.kind === 'cpu' ? (
+          <>
+            <dt>host</dt>
+            <dd>{hardware.host}</dd>
+            <dt>gpu</dt>
+            <dd>not used, the RTX 5060 sat idle</dd>
           </>
         ) : (
           <>

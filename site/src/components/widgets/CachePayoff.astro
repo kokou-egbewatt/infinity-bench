@@ -1,0 +1,110 @@
+---
+// What shared tool caches save: every job downloading its toolchain, against one download
+// per version. The browser and target/ sizes are measured (the post's section 10); the rest are
+// examples. Logic in src/lib/runners.ts.
+import '../../styles/widget.css';
+
+const uid = 'cache';
+// Sizes in MB: replace with yours.
+const ROWS = [
+  { key: 'go', label: 'Go toolchain', size: 75, jobs: 20 },
+  { key: 'rust', label: 'Rust toolchain', size: 250, jobs: 6 },
+  { key: 'node', label: 'Node.js and pnpm', size: 40, jobs: 30 },
+  { key: 'python', label: 'Python through uv', size: 35, jobs: 20 },
+  { key: 'browser', label: 'Playwright Chromium, cached', size: 278, jobs: 8 },
+  { key: 'target', label: 'Rust target/, one repository', size: 656, jobs: 6 },
+];
+---
+
+<div class="widget" data-widget="cache-payoff">
+  <p class="wt">What a shared tool cache saves</p>
+  <div class="stack">
+    <div>
+      <div class="tbl" role="group" aria-label="Toolchains">
+        <span class="th">toolchain</span><span class="th">MB</span><span class="th">jobs a day</span>
+        {
+          ROWS.map((r) => (
+            <>
+              <span class="tn">{r.label}</span>
+              <input type="number" inputmode="numeric" min="0" step="5" value={r.size} data-size aria-label={`${r.label}, MB`} />
+              <input type="number" inputmode="numeric" min="0" step="1" value={r.jobs} data-jobs aria-label={`${r.label}, jobs a day`} />
+            </>
+          ))
+        }
+      </div>
+      <div class="rng">
+        <div class="r">
+          <label for={`${uid}-mbps`}>Download speed (Mbit/s)</label>
+          <output for={`${uid}-mbps`} data-show="mbps">100</output>
+        </div>
+        <input id={`${uid}-mbps`} type="range" data-in="mbps" min="10" max="1000" step="10" value="100" />
+      </div>
+      <div class="rng">
+        <div class="r">
+          <label for={`${uid}-days`}>Working days a month</label>
+          <output for={`${uid}-days`} data-show="days">22</output>
+        </div>
+        <input id={`${uid}-days`} type="range" data-in="days" min="1" max="31" step="1" value="22" />
+      </div>
+    </div>
+    <div>
+      <dl aria-live="polite">
+        <dt>downloaded without a cache</dt><dd data-out="gb">–</dd>
+        <dt>minutes spent downloading</dt><dd data-out="min">–</dd>
+        <dt>cost on Linux 2-core</dt><dd data-out="usd">–</dd>
+        <dt>with a shared cache</dt><dd>one download per version</dd>
+      </dl>
+      <p class="note" data-out="note" aria-live="polite"></p>
+    </div>
+  </div>
+  <p class="formula">
+    Data = size × jobs a day × days. Time = data ÷ download speed. The browser and <code>target/</code> sizes are measured in the post; the rest are examples. GitHub's own cache counts as a download: it is restored on every run.
+  </p>
+  <p class="src"><a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">code</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">tests</a></p>
+  <noscript><p class="formula">This lab needs JavaScript.</p></noscript>
+</div>
+
+<script>
+  import { cachePayoff } from '../../lib/runners';
+  import { RUNNER_PRICES } from '../../data/actionsPricing';
+  import { onVisible } from '../../lib/onVisible';
+
+  const rate = RUNNER_PRICES.find((p) => p.id === 'linux-2')!.perMinute;
+
+  function init(root: HTMLElement) {
+    const num = (el: HTMLInputElement) => Math.max(0, Number(el.value) || 0);
+    const field = (k: string) => root.querySelector<HTMLInputElement>(`[data-in="${k}"]`)!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+
+    const run = () => {
+      const sizes = [...root.querySelectorAll<HTMLInputElement>('[data-size]')];
+      const jobs = [...root.querySelectorAll<HTMLInputElement>('[data-jobs]')];
+      const rows = sizes.map((s, i) => ({ sizeMb: num(s), jobsPerDay: num(jobs[i]) }));
+      const mbps = num(field('mbps'));
+      const days = num(field('days'));
+      root.querySelector<HTMLElement>('[data-show="mbps"]')!.textContent = String(mbps);
+      root.querySelector<HTMLElement>('[data-show="days"]')!.textContent = String(days);
+      const p = cachePayoff(rows, mbps, days);
+      out('gb').textContent = `${p.gbPerMonth.toFixed(1)} GB a month`;
+      out('min').textContent = `${Math.round(p.minutesPerMonth).toLocaleString('en-US')} min a month`;
+      out('usd').textContent = `$${(p.minutesPerMonth * rate).toFixed(2)}`;
+      out('note').textContent = p.gbPerMonth > 100 ? 'Over 100 GB a month of the same files.' : '';
+    };
+
+    root.querySelectorAll('input').forEach((el) => el.addEventListener('input', run));
+    run();
+  }
+
+  onVisible('[data-widget="cache-payoff"]', init);
+</script>
+
+<style>
+  .tbl { display: grid; grid-template-columns: minmax(0, 1fr) 70px 70px; gap: 6px 8px; align-items: center; margin-bottom: 14px; }
+  .th { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tx2); }
+  .tn { font-size: 13px; color: var(--tx); }
+  .tbl input {
+    width: 100%; box-sizing: border-box; background: #08080a; border: 1px solid var(--line2); border-radius: 4px;
+    color: var(--tx); font-family: var(--mono); font-size: 12px; padding: 5px 7px;
+  }
+  .tbl input:focus-visible { outline: 2px solid var(--ac); outline-offset: 1px; }
+</style>

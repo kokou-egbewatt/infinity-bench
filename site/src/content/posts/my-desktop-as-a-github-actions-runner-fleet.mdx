@@ -1,0 +1,304 @@
+---
+title: My desktop as a GitHub Actions runner fleet
+dek: CI stopped for every private repository in the organisation when billing blocked its GitHub-hosted runners, so I moved it onto self-hosted runners on the desktop I already had.
+date: 2026-10-28
+topic: platform
+plan: desktop-runner-fleet
+repo: infinity-bench
+hardware:
+  kind: cpu
+  host: Ryzen 5 8400F, 6c/12t, Windows 11, WSL2, Docker Compose
+cost: "$0 · one machine, GPU idle"
+harness: "ad4dee4"
+data: gha-runners
+draft: false
+---
+
+Every job across ten private repositories stopped when billing blocked the organisation's GitHub-hosted runners. Self-hosted runners use no Actions minutes, so the desktop I already had became a small fleet for all of it.
+The product is at a very early stage and has no production environment yet, so this is development CI and nothing deploys from it.
+
+## 1. Incident
+
+<PullQuote>A runner you do not control is a dependency like any other and it can go away on a random Tuesday.</PullQuote>
+
+Every workflow in the organisation started failing the same way; a job would queue, run for about two seconds, execute zero steps and stop. That was all of 27 workflows and 83 jobs across ten repositories, and none of it was caused by code.
+The organisation's private repositories had been blocked on billing, so GitHub-hosted runners no longer started for them. Nothing merges here on a red build, which is a rule I keep rather than one GitHub enforces: branch protection needs a paid plan for private repositories, and the plan was what had lapsed. So nothing was blocked by GitHub, it was blocked by me: no change could show a passing build, and I was not going to merge ten repositories' worth of work on trust.
+
+My desktop was already running Kubernetes nodes for local development of all the services. The question became how to put ten repositories' CI on the same machine without handing every job the keys to it.
+
+Owning the runners also exposed two problems the hosted ones had been hiding:
+
+- **Host ports collided.** The identity service has a contract suite and an integration suite that both publish Postgres on 5432 and Redis on 6379, and they run in parallel and on a shared host they fought.
+- **Toolchains were downloaded on every run.** A few jobs rebuilt their toolchains from nothing with little or no caching. The Rust media service compiled in release mode twice per run with no cache at all; `Swatinem/rust-cache` came later, and section 10 shows what it cost on the fleet.
+
+## 2. Requirements
+
+Workflows should need only their `runs-on` line changed.
+Integration tests and other jobs with a `services:` block had to run in parallel without colliding, no job could read a credential that outlived it, toolchains had to download once, and the setup had to move to any machine with Docker on it.
+
+Going back had to be one change too. Every workflow's `runs-on` line reads an organisation variable with a fallback, one variable per runner class, so clearing them sends every job back to GitHub-hosted runners:
+
+```yaml
+runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}        # most jobs
+runs-on: ${{ vars.CI_RUNNER_DIND || 'ubuntu-latest' }}   # requiring Docker daemon
+```
+
+The move itself needed nothing more. The workflow changes that came later, in section 10, apply only on self-hosted runners and leave GitHub-hosted runs as they were.
+
+Out of scope: Kubernetes nodes used as a fleet, more than one machine being part of the fleet, and being safe against a job that is actively trying to break out.
+
+## 3. Options
+
+Most jobs lint, run unit tests or render a Helm chart and do not need Docker, while eight start containers.
+
+There are several ways to put a daemon in front of a job, analysing our options gave more clarity to our final decision:
+
+| Option | Published ports | Shared by concurrent jobs | Reaches root outside the job | Verdict |
+| --- | --- | --- | --- | --- |
+| Mount the host's Docker socket | collide on the host | one daemon for all of them | yes, the socket is the API | the port collisions that started this, plus an unauthenticated root API shared by every job |
+| **A `docker:dind` daemon per runner** | contained in the pair | nothing in common | yes, through the privileged daemon | chosen |
+| Rootless dind | contained | nothing in common | mostly closed | `kind` and buildx are fragile under it, and the two jobs that need a daemon most are a kind cluster and an image build |
+| Actions Runner Controller on Kubernetes | per pod | nothing in common | depends on the dind mode | needs a cluster to be healthy before CI can run; Compose moves to any machine with Docker on it |
+| GitHub larger runners | per VM | nothing in common | no | billed by the minute, which is the thing that had just stopped working |
+
+I chose a daemon per runner. It fixes the port collisions, keeps concurrent jobs apart, and needs nothing on the machine beyond Docker. The cost is a privileged container, covered in section 8.
+
+To weigh the cost against your own minutes, try the lab's <LabLink id="runner-fleet" section="break-even">break-even calculator</LabLink>.
+
+## 4. A daemon per runner
+
+Each runner that needs Docker is paired with its own `docker:28-dind` sidecar, and the runner joins the sidecar's network namespace with `network_mode: "service:dind-1"`. A job's `services:` block publishes 5432, the job connects to `localhost:5432`, and `localhost` means the same thing to the job and to the containers started for it. A second pair publishes 5432 too and neither notices, because the port is published inside the pair's namespace, not on the host.
+
+<RunnerFigure scene="port-collision" />
+
+The light class, which serves most jobs, has no daemon at all, so a one-line changelog check does not run beside a privileged daemon. The <LabLink id="runner-fleet" section="runner-class">runner class checker</LabLink> sorts the jobs of a workflow you paste into one class or the other.
+
+The daemon's TCP port is bound to the loopback and nothing else:
+
+```yaml
+command: ["dockerd", "--host=tcp://127.0.0.1:2375", "--host=unix:///var/run/docker.sock"]
+```
+
+`DOCKER_TLS_CERTDIR` is empty, so this port has no authentication. That's acceptable here because only the paired runner needs it and shares the sidecar's network namespace. Binding it to `0.0.0.0`, though, would make it easy to expose accidentally with a `ports:` entry.
+
+The order of the command matters too. If the first argument starts with a dash, `dockerd-entrypoint.sh` adds its own `--host=tcp://0.0.0.0:2375`. When the first argument is `dockerd`, it leaves the host options alone.
+
+Passing only the addresses and the entrypoint adds its own listener as well. Both then claim port 2375, so the daemon exits with "port is already allocated" and keeps restarting. I once bound the port to `0.0.0.0`; it seemed to work only because that duplicated the entrypoint's default exactly.
+
+## 5. Credentials
+
+<PullQuote>Anything a job can read, a job will eventually read.</PullQuote>
+
+The obvious place for the GitHub App private key was each runner's environment, but there every job could read it.
+
+The key registers runners anywhere in the organisation with any label, so a job could register a runner with the light label, wait for another repository's job, and read its secrets. The key is long-lived and works from anywhere, so it would have outlived the container, the fleet and the host.
+
+<RunnerFigure scene="where-the-key-lives" />
+
+I moved it into one container that runs no job. A runner sends its hostname over a unix socket and gets back a single-use JIT config. GitHub deletes a JIT runner when its job finishes, so the runner never calls the registration API itself, nothing has to deregister, and no token is left to expire.
+
+```bash
+# the whole of what a runner can do about registering
+JIT_CONFIG=$(hostname | socat -t 30 - "UNIX-CONNECT:${JIT_SOCKET}")
+./run.sh --jitconfig "$JIT_CONFIG"
+```
+
+Here is one runner, from a clean container back to a clean container:
+
+<RunnerFigure scene="life-of-a-job" />
+
+Two details do most of the work:
+
+- **A unix socket on a volume (not HTTP on a network).** A dind runner shares its sidecar's namespace and cannot be given a network of its own. HTTP is possible, since the sidecar can join one, but it buys a TCP listener that everything on that network can reach. A volume reaches both classes the same way with no listener at all.
+- **One socket per class, on its own volume.** Each runner can reach only its class's socket, so a light runner cannot ask for a dind config. File permissions were no help when I first built this: the base image gave `runner` passwordless sudo, which let a job become root and ignore them. Sudo is gone now (section 10), but dind jobs can still reach root through the privileged daemon. The separate volumes remain the boundary, and read-only mounts stop jobs from replacing or removing the socket.
+
+The runner image carries no App key, no registration token and no PAT, and CI asserts that on the built image so a regression fails the build.
+
+## 6. What is ephemeral, and what is not
+
+<PullQuote>`restart: always` restarts a container. It does not recreate it.</PullQuote>
+
+GitHub treats a runner as ephemeral: it handles one job, then its registration is deleted. The container's files are another story, and that difference bit me twice. One container ran 21 jobs and kept checkouts from seven repositories, so each job could read the previous jobs' files. In another case, a half-installed Python from one job broke a later job with `libpython3.12.so.1.0: cannot open shared object file`.
+
+<RunnerFigure scene="restart-not-recreate" />
+
+The entrypoint now clears `_work` every time the container starts. It uses an absolute path, so there is no risk of an empty variable pointing the cleanup somewhere unintended. That gives every job a clean checkout, but the rest of the container's filesystem still persists. To make the whole filesystem fresh, I would need `read_only: true` and tmpfs. I have not done that yet.
+
+The caches are shared by design. I did not want every job to download a Go toolchain or a 278 MB browser cache again, so named volumes hold `/opt/hostedtoolcache`, the Cargo registry, Go's module cache, uv, pnpm and Playwright's browsers. Runners in both classes use them. Cargo, Go, uv and pnpm lock their caches, which makes concurrent access safe. But locking does not verify what is in a cache. Because the volumes outlive their containers, a job can leave files there for a later job in another repository to use:
+
+| Cache | If a job poisons it |
+| --- | --- |
+| cargo registry, Go modules, pnpm store | content hashes are checked against a lockfile; a bad entry fails rather than runs |
+| `/opt/hostedtoolcache`, Playwright browsers | plain binaries, executed with no verification once cached |
+| `cargo-target`, the media service's compiled `target/` | compiled artefacts that tests execute, with no verification |
+
+The `cargo-target` row is new. The measurements in section 10 led me to move the media service's `target/` directory off GitHub's cache and into that volume. Since `Swatinem/rust-cache` no longer runs on the fleet, nothing prunes it, and it will keep growing.
+
+A separate volume for each repository is not practical: the runner registers before GitHub assigns it a job, so it does not yet know which repository it will serve. Scheduled cache resets are on my list; they would at least limit how long poisoned contents could stick around.
+
+For your own toolchains, the lab's <LabLink id="runner-fleet" section="cache-payoff">cache savings</LabLink> tool estimates what a shared cache saves.
+
+## 7. What broke
+
+Each of these three bugs cost me an evening. Here they are, in the hope you can avoid the same detours.
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| every dind replica saw the same ports and the same hostname | `network_mode: service:dind` resolves to the first replica, so `replicas: 3` put three runners in one namespace | write the pairs out, one Compose profile each, so `make up DIND=2` starts two |
+| runner got an empty config; registrar log said `jq: writing output failed: Broken pipe` | the runner sends its hostname and half-closes; socat tears down the other direction 0.5 s later, and minting takes several API calls | `socat -t 30` |
+| a config that did not parse | the mint script logged to stdout, and stdout was the config | log to stderr, everywhere |
+
+There is one more limitation: Docker container actions do not work on either class. Light runners have no Docker daemon. On a dind runner, the sidecar daemon creates the action's container, but that container has a separate filesystem and cannot mount the runner's workspace. The action starts, but it cannot see the checkout. hadolint and shellcheck are both distributed as container actions, so I install their binaries in the runner image instead.
+
+## 8. What this does not buy
+
+A daemon per runner requires `privileged: true`. That lets a job on the dind class mount host devices and load kernel modules, which means it can reach root outside its container. Here, the blast radius is the WSL2 VM. That VM also runs all my local Kubernetes nodes and everything else in Docker. It is why I keep the dind class small: every job in it runs alongside a privileged daemon. I also make sure there are no credentials on this host that the fleet should not be able to access.
+
+The registrar keeps the GitHub App key out of jobs, but it does not eliminate every risk. While the fleet is running, a job can use its class's socket to mint another config for that same class. That gives it no long-lived secret, stops working after `make down`, and cannot cross into the other class. Still, it is a path worth acknowledging. To close it entirely, I would have to mint configs outside any container a job can reach. That would give up Compose's `restart: always` and some of the portability that made me choose Compose.
+
+The fleet registers in a named runner group with an explicit list of repositories. I do not use `Default`, which is visible to every repository in the organisation, including ones created later. The group blocks public repositories, and the organisation does not allow private repositories to be forked. That still leaves anyone with write access to a listed repository: they can push a branch and run code on this machine.
+
+## 9. What I would change
+
+- I would move to rootless dind once `kind` and buildx work reliably with it. That would close most of the security gap I described in section 8.
+- If the fleet outgrows one machine, I would move to Actions Runner Controller, with a cache per tenant and a runner group for each trust level. The lab's <LabLink id="runner-fleet" section="fleet-size">fleet sizing</LabLink> estimates when one machine stops being enough.
+
+export const rank = (name) => {
+  if (name.startsWith('light-')) return 100 + Number(name.slice(6));
+  if (name.startsWith('dind-')) return 200 + Number(name.slice(5)) * 2;
+  if (name.startsWith('runner-dind-')) return 201 + Number(name.slice(12)) * 2;
+  return { registrar: 300, 'fleet total': 400 }[name] ?? 500;
+};
+
+## 10. Results
+
+I measured the fleet in the Docker VM where it runs, which has 10 threads and 31 GiB of memory. Pickup latency and the cold-versus-warm numbers come from 14 and 15 October 2026 (UTC), on fleet 0.5.4 with 4 light runners and 2 dind pairs: latency and the first cache round used runner image `8ec0588b`, the second cache round `67e271dc`. The memory numbers come from 28 October, on fleet 0.5.6 with 6 light runners and 3 dind pairs, runner image `59bc005c`. I re-ran all six latency targets that day too, on the corrected harness, and they reproduced the October figures, so those tables are the October ones. The harness is in [`bench/gha-runners/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/gha-runners), and the figures and tables below come from the raw CSVs in [`data/gha-runners/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/gha-runners). I refer to the repositories by what they do, rather than by their names.
+
+**Pickup latency.** I measured how long a queued job waited for a runner: `started_at` minus `created_at` in the Actions API. Each test job only echoed the runner's name. GitHub records timestamps to the nearest second, so each result is accurate to about ±1 s. Percentiles use the nearest-rank method.
+
+<RunnerFigure scene="pickup-latency" />
+
+<details class="fold">
+<summary>the table: p50, p95 and max per class and width</summary>
+
+<ResultsTable
+  file="latency.csv"
+  caption="Pickup latency in seconds. Queued is how many jobs were submitted at once; more than there are idle runners means some wait for a runner to be recycled."
+  columns={{
+    target: { label: 'Runner', format: (v) => (v === 'ubuntu-24.04' ? 'GitHub-hosted, ubuntu-24.04' : `fleet, ${v.replace('fleet-', '')} class`) },
+    width: 'Queued',
+    n: 'Jobs',
+    p50_s: 'p50',
+    p95_s: 'p95',
+    max_s: 'max',
+  }}
+/>
+
+</details>
+
+With a runner already idle, the fleet picked up jobs in about a second in either class. GitHub-hosted runners took about two seconds. In the eight-job run on four light runners, and the four-job run on two dind pairs, the jobs split evenly between runners that were already idle and runners that had to finish and re-register first. For the fleet, p95 mostly comes down to whether the queue is longer than the number of runners: re-running the eight-job case on six light runners left two jobs queued instead of four, and p95 moved from 11 to 13 seconds. The comparison is not perfectly even: a fleet runner is guaranteed to be idle when I submit one job, while GitHub-hosted runners come from a shared pool. That makes queue width less informative for GitHub-hosted runners.
+
+I ran the GitHub-hosted tests from a public repository, so these results are for free-tier standard runners. They were the only GitHub-hosted runners I could still start while billing blocked the organisation's private repositories. Larger or paid runners may behave differently; I did not test them.
+
+**Cold versus warm.** I reran two jobs at fixed `develop` commits: the media service's `build_n_test` job, which runs `cargo build` and `cargo test` in release mode, and the web app's Playwright end-to-end smoke test in Chromium. For a cold run, I recreated the fleet and deleted its cache volumes, then deleted the repository's GitHub Actions caches. Warm runs followed immediately. I did three cycles of cold, warm, warm, giving me three cold runs and six warm runs per job. That is enough to compare medians and ranges, but not to make fine-grained claims; I focus on the large differences. The steps below are grouped into setup, install, build and lint, test, and GitHub cache time.
+
+<RunnerFigure scene="cold-warm" />
+
+<details class="fold">
+<summary>the tables: whole job, and every step over 10 s</summary>
+
+<ResultsTable
+  file="cache.csv"
+  caption="Whole job, in seconds. The range is the fastest and slowest run."
+  columns={{
+    round: 'Round',
+    repo: { label: 'Job', format: (v) => (v.endsWith('media-service') ? 'media service, build_n_test' : 'web app, e2e') },
+    cold_n: 'Cold runs',
+    cold_median_s: 'Cold median',
+    cold_range_s: 'Cold range',
+    warm_n: 'Warm runs',
+    warm_median_s: 'Warm median',
+    warm_range_s: 'Warm range',
+  }}
+/>
+
+<ResultsTable
+  file="cache-steps.csv"
+  caption="Steps that take 10 s or more in either mode, median and range in seconds."
+  columns={{
+    round: 'Round',
+    repo: { label: 'Job', format: (v) => (v.endsWith('media-service') ? 'media service' : 'web app') },
+    step: 'Step',
+    cold_median_s: 'Cold median',
+    cold_range_s: 'Cold range',
+    warm_median_s: 'Warm median',
+    warm_range_s: 'Warm range',
+  }}
+/>
+
+</details>
+
+I left two outliers in the medians and ranges. In the first cycle, the warm builds were slower than in the other two, even though nothing else was running on the fleet. I was not sampling load that cycle, so I do not know why. The web app's slowest warm run spent all its extra time restoring the 278 MB browser cache from GitHub: 49 seconds instead of the usual 14 to 15.
+
+The cache steps tell the story. In round 1, a "warm" fleet run was still warming from GitHub's cache, not the fleet's. Both workflows downloaded from GitHub into paths that were also backed by the fleet's shared volumes. So every warm media-service run downloaded about 656 MB of `target/`, and every warm web-app run downloaded its browsers. Cold runs then uploaded those files back to GitHub at the end. For these two jobs, the shared volumes from section 6 were barely helping.
+
+For round 2, I disabled GitHub caching on self-hosted runners. The media service skips `Swatinem/rust-cache` and stores `CARGO_TARGET_DIR` in a new shared `cargo-target` volume. The web app skips `actions/cache` for browsers and setup-node's pnpm cache, using the fleet's Playwright and pnpm volumes instead. GitHub-hosted runs are unchanged. I used the same cold-run method, including deleting `cargo-target`. One caveat: round 2 used the commits that included these CI changes, not the commits from round 1. The two versions differ only in CI files and version numbers.
+
+The warm media-service job is about twice as fast, and its range shrank from 161 seconds to 9. That points to the trip to and from GitHub's cache as the source of the earlier variability. `clippy` now takes 3 seconds because it reuses the persistent `target/`. `Build` still takes about 100 seconds: each fresh checkout changes timestamps, so Cargo recompiles the workspace's own crates while reusing dependencies. For the web app, browser downloads, browser system libraries and setup-node's cache all dropped to zero. One step may have slowed down: median `pnpm install` time increased by 3.5 seconds. With only six warm runs, that could easily be noise. If it is a real regression, linking packages from the shared store is slower than restoring GitHub's tarball.
+
+Cold runs improved too, because they no longer upload caches to GitHub at the end. For the media service, that upload alone took 75 seconds. The rest of the improvement came from `Run tests`: it took about a second in round 2's cold runs, compared with several minutes in round 1. The logs explain some of that gap. In round 1, `cargo test` spent 107 seconds recompiling the `prost-build` part of the dependency tree (hashbrown, petgraph, pulldown-cmark, prost-build and tonic-prost-build), even though `Build` had just compiled every target. In round 2, it compiled only the service's own crates. I still do not know what changed those crates' fingerprints between the two round-1 steps. The environments differ only by a variable none of those crates reads, and the apt step installed nothing new.
+
+There is a cost, as I noted in section 6: `cargo-target` keeps growing, and it contains compiled artefacts that tests execute. The volume is shared across repositories and has no integrity check.
+
+I did not re-run this pair of rounds, and on a current fleet they would not reproduce. Fleet 0.5.6 moved the tool cache out of a shared volume and into each runner's own container, seeded by the image with the toolchains the repositories pin. A cold run there starts with Go, Node, uv and Python already in place, so it skips downloads that every cold run above paid for. Cold is still cold for the package and build caches, but the cold setup times are specific to 0.5.4.
+
+**Memory with three dind pairs.** I ran my three heaviest dind jobs together on a fleet with 6 light runners and 3 dind pairs: the identity service's contract and integration suites, rerun together from one workflow run, and the infra repository's integration job, which starts a kind cluster. All three overlapped for about a minute. I sampled `docker stats` and the VM's `/proc/meminfo` every 5 seconds, so shorter spikes may not show up. Also, `docker stats` reports cgroup memory, not a process's resident set. I discarded the first attempt because the identity service's concurrency setting cancelled one of its two reruns; only two of the three jobs overlapped.
+
+<RunnerFigure scene="memory-load" />
+
+<details class="fold">
+<summary>the table: every container at its own peak</summary>
+
+<ResultsTable
+  file="memory.csv"
+  caption="Peak memory in MiB, each container at its own peak. The fleet total is the largest single sample; VM used is MemTotal minus MemAvailable."
+  columns={{
+    name: {
+      label: 'Container',
+      format: (v) =>
+        v.startsWith('runner-dind-') ? `dind pair ${v.slice(12)}, runner half`
+        : v.startsWith('dind-') ? `dind pair ${v.slice(5)}, sidecar`
+        : v.startsWith('light-') ? `light runner ${v.slice(6)}`
+        : v.startsWith('VM used of ') ? `whole VM, of ${Number(v.slice(11)).toLocaleString('en')}`
+        : v,
+    },
+    peak_mib: 'Peak (MiB)',
+  }}
+  sort={(a, b) => rank(a.name) - rank(b.name)}
+/>
+
+</details>
+
+A sidecar's memory figure includes all the containers its daemon starts. I checked this by writing 400 MiB to a tmpfs in a nested container; the sidecar's reported use grew by about the same amount. Light runner 6 was running the identity service's unit tests, which were included in the rerun, and light runner 4 its version job. Which runner picks up which job varies per run, so read the shape of the table rather than the row names: one sidecar holding a kind cluster, two runner halves on the heavier suites, one light runner on unit tests, and the rest idle at about 50 MiB. The whole-VM figure is far below October's 11.9 GiB because that run shared the VM with roughly 9 GiB of unrelated work, where this one had it nearly to itself.
+
+The configured memory limits total 75 GiB on a VM with 31 GiB: 36 GiB across the six light runners, 30 GiB across the three sidecars, and 9 GiB across the three runner halves, capped at 3 GiB each after the first round of measuring found them uncapped. Nothing came close to its ceiling; the heaviest container was the sidecar holding the kind cluster, at 705 MiB of its 10 GiB. Overcommitting the VM this far only works because the limits are ceilings rather than reservations, and because the jobs I actually run stay far below them. I also left several demanding jobs out of this test: the graph service's rebuild and live ingest, which run Fuseki with a 4 GiB heap in the sidecar; the streaming service's integration tests and image build; and the gateway's integration tests. I have not measured those jobs.
+
+**What measuring found.** The measurements uncovered three problems, and an audit turned up a fourth. I have deployed the fixes in fleet 0.5.4 and 0.5.5, and checked each one on the running fleet.
+
+- One dind runner was stranded for about 33 hours after its sidecar restarted. The runner stayed in the old, dead network namespace and retried forever. I added a watchdog that exits the runner, letting `restart: always` bring it back in the sidecar's new namespace. To check it, I ran `docker compose restart dind-2`. The runner reported that its daemon's port had not answered for 129 seconds, exited, and registered itself again 132 seconds after the sidecar restarted.
+- The runner container in each dind pair had no resource limits. It now gets 3 CPUs and 3 GiB of memory, about five times its measured peak, leaving some headroom for jobs I have not measured.
+- `docker stop` was not stopping the runner cleanly. Every stop waited through the two-minute grace period and ended with SIGKILL. My first fix forwarded the signal with a trap. It worked with a stand-in for `run.sh`, but not with the real runner. During the next cold reset, `docker events` showed SIGTERM reaching every runner, followed by SIGKILL two minutes later. `/proc/<pid>/status` revealed why: `run.sh` waits for `run-helper.sh` in the foreground, so Bash held the trapped TERM until its child exited. The listener also ignored SIGINT, inherited because the entrypoint started `run.sh` in the background without job control. The working fix starts it under `set -m` with `RUNNER_MANUALLY_TRAP_SIG=1`. In that container mode, `run.sh` translates TERM into INT for the listener. A real runner now stops in under a second, deletes its session, and exits with status 143.
+- I removed passwordless sudo from the runner image, after auditing every workflow on the fleet. The media service, QA suite and infra repository skip their apt steps on these runners; the web app's end-to-end job drops `--with-deps`; and the identity service needed no changes. CI now checks that the runner cannot become root by asserting that `sudo -n true` fails. A dind job can still reach root through the privileged daemon.
+
+If your numbers disagree with mine, I want to hear it.
+
+## 11. Sources
+
+- [GitHub: security hardening for self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/security-hardening-for-self-hosted-runners)
+- [GitHub REST: create configuration for a just-in-time runner](https://docs.github.com/en/rest/actions/self-hosted-runners#create-configuration-for-a-just-in-time-runner-for-an-organization)
+- [Compose file reference: network_mode](https://docs.docker.com/reference/compose-file/services/#network_mode)
+- [docker-library: dockerd-entrypoint.sh](https://github.com/docker-library/docker/blob/master/dockerd-entrypoint.sh)
+- [actions/runner-images](https://github.com/actions/runner-images), the base the runner image is built from
+- [actions/runner: run.sh](https://github.com/actions/runner/blob/main/src/Misc/layoutroot/run.sh), where `RUNNER_MANUALLY_TRAP_SIG` turns TERM into INT for the listener
+- [socat manual](http://www.dest-unreach.org/socat/doc/socat.html), for `-t`, the half-close timeout
+- [docker container stats](https://docs.docker.com/reference/cli/docker/container/stats/), what the memory figures report

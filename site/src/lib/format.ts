@@ -12,3 +12,8 @@ export function readTime(body = ''): number {
     .match(/[A-Za-z0-9][\w'’.-]*/g);
   return Math.max(1, Math.ceil((words?.length ?? 0) / 230));
 }
+
+/** "1 erratum", "2 errata", "0 errata": the journal's words, not "corrections". */
+export function errataCount(n: number): string {
+  return `${n} ${n === 1 ? 'erratum' : 'errata'}`;
+}

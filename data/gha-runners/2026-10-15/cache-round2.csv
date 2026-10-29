@@ -1,0 +1,289 @@
+mode,repo,run_id,attempt,job,runner_name,conclusion,step,seconds
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","(whole job)",418
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Set up job",1
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Run actions/checkout@v7",1
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Install build and media tooling",0
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Install Rust toolchain",13
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Cache cargo registry and target",0
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Keep target/ in the fleet's cargo-target volume",0
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Format",1
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Lint",91
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","No bare instrument attribute",0
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Check every relative documentation link resolves",0
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Build",307
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Run tests",1
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Post Run actions/checkout@v7",0
+"cold","acme/media-service",38681324102,"2","build_n_test","fleet-light-1a50a5d719be","success","Complete job",0
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","(whole job)",122
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Set up job",1
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Install build and media tooling",0
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Install Rust toolchain",10
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Cache cargo registry and target",0
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Keep target/ in the fleet's cargo-target volume",0
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Format",0
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Lint",4
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","No bare instrument attribute",0
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Check every relative documentation link resolves",0
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Build",102
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Run tests",1
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Post Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"3","build_n_test","fleet-light-f1bbb516c165","success","Complete job",0
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","(whole job)",122
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Set up job",1
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Install build and media tooling",0
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Install Rust toolchain",9
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Cache cargo registry and target",0
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Keep target/ in the fleet's cargo-target volume",0
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Format",1
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Lint",3
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","No bare instrument attribute",0
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Check every relative documentation link resolves",0
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Build",104
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Run tests",1
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Post Run actions/checkout@v7",0
+"warm","acme/media-service",38681324102,"4","build_n_test","fleet-light-20dbd09873a2","success","Complete job",0
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","(whole job)",116
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Set up job",3
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Run actions/checkout@v7",1
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Run pnpm/action-setup@v6",5
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Run actions/setup-node@v6",10
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Run pnpm install --frozen-lockfile",13
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Resolve the Playwright version",0
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Cache the browser",0
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Install the browser",23
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Install the browser's system libraries",0
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Run pnpm build",24
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Run pnpm e2e",32
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Upload the report",2
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Post Run actions/setup-node@v6",0
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Post Run pnpm/action-setup@v6",0
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Post Run actions/checkout@v7",0
+"cold","acme/web-app",38681332875,"2","End-to-end smoke","fleet-light-56d1347fb0c4","success","Complete job",0
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","(whole job)",76
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Set up job",3
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Run actions/checkout@v7",1
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Run pnpm/action-setup@v6",5
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Run pnpm install --frozen-lockfile",9
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Resolve the Playwright version",0
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Cache the browser",0
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Install the browser",1
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Install the browser's system libraries",0
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Run pnpm build",21
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Run pnpm e2e",32
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Upload the report",1
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Post Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Post Run pnpm/action-setup@v6",0
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Post Run actions/checkout@v7",1
+"warm","acme/web-app",38681332875,"3","End-to-end smoke","fleet-light-84de31cee31e","success","Complete job",0
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","(whole job)",86
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Set up job",4
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Run actions/checkout@v7",1
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Run pnpm/action-setup@v6",5
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Run pnpm install --frozen-lockfile",11
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Resolve the Playwright version",0
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Cache the browser",0
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Install the browser",1
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Install the browser's system libraries",0
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Run pnpm build",23
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Run pnpm e2e",36
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Upload the report",2
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Post Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Post Run pnpm/action-setup@v6",0
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Post Run actions/checkout@v7",1
+"warm","acme/web-app",38681332875,"4","End-to-end smoke","fleet-light-a2b075397dd4","success","Complete job",0
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","(whole job)",411
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Set up job",1
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Run actions/checkout@v7",1
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Install build and media tooling",0
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Install Rust toolchain",9
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Cache cargo registry and target",0
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Keep target/ in the fleet's cargo-target volume",1
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Format",0
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Lint",90
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","No bare instrument attribute",0
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Check every relative documentation link resolves",0
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Build",305
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Run tests",1
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Post Run actions/checkout@v7",0
+"cold","acme/media-service",38681324102,"5","build_n_test","fleet-light-4476444d817f","success","Complete job",0
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","(whole job)",115
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Set up job",1
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Install build and media tooling",0
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Install Rust toolchain",1
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Cache cargo registry and target",0
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Keep target/ in the fleet's cargo-target volume",0
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Format",0
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Lint",3
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","No bare instrument attribute",0
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Check every relative documentation link resolves",1
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Build",104
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Run tests",1
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Post Run actions/checkout@v7",0
+"warm","acme/media-service",38681324102,"6","build_n_test","fleet-light-4476444d817f","success","Complete job",0
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","(whole job)",123
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Set up job",2
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Install build and media tooling",0
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Install Rust toolchain",9
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Cache cargo registry and target",0
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Keep target/ in the fleet's cargo-target volume",0
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Format",0
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Lint",4
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","No bare instrument attribute",0
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Check every relative documentation link resolves",0
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Build",103
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Run tests",1
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Post Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"7","build_n_test","fleet-light-bbcf4c2df402","success","Complete job",0
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","(whole job)",107
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Set up job",3
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Run actions/checkout@v7",2
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Run pnpm/action-setup@v6",4
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Run actions/setup-node@v6",9
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Run pnpm install --frozen-lockfile",9
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Resolve the Playwright version",0
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Cache the browser",0
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Install the browser",23
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Install the browser's system libraries",0
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Run pnpm build",20
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Run pnpm e2e",32
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Upload the report",1
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Post Run actions/setup-node@v6",1
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Post Run pnpm/action-setup@v6",0
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Post Run actions/checkout@v7",0
+"cold","acme/web-app",38681332875,"5","End-to-end smoke","fleet-light-60b67a9df368","success","Complete job",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","(whole job)",75
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Set up job",3
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Run actions/checkout@v7",1
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Run pnpm/action-setup@v6",5
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Run pnpm install --frozen-lockfile",8
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Resolve the Playwright version",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Cache the browser",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Install the browser",1
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Install the browser's system libraries",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Run pnpm build",21
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Run pnpm e2e",31
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Upload the report",2
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Post Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Post Run pnpm/action-setup@v6",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Post Run actions/checkout@v7",0
+"warm","acme/web-app",38681332875,"6","End-to-end smoke","fleet-light-3fa77bd0a162","success","Complete job",0
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","(whole job)",78
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Set up job",3
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Run actions/checkout@v7",1
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Run pnpm/action-setup@v6",5
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Run actions/setup-node@v6",1
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Run pnpm install --frozen-lockfile",8
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Resolve the Playwright version",0
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Cache the browser",0
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Install the browser",1
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Install the browser's system libraries",0
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Run pnpm build",21
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Run pnpm e2e",33
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Upload the report",2
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Post Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Post Run pnpm/action-setup@v6",0
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Post Run actions/checkout@v7",0
+"warm","acme/web-app",38681332875,"7","End-to-end smoke","fleet-light-bcc6e67d14f6","success","Complete job",0
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","(whole job)",415
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Set up job",2
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Run actions/checkout@v7",1
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Install build and media tooling",0
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Install Rust toolchain",9
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Cache cargo registry and target",0
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Keep target/ in the fleet's cargo-target volume",0
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Format",1
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Lint",91
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","No bare instrument attribute",0
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Check every relative documentation link resolves",0
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Build",306
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Run tests",1
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Post Run actions/checkout@v7",0
+"cold","acme/media-service",38681324102,"8","build_n_test","fleet-light-9dcb52b9ea31","success","Complete job",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","(whole job)",114
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Set up job",1
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Install build and media tooling",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Install Rust toolchain",1
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Cache cargo registry and target",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Keep target/ in the fleet's cargo-target volume",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Format",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Lint",3
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","No bare instrument attribute",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Check every relative documentation link resolves",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Build",104
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Run tests",1
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Post Run actions/checkout@v7",0
+"warm","acme/media-service",38681324102,"9","build_n_test","fleet-light-9dcb52b9ea31","success","Complete job",0
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","(whole job)",123
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Set up job",2
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Install build and media tooling",0
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Install Rust toolchain",9
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Cache cargo registry and target",0
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Keep target/ in the fleet's cargo-target volume",0
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Format",0
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Lint",3
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","No bare instrument attribute",0
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Check every relative documentation link resolves",1
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Build",102
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Run tests",1
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Post Run actions/checkout@v7",1
+"warm","acme/media-service",38681324102,"10","build_n_test","fleet-light-11c9a7932607","success","Complete job",0
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","(whole job)",107
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Set up job",4
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Run actions/checkout@v7",1
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Run pnpm/action-setup@v6",4
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Run actions/setup-node@v6",9
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Run pnpm install --frozen-lockfile",9
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Resolve the Playwright version",0
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Cache the browser",0
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Install the browser",23
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Install the browser's system libraries",0
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Run pnpm build",21
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Run pnpm e2e",31
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Upload the report",2
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Post Run actions/setup-node@v6",0
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Post Run pnpm/action-setup@v6",0
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Post Run actions/checkout@v7",0
+"cold","acme/web-app",38681332875,"8","End-to-end smoke","fleet-light-1b42f96b835d","success","Complete job",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","(whole job)",84
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Set up job",4
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Run actions/checkout@v7",1
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Run pnpm/action-setup@v6",4
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Run pnpm install --frozen-lockfile",9
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Resolve the Playwright version",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Cache the browser",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Install the browser",1
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Install the browser's system libraries",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Run pnpm build",21
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Run pnpm e2e",39
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Upload the report",2
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Post Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Post Run pnpm/action-setup@v6",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Post Run actions/checkout@v7",0
+"warm","acme/web-app",38681332875,"9","End-to-end smoke","fleet-light-5e199bb1b2d6","success","Complete job",0
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","(whole job)",79
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Set up job",3
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Run actions/checkout@v7",2
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Run pnpm/action-setup@v6",4
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Run actions/setup-node@v6",1
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Run pnpm install --frozen-lockfile",8
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Resolve the Playwright version",0
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Cache the browser",0
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Install the browser",1
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Install the browser's system libraries",0
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Run pnpm build",21
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Run pnpm e2e",34
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Upload the report",2
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Post Run actions/setup-node@v6",0
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Post Run pnpm/action-setup@v6",0
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Post Run actions/checkout@v7",0
+"warm","acme/web-app",38681332875,"10","End-to-end smoke","fleet-light-637c3c753419","success","Complete job",0

@@ -1,13 +1,15 @@
 ---
 import { url, stripBase } from '../lib/url';
+import SocialIcons from './SocialIcons.astro';
 
 const path = stripBase(Astro.url.pathname);
 const links = [
+  { href: '/about', label: 'About', active: path === '/about' },
   { href: '/', label: 'Posts', active: path === '/' || path.startsWith('/posts/') },
   { href: '/series', label: 'Series', active: path === '/series' },
   { href: '/labs', label: 'Labs', active: path === '/labs' },
-  { href: '/corrections', label: 'Corrections', active: path === '/corrections' },
-  { href: '/about', label: 'About', active: path === '/about' },
+  { href: '/changelog', label: 'Changelog', active: path === '/changelog' },
+  { href: '/errata', label: 'Errata', active: path === '/errata' },
 ];
 ---
 
@@ -21,8 +23,7 @@ const links = [
       {links.map((l) => (
         <a href={url(l.href)} class:list={{ active: l.active }} aria-current={l.active ? 'page' : undefined}>{l.label}</a>
       ))}
-      <a class="ext" href="https://github.com/kokou-egbewatt" target="_blank" rel="noopener">GitHub</a>
-      <a class="ext" href="https://www.linkedin.com/in/kinfinity3/" target="_blank" rel="noopener">LinkedIn</a>
+      <SocialIcons class="navsocial" />
     </nav>
   </div>
 </header>

@@ -44,3 +44,37 @@ jobs:
 
       - name: Relative links resolve
         run: bash ci/scripts/check-doc-links.sh
+
+  site:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v7
+
+      # packageManager and the lockfile live in site/, not the repository root.
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: site/package.json
+          cache: true
+          cache_dependency_path: site/pnpm-lock.yaml
+
+      # site/.nvmrc is the one Node version, read here and by Cloudflare's build.
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: site/.nvmrc
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Types and props
+        run: pnpm check
+
+      - name: Tests
+        run: pnpm test
+
+      # wrangler deploy --dry-run: builds through the build block in wrangler.jsonc, exactly as
+      # the deploy does, then checks the deployment. Drafts are left out of that build, so this is
+      # also what a merge to main would publish. A separate pnpm build would build the site twice.
+      - name: Build and deployment config
+        run: pnpm deploy:check

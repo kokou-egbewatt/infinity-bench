@@ -10,11 +10,14 @@ interface Props {
   /** Picks, orders and renames columns; omitted means every column as-is. */
   columns?: Record<string, Column>;
   highlight?: (row: Row) => boolean;
+  /** Row order; omitted keeps the file's. */
+  sort?: (a: Row, b: Row) => number;
 }
 
-const { file, caption, columns, highlight } = Astro.props;
+const { file, caption, columns, highlight, sort } = Astro.props;
 const post = currentPost(Astro.locals, 'ResultsTable');
-const rows = readCsv(post.data, file, 'ResultsTable', post.slug);
+const rows = [...readCsv(post.data, file, 'ResultsTable', post.slug)];
+if (sort) rows.sort(sort);
 
 const keys = columns ? Object.keys(columns) : Object.keys(rows[0]);
 const missing = keys.filter((k) => !(k in rows[0]));
@@ -28,7 +31,8 @@ const format = (k: string, v: string) => {
   const c = columns?.[k];
   return typeof c === 'object' && c.format ? c.format(v) : v;
 };
-const isNum = (v: string) => v === '' || /^[-+]?[\d,]*\.?\d+%?$/.test(v);
+const isNum = (v: string) => v === '' || /^[-+]?[\d,]*\.?\d+%?$/.test(v) || /^\d[\d,.]*-\d[\d,.]*$/.test(v);
+const oneToken = (v: string) => !/\s/.test(v);
 const numeric = keys.map((k, i) => i > 0 && rows.every((r) => isNum(r[k])));
 ---
 
@@ -42,7 +46,7 @@ const numeric = keys.map((k, i) => i > 0 && rows.every((r) => isNum(r[k])));
       rows.map((r) => (
         <tr class:list={{ hl: highlight?.(r) }}>
           {keys.map((k, i) => (
-            <td class:list={{ num: numeric[i] }}>{format(k, r[k])}</td>
+            <td class:list={{ num: numeric[i], nw: !numeric[i] && oneToken(format(k, r[k])) }}>{format(k, r[k])}</td>
           ))}
         </tr>
       ))

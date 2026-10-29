@@ -1,0 +1,188 @@
+---
+// How many runners of each class one machine needs, and whether they fit.
+// A queue model (Erlang C), not a measurement. Logic in src/lib/runners.ts.
+// Machine defaults and the pickup line come from data/gha-runners/ (ADR-0002).
+import { envNumber, readCsv } from '../../lib/postData';
+import { readEnv } from '../../lib/env';
+import '../../styles/widget.css';
+
+const DATA = 'gha-runners';
+const WHO = 'FleetSizing';
+const AT = 'labs/runner-fleet';
+const vmCpus = envNumber(DATA, (e) => e.host?.docker_vm?.cpus, 'host.docker_vm.cpus', WHO, AT);
+const vmGib = envNumber(DATA, (e) => e.host?.docker_vm?.memory_bytes, 'host.docker_vm.memory_bytes', WHO, AT) / 2 ** 30;
+const fleet = readEnv(DATA)?.fleet;
+const othersGib = envNumber(DATA, (e) => e.fleet?.vm_in_use_by_others_gib?.at(-1), 'fleet.vm_in_use_by_others_gib', WHO, AT);
+const pickup = (target: string, width: string) => {
+  const r = readCsv(DATA, 'latency.csv', WHO, AT).find((x) => x.target === target && x.width === width);
+  if (!r) throw new Error(`${WHO}: data/${DATA}/latency.csv has no ${target} width ${width}`);
+  return r;
+};
+const idle = pickup('fleet-light', '1');
+const busy = pickup('fleet-light', '8');
+// The pickup line describes the run it came from, so it takes that run's runner count. The
+// fleet has six light runners now; latency.csv was measured on four, and saying 8 jobs on 6
+// runners next to a p95 measured with four of them queued would misreport the measurement.
+const busyRunners = fleet?.measured_on?.latency?.light_runners ?? fleet?.light?.runners;
+// Memory defaults: the peaks under the heaviest dind jobs, rounded up to the field's 0.5 GiB step.
+const peaks = new Map(readCsv(DATA, 'memory.csv', WHO, AT).map((x) => [x.name, Number(x.peak_mib)]));
+const peak = (name: string) => {
+  const v = peaks.get(name);
+  if (v === undefined) throw new Error(`${WHO}: data/${DATA}/memory.csv has no ${name}`);
+  return v;
+};
+const pairs = [...peaks.keys()].filter((n) => /^dind-\d+$/.test(n));
+const lightPeak = Math.max(...[...peaks.keys()].filter((n) => n.startsWith('light-')).map(peak));
+const pairPeak = Math.max(...pairs.map((n) => peak(n) + peak(`runner-${n}`)));
+const upHalf = (mib: number) => Math.max(0.5, Math.ceil((mib / 1024) * 2) / 2);
+const measured =
+  `Machine: the Docker VM my fleet runs in, ${vmCpus} CPU threads and ${Math.round(vmGib)} GiB, with ${othersGib} GiB already taken by other things. ` +
+  `Measured pickup on the light class: p50 ${idle.p50_s} s and p95 ${idle.p95_s} s with a runner idle, which the wait above leaves out; ` +
+  `p95 ${busy.p95_s} s with ${busy.width} jobs on ${busyRunners ?? '?'} runners, where the jobs past the first ${busyRunners ?? '?'} wait for a runner to restart. ` +
+  `Memory per runner: the peaks with ${pairs.length} dind pairs under the heaviest dind jobs I measured, ${lightPeak} MiB for a light runner and ${pairPeak} MiB for a pair (sidecar plus runner half, each at its own peak), rounded up. ` +
+  `They are peaks, not ceilings: the fleet's configured limits are ${fleet?.light?.memory_gb} GiB per light runner and ${fleet?.dind?.sidecar_memory_gb} GiB per dind sidecar plus ${fleet?.dind?.runner_limits?.memory_gb} GiB for its runner half, which was uncapped when pickup was measured and capped by the time memory was. CPUs per runner are not measured.`;
+
+const uid = 'fleet';
+const workload = [
+  { key: 'jobs', label: 'Jobs per hour, busiest', min: 1, max: 300, step: 1, value: 24 },
+  { key: 'minutes', label: 'Average job length (min)', min: 1, max: 60, step: 1, value: 6 },
+  { key: 'docker', label: 'Jobs that need Docker (%)', min: 0, max: 100, step: 1, value: 10 },
+  { key: 'wait', label: 'Acceptable average wait (s)', min: 5, max: 300, step: 5, value: 60 },
+];
+const machine = [
+  { key: 'cores', label: 'CPU threads', min: 2, max: 64, step: 1, value: vmCpus },
+  { key: 'ram', label: 'Memory (GiB)', min: 8, max: 256, step: 1, value: Math.floor(vmGib) },
+  { key: 'reserved', label: 'Memory kept for other things (GiB)', min: 0, max: 128, step: 1, value: othersGib },
+];
+const per = [
+  { key: 'lram', label: 'light runner, GiB', value: upHalf(lightPeak), step: 0.5, min: 0.5 },
+  { key: 'lcpu', label: 'light runner, CPUs', value: 1.5, step: 0.5, min: 0.5 },
+  { key: 'dram', label: 'dind pair, GiB', value: upHalf(pairPeak), step: 0.5, min: 1 },
+  { key: 'dcpu', label: 'dind pair, CPUs', value: 3, step: 0.5, min: 0.5 },
+];
+---
+
+<div class="widget" data-widget="fleet-size">
+  <p class="wt">Fleet sizing for one machine</p>
+  <div class="g2">
+    <div>
+      <fieldset>
+        <legend>Workload</legend>
+        {
+          workload.map((r) => (
+            <div class="rng">
+              <div class="r">
+                <label for={`${uid}-${r.key}`}>{r.label}</label>
+                <output for={`${uid}-${r.key}`} data-show={r.key}>{r.value}</output>
+              </div>
+              <input id={`${uid}-${r.key}`} type="range" data-in={r.key} min={r.min} max={r.max} step={r.step} value={r.value} />
+            </div>
+          ))
+        }
+      </fieldset>
+      <fieldset>
+        <legend>Machine</legend>
+        {
+          machine.map((r) => (
+            <div class="rng">
+              <div class="r">
+                <label for={`${uid}-${r.key}`}>{r.label}</label>
+                <output for={`${uid}-${r.key}`} data-show={r.key}>{r.value}</output>
+              </div>
+              <input id={`${uid}-${r.key}`} type="range" data-in={r.key} min={r.min} max={r.max} step={r.step} value={r.value} />
+            </div>
+          ))
+        }
+      </fieldset>
+      <fieldset>
+        <legend>Per runner</legend>
+        <div class="nums">
+          {
+            per.map((n) => (
+              <label class="num">
+                <input type="number" inputmode="decimal" data-in={n.key} value={n.value} min={n.min} step={n.step} />
+                <span>{n.label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+    </div>
+    <div>
+      <div class="sbar" aria-hidden="true">
+        <i data-bar="light" style="background:var(--ac)"></i><i data-bar="dind" style="background:var(--warn)"></i>
+      </div>
+      <dl aria-live="polite">
+        <dt>light runners</dt><dd data-out="lrun">–</dd>
+        <dt>dind pairs</dt><dd data-out="drun">–</dd>
+        <dt>average wait, light</dt><dd data-out="lwait">–</dd>
+        <dt>average wait, dind</dt><dd data-out="dwait">–</dd>
+        <dt>memory needed</dt><dd data-out="ram">–</dd>
+        <dt>memory available</dt><dd data-out="avail">–</dd>
+        <dt>CPU limits / threads</dt><dd data-out="cpu">–</dd>
+      </dl>
+      <p class="note" data-out="note" aria-live="polite"></p>
+    </div>
+  </div>
+  <p class="formula">
+    Runners per class: the fewest that keep the average wait under your limit. Memory = runners × the memory per
+    runner.
+  </p>
+  <p class="formula">{measured}</p>
+  <p class="src"><a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">code</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">tests</a> · <a href="https://en.wikipedia.org/wiki/Erlang_(unit)#Erlang_C_formula">Erlang C</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/gha-runners">data</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/gha-runners">harness</a></p>
+  <noscript><p class="formula">This lab needs JavaScript.</p></noscript>
+</div>
+
+<script>
+  import { fleetSize } from '../../lib/runners';
+  import { onVisible } from '../../lib/onVisible';
+
+  const secs = (s: number) => (!Number.isFinite(s) ? 'never served' : s < 1 ? 'under 1 s' : s < 90 ? `${Math.round(s)} s` : `${(s / 60).toFixed(1)} min`);
+
+  function init(root: HTMLElement) {
+    const val = (k: string) => Number(root.querySelector<HTMLInputElement>(`[data-in="${k}"]`)!.value) || 0;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const bar = (k: string) => root.querySelector<HTMLElement>(`[data-bar="${k}"]`)!;
+
+    const run = () => {
+      for (const o of root.querySelectorAll<HTMLElement>('[data-show]')) {
+        const k = o.dataset.show!;
+        o.textContent = String(val(k));
+        root.querySelector(`[data-in="${k}"]`)!.setAttribute('aria-valuetext', o.textContent);
+      }
+      const reserved = Math.min(val('reserved'), val('ram'));
+      const p = fleetSize({
+        jobsPerHour: val('jobs'),
+        jobMinutes: val('minutes'),
+        dockerShare: val('docker') / 100,
+        cores: val('cores'),
+        ramGb: val('ram'),
+        reservedGb: reserved,
+        light: { ramGb: val('lram'), cpus: val('lcpu') },
+        dind: { ramGb: val('dram'), cpus: val('dcpu') },
+        targetWaitSec: val('wait'),
+      });
+      out('lrun').textContent = `${p.light.runners}  (load ${p.light.load.toFixed(1)})`;
+      out('drun').textContent = `${p.dind.runners}  (load ${p.dind.load.toFixed(1)})`;
+      out('lwait').textContent = p.light.runners ? secs(p.light.waitSec) : '–';
+      out('dwait').textContent = p.dind.runners ? secs(p.dind.waitSec) : '–';
+      out("ram").textContent = `${p.ramNeeded.toFixed(1)} GiB`;
+      out("avail").textContent = `${p.ramAvailable.toFixed(1)} GiB`;
+      const ratio = val('cores') ? p.cpuAsked / val('cores') : 0;
+      out('cpu').textContent = `${p.cpuAsked.toFixed(1)} / ${val('cores')}  (${ratio.toFixed(1)}×)`;
+      const scale = Math.max(p.ramAvailable, p.ramNeeded) || 1;
+      bar('light').style.width = `${((p.light.runners * val('lram')) / scale) * 100}%`;
+      bar('dind').style.width = `${((p.dind.runners * val('dram')) / scale) * 100}%`;
+      const notes = [];
+      if (p.status === 'over') notes.push('Does not fit on one machine.');
+      if (p.status === 'tight') notes.push('Fits, with under 15% memory to spare.');
+      if (ratio > 2) notes.push(`CPU limits are ${ratio.toFixed(1)}× the threads; jobs slow down at peak.`);
+      out('note').textContent = notes.join(' ');
+    };
+
+    root.querySelectorAll('input').forEach((el) => el.addEventListener('input', run));
+    run();
+  }
+
+  onVisible('[data-widget="fleet-size"]', init);
+</script>

@@ -7,8 +7,10 @@ import EnvBlock from '../../components/post/EnvBlock.astro';
 import Changelog from '../../components/post/Changelog.astro';
 import ResultsTable from '../../components/post/ResultsTable.astro';
 import PullQuote from '../../components/post/PullQuote.astro';
+import LabLink from '../../components/post/LabLink.astro';
 import VramAccount from '../../components/widgets/VramAccount.astro';
 import KvCalc from '../../components/widgets/KvCalc.astro';
+import RunnerFigure from '../../components/figures/runners/RunnerFigure.astro';
 import { getPosts } from '../../lib/posts';
 import { readEnv, commitUrl, repoUrl } from '../../lib/env';
 import { isoDate, readTime } from '../../lib/format';
@@ -46,8 +48,8 @@ const repoLink =
         </div>
         <HardwareBlock hardware={d.hardware} cost={d.cost} env={env} />
         <div class="prose">
-          <Content components={{ ResultsTable, PullQuote, VramAccount, KvCalc }} />
-          <Changelog date={d.date} corrections={d.corrections} />
+          <Content components={{ ResultsTable, PullQuote, VramAccount, KvCalc, RunnerFigure, LabLink }} />
+          <Changelog post={post} />
         </div>
       </article>
       <aside>

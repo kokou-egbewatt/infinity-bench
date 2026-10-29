@@ -1,0 +1,23 @@
+=== 04:01:22 rerun identity-service 38431511901 (all jobs)
+=== 04:02:35 identity-service dind jobs running
+=== 04:02:37 rerun infra integration
+integration-tests	success	fleet-dind-7c81e9ec54a7	04:02:33	04:05:10
+contract-tests	success	fleet-dind-d078c0f30703	04:02:33	04:08:54
+🔗 Integration & Environment Tests	success	fleet-dind-89b78d9b1065	04:02:40	04:03:50
+
+results/memory-dind3.csv, peaks in MiB:
+  runner-fleet-dind-3-1                     184
+  bench-meminfo                            0
+  runner-fleet-light-1                       58
+  runner-fleet-runner-dind-3-1              574
+  runner-fleet-light-2                       53
+  runner-fleet-dind-1-1                     711
+  runner-fleet-light-3                       56
+  bench-load                               1
+  runner-fleet-light-4                      565
+  runner-fleet-runner-dind-1-1              225
+  runner-fleet-registrar-1                   16
+  runner-fleet-dind-2-1                     271
+  runner-fleet-runner-dind-2-1              578
+  fleet, highest single sample          2557
+  VM used (total minus available)      11907 of 32098

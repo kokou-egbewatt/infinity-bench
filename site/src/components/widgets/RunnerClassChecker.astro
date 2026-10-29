@@ -1,0 +1,150 @@
+---
+// Paste a workflow; each job is sorted into light, dind or neither, with the runs-on and
+// port problems the post describes. Logic in src/lib/runners.ts. Nothing leaves the page.
+import { SAMPLE_WORKFLOW } from '../../lib/runnersSample';
+import '../../styles/widget.css';
+
+const uid = 'rcc';
+---
+
+<div class="widget rcc" data-widget="runner-class" data-sample={SAMPLE_WORKFLOW}>
+  <p class="wt">Which runner class does each job need?</p>
+  <label class="lbl" for={`${uid}-yaml`}>Paste a workflow file.</label>
+  <textarea id={`${uid}-yaml`} data-in="yaml" spellcheck="false" autocomplete="off" rows="14">{SAMPLE_WORKFLOW}</textarea>
+  <div class="acts">
+    <button type="button" data-act="sample">reset to the example</button>
+    <button type="button" data-act="clear">clear</button>
+  </div>
+  <p class="sum" data-out="summary" aria-live="polite"></p>
+  <ol class="jobs" data-out="jobs"></ol>
+  <div data-out="collisions"></div>
+  <p class="formula">
+    dind: services, a job container or Docker commands. Neither: container actions, Windows and macOS. Light:
+    everything else. Nothing you paste leaves the page.
+  </p>
+  <p class="src"><a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">code</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">tests</a></p>
+  <noscript><p class="formula">This lab needs JavaScript.</p></noscript>
+</div>
+
+<script>
+  import { checkWorkflow, type JobReport } from '../../lib/runners';
+  import { onVisible } from '../../lib/onVisible';
+
+  const LABEL = { light: 'light', dind: 'dind', neither: 'neither' } as const;
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function jobItem(j: JobReport) {
+    const li = el('li', `job ${j.cls}`);
+    const head = el('div', 'jh');
+    head.append(el('code', 'id', j.id), el('span', `badge ${j.cls}`, LABEL[j.cls]));
+    li.append(head);
+    li.append(el('p', 'why', j.reasons.join('; ') + '.'));
+    for (const f of j.flags) li.append(el('p', 'flag', f + '.'));
+    const use = el('p', 'use');
+    use.append(el('span', 'k', 'runs-on'));
+    if (j.cls === 'neither') use.append(el('span', 'adv', j.suggest));
+    else use.append(el('code', undefined, j.suggest));
+    li.append(use);
+    return li;
+  }
+
+  function init(root: HTMLElement) {
+    const area = root.querySelector<HTMLTextAreaElement>('[data-in="yaml"]')!;
+    const summary = root.querySelector<HTMLElement>('[data-out="summary"]')!;
+    const list = root.querySelector<HTMLElement>('[data-out="jobs"]')!;
+    const coll = root.querySelector<HTMLElement>('[data-out="collisions"]')!;
+
+    const run = () => {
+      const r = checkWorkflow(area.value);
+      list.replaceChildren();
+      coll.replaceChildren();
+      if (r.error) {
+        summary.textContent = r.error;
+        summary.classList.add('err');
+        return;
+      }
+      summary.classList.remove('err');
+      const n = (c: string) => r.jobs.filter((j) => j.cls === c).length;
+      const flagged = r.jobs.filter((j) => j.flags.length).length;
+      summary.textContent =
+        `${r.jobs.length} jobs: ${n('light')} light, ${n('dind')} dind, ${n('neither')} on neither. ` +
+        (flagged ? `${flagged} with a runs-on to fix.` : 'Every runs-on is fine.');
+      list.replaceChildren(...r.jobs.map(jobItem));
+      if (r.collisions.length) {
+        const box = el('div', 'coll');
+        box.append(el('p', 'ch', 'Ports that collide on a shared daemon'));
+        const ul = el('ul');
+        for (const c of r.collisions) {
+          ul.append(el('li', undefined, `:${c.port}, published by ${c.jobs[0]} and ${c.jobs[1]}, which can run at the same time`));
+        }
+        box.append(ul, el('p', 'cn', 'No collision with a daemon per runner.'));
+        coll.append(box);
+      }
+    };
+
+    let t: number | undefined;
+    area.addEventListener('input', () => {
+      clearTimeout(t);
+      t = window.setTimeout(run, 200);
+    });
+    root.querySelector('[data-act="sample"]')!.addEventListener('click', () => {
+      area.value = root.dataset.sample ?? '';
+      run();
+    });
+    root.querySelector('[data-act="clear"]')!.addEventListener('click', () => {
+      area.value = '';
+      area.focus();
+      run();
+    });
+    run();
+  }
+
+  onVisible('[data-widget="runner-class"]', init);
+</script>
+
+<style>
+  .lbl { display: block; font-size: 12.5px; color: var(--tx2); margin: 0 0 6px; }
+  textarea {
+    display: block; width: 100%; resize: vertical; min-height: 180px; box-sizing: border-box;
+    background: #08080a; color: var(--tx); border: 1px solid var(--line2); border-radius: 6px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.55; padding: 10px 12px; tab-size: 2;
+  }
+  textarea:focus-visible { outline: 2px solid var(--ac); outline-offset: 1px; }
+  .acts { display: flex; gap: 8px; margin: 8px 0 14px; }
+  .acts button {
+    font-family: var(--mono); font-size: 11px; color: var(--tx2); background: var(--bg); border: 1px solid var(--line2);
+    border-radius: 4px; padding: 6px 12px; cursor: pointer;
+  }
+  .acts button:hover { color: var(--hi); }
+  .widget p.sum { font-size: 13.5px; color: var(--tx); margin: 0 0 10px; line-height: 1.5; }
+  .widget p.sum.err { color: var(--warn); }
+  .jobs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .jobs :global(.job) { border: 1px solid var(--line); border-left: 3px solid var(--line2); border-radius: 6px; background: var(--bg); padding: 10px 12px; }
+  .jobs :global(.job.light) { border-left-color: var(--ac); }
+  .jobs :global(.job.dind) { border-left-color: var(--warn); }
+  .jobs :global(.job.neither) { border-left-color: #f87171; }
+  .jobs :global(.jh) { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+  .jobs :global(.id) { font-family: var(--mono); font-size: 13px; color: var(--hi); background: none; padding: 0; }
+  .jobs :global(.badge) { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; border: 1px solid; }
+  .jobs :global(.badge.light) { color: var(--ac); border-color: var(--ac2); }
+  .jobs :global(.badge.dind) { color: var(--warn); border-color: #4a3a1a; }
+  .jobs :global(.badge.neither) { color: #f87171; border-color: #4a2222; }
+  .widget .jobs :global(p) { margin: 0 0 4px; font-size: 13px; line-height: 1.5; }
+  .widget .jobs :global(p.why) { color: var(--tx2); }
+  .widget .jobs :global(p.flag) { color: var(--warn); }
+  .widget .jobs :global(p.use) { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; margin: 6px 0 0; }
+  .jobs :global(.k) { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
+  .jobs :global(.use code) { font-family: var(--mono); font-size: 12px; color: var(--tx); background: #1a1b1f; padding: 0.1em 0.4em; border-radius: 3px; overflow-wrap: anywhere; }
+  .jobs :global(.adv) { font-size: 13px; color: var(--tx); }
+  [data-out='collisions'] :global(.coll) { margin-top: 12px; border: 1px solid #4a2222; border-radius: 6px; padding: 10px 12px; background: rgba(248, 113, 113, 0.05); }
+  .widget [data-out='collisions'] :global(p) { margin: 0; font-size: 13px; line-height: 1.5; }
+  [data-out='collisions'] :global(.ch) { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #f87171; margin-bottom: 6px !important; }
+  [data-out='collisions'] :global(ul) { margin: 0 0 6px 18px; padding: 0; font-size: 13px; color: var(--tx); }
+  [data-out='collisions'] :global(.cn) { color: var(--tx2); }
+</style>

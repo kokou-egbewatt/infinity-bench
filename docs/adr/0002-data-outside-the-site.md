@@ -44,4 +44,4 @@ chunks move and `import.meta.url` no longer points at the source tree.
 - The build needs the repository layout: it runs from `site/` with `data/` beside it, locally and in
   CI.
 - Harness output is reviewed as a diff in the same pull request as the post that cites it.
-- `data/_example/` exists only for the draft fixture; published posts never use it.
+- Every folder under `data/` now backs a real post.

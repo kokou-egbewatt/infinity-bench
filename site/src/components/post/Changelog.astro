@@ -1,27 +1,32 @@
 ---
+// A post's own history: published, updated, errata. The same events /changelog lists site-wide.
 import { isoDate } from '../../lib/format';
+import { postEvents, KIND_LABEL, type ChangeInput } from '../../lib/changes';
+import { url } from '../../lib/url';
 
 interface Props {
-  date: Date;
-  corrections: { date: Date; text: string; credit?: string }[];
+  post: ChangeInput;
 }
 
-const { date, corrections } = Astro.props;
-const entries = [...corrections].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+const events = postEvents(Astro.props.post);
 ---
 
 <section class="chg">
   <h2 id="changelog">Changelog</h2>
   <ul>
     {
-      entries.map((c) => (
-        <li>
-          <span>{isoDate(c.date)}</span>
-          {c.text}
-          {c.credit && ` Thanks to ${c.credit}.`}
+      events.map((e) => (
+        <li class:list={[e.kind]}>
+          <span>{isoDate(e.date)}</span>
+          {e.kind !== 'published' && <em>{KIND_LABEL[e.kind]}</em>}
+          {e.kind === 'lab' && e.lab ? (
+            <a href={url(`/labs/${e.lab.id}`)}>{e.lab.name}</a>
+          ) : (
+            e.text
+          )}
+          {e.credit && ` Thanks to ${e.credit}.`}
         </li>
       ))
     }
-    <li><span>{isoDate(date)}</span>Published.</li>
   </ul>
 </section>

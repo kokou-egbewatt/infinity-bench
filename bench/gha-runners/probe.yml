@@ -1,0 +1,29 @@
+# Job pickup latency probe. The job does nothing, on purpose: what is measured is
+# started_at minus created_at, the time a queued job waits for a runner to take it.
+# bench/latency.sh dispatches this and reads the timings back from the API.
+name: probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: The runs-on label to measure
+        required: true
+      matrix:
+        description: A JSON array, one job per element. Its length is how many jobs queue at once.
+        required: true
+        default: '[1]'
+
+permissions: {}
+
+jobs:
+  probe:
+    name: probe ${{ matrix.i }}
+    runs-on: ${{ inputs.target }}
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        i: ${{ fromJSON(inputs.matrix) }}
+    steps:
+      - run: echo "$RUNNER_NAME"

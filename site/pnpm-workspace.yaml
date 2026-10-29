@@ -1,2 +1,4 @@
 allowBuilds:
   esbuild: true
+  # Local runtime for `wrangler dev`. Deploying prebuilt assets never bundles, so it stays off.
+  workerd: false
