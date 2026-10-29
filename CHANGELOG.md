@@ -35,6 +35,15 @@ of a wrapper almost twice their width.
   Figures bleed to the new edge.
 - **The status bar keeps the post counts on phones** and drops the hardware string, which was
   ellipsised to nothing anyway and is on the home page.
+- **CI runs in two jobs rather than three.** The documentation links check moves in beside the
+  version and changelog gates, which need no Node either, and every step after the first is
+  guarded with `!cancelled()` so a failing gate no longer hides the ones behind it. Taken from
+  the AA Grace Counseling site, whose pipeline this one is otherwise a copy of.
+- **Prettier and ESLint run in CI and in `pnpm verify`**, with the same configuration as that
+  site: `eslint-plugin-astro` with its accessibility rules, and Prettier at 100 columns with
+  single quotes. The stylesheets, the generated figure components and the post itself are left
+  out, because the first is written one rule per line on purpose, the second is rebuilt by
+  `build.py`, and the third is prose.
 
 ## [0.8.0] - Live at kokou.dev (2026-10-28)
 
