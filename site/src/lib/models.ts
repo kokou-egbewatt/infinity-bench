@@ -13,8 +13,14 @@ export async function getModels(runtime: 'llama.cpp' | 'vllm', selected: string,
       label: `${m.name} ${m.quantization}`,
       size_mb: m.size_mb,
       selected: id === selected,
-      attrs: { 'data-size': m.size_mb, 'data-layers': m.layers, 'data-kv-heads': m.kv_heads, 'data-head-dim': m.head_dim },
+      attrs: {
+        'data-size': m.size_mb,
+        'data-layers': m.layers,
+        'data-kv-heads': m.kv_heads,
+        'data-head-dim': m.head_dim,
+      },
     }));
-  if (!models.some((m) => m.selected)) throw new Error(`${who}: model ${selected} is not a ${runtime} model in models.yaml`);
+  if (!models.some((m) => m.selected))
+    throw new Error(`${who}: model ${selected} is not a ${runtime} model in models.yaml`);
   return models;
 }

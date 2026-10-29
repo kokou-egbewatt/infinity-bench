@@ -35,8 +35,14 @@ export interface WorkflowReport {
 /** Actions known to run in their own container (runs.using: docker), so they need a daemon that can mount the workspace. */
 const DOCKER_ACTIONS = ['hadolint/hadolint-action', 'bridgecrewio/checkov-action'];
 /** Actions that drive a Docker daemon from the job. */
-const DAEMON_ACTIONS = ['docker/build-push-action', 'docker/setup-buildx-action', 'docker/login-action', 'helm/kind-action'];
-const DOCKER_CMD = /\b(docker\s+(build|buildx|compose|run|push|pull|login|exec)|docker-compose|kind\s+create|podman\s+(build|run))\b/;
+const DAEMON_ACTIONS = [
+  'docker/build-push-action',
+  'docker/setup-buildx-action',
+  'docker/login-action',
+  'helm/kind-action',
+];
+const DOCKER_CMD =
+  /\b(docker\s+(build|buildx|compose|run|push|pull|login|exec)|docker-compose|kind\s+create|podman\s+(build|run))\b/;
 
 export const SUGGEST = {
   light: "${{ vars.CI_RUNNER || 'ubuntu-latest' }}",
@@ -63,7 +69,12 @@ function stripComment(l: string): string {
 /** A scalar, a flow list "[a, b]", or a block list on the following lines. */
 function readList(lines: string[], i: number, keyIndent: number, value: string): string[] {
   const v = value.trim();
-  if (v.startsWith('[')) return v.replace(/^\[|\]$/g, '').split(',').map(unquote).filter(Boolean);
+  if (v.startsWith('['))
+    return v
+      .replace(/^\[|\]$/g, '')
+      .split(',')
+      .map(unquote)
+      .filter(Boolean);
   if (v) return [unquote(v)];
   const out: string[] = [];
   for (let j = i + 1; j < lines.length; j++) {
@@ -95,7 +106,9 @@ function servicePorts(svc: string[]): number[] {
   for (let k = 0; k < svc.length; k++) {
     if (!/^\s*ports:\s*(\[.*\])?\s*$/.test(svc[k])) continue;
     const inline = svc[k].match(/\[(.*)\]/);
-    const items = inline ? inline[1].split(',') : block(svc, k).map((l) => l.trim().replace(/^-\s*/, ''));
+    const items = inline
+      ? inline[1].split(',')
+      : block(svc, k).map((l) => l.trim().replace(/^-\s*/, ''));
     for (const raw of items) {
       const m = unquote(raw).match(/^(?:\d+\.\d+\.\d+\.\d+:)?(\d+):(\d+)(?:\/\w+)?$/);
       if (m) ports.push(Number(m[1]));
@@ -107,10 +120,16 @@ function servicePorts(svc: string[]): number[] {
 export function checkWorkflow(src: string): WorkflowReport {
   const lines = src.replace(/\t/g, '  ').split(/\r?\n/).map(stripComment);
   const start = lines.findIndex((l) => /^jobs:\s*$/.test(l));
-  if (start < 0) return { jobs: [], collisions: [], error: 'No top-level jobs: key found. Paste a whole workflow file.' };
+  if (start < 0)
+    return {
+      jobs: [],
+      collisions: [],
+      error: 'No top-level jobs: key found. Paste a whole workflow file.',
+    };
 
   const first = lines.slice(start + 1).find((l) => l.trim());
-  if (!first || indentOf(first) === 0) return { jobs: [], collisions: [], error: 'The jobs: key has no jobs under it.' };
+  if (!first || indentOf(first) === 0)
+    return { jobs: [], collisions: [], error: 'The jobs: key has no jobs under it.' };
   const jobIndent = indentOf(first);
 
   const jobs: JobReport[] = [];
@@ -139,12 +158,17 @@ export function checkWorkflow(src: string): WorkflowReport {
         if (name === 'runs-on') {
           runsOnRaw = value.trim();
           runsOnList = readList(body, k, keyIndent, value);
-          if (!runsOnRaw) runsOnRaw = runsOnList.length ? `[${runsOnList.join(', ')}]` : '(group or labels block)';
+          if (!runsOnRaw)
+            runsOnRaw = runsOnList.length
+              ? `[${runsOnList.join(', ')}]`
+              : '(group or labels block)';
         } else if (name === 'needs') {
           needs = readList(body, k, keyIndent, value);
         } else if (name === 'services') {
           const svc = block(body, k);
-          const names = svc.filter((s) => indentOf(s) === indentOf(svc[0] ?? '')).map((s) => s.trim().replace(/:.*$/, ''));
+          const names = svc
+            .filter((s) => indentOf(s) === indentOf(svc[0] ?? ''))
+            .map((s) => s.trim().replace(/:.*$/, ''));
           reasons.push(`services: ${names.join(', ') || 'yes'}`);
           ports = servicePorts(svc);
         } else if (name === 'container') {
@@ -165,7 +189,8 @@ export function checkWorkflow(src: string): WorkflowReport {
           reasons.push(`${repo} needs a daemon`);
         }
       }
-      if (DOCKER_CMD.test(bl) && !reasons.includes('docker commands')) reasons.push('docker commands');
+      if (DOCKER_CMD.test(bl) && !reasons.includes('docker commands'))
+        reasons.push('docker commands');
     });
 
     const target = runsOnList.join(' ').toLowerCase();
@@ -178,7 +203,10 @@ export function checkWorkflow(src: string): WorkflowReport {
       // staying on a GitHub-hosted label is the right answer here, not a flag
     } else if (runsOnList.length === 1 && runsOnList[0] === 'self-hosted') {
       flags.push('bare self-hosted: name the runner class');
-    } else if (runsOnList.some((r) => /^(ubuntu|windows|macos)-/.test(r)) && !/vars\./.test(runsOnRaw)) {
+    } else if (
+      runsOnList.some((r) => /^(ubuntu|windows|macos)-/.test(r)) &&
+      !/vars\./.test(runsOnRaw)
+    ) {
       flags.push('pinned to GitHub-hosted: read it from a variable');
     } else if (/matrix\./.test(runsOnRaw)) {
       flags.push('set by a matrix; check each value');
@@ -213,7 +241,8 @@ export function checkWorkflow(src: string): WorkflowReport {
       const a = jobs[x];
       const b = jobs[y];
       if (reaches(a.id, b.id) || reaches(b.id, a.id)) continue;
-      for (const port of a.ports.filter((p) => b.ports.includes(p))) collisions.push({ port, jobs: [a.id, b.id] });
+      for (const port of a.ports.filter((p) => b.ports.includes(p)))
+        collisions.push({ port, jobs: [a.id, b.id] });
     }
   }
   return { jobs, collisions };
@@ -287,7 +316,8 @@ export function fleetSize(i: FleetInput): FleetPlan {
   const ramNeeded = light.runners * i.light.ramGb + dind.runners * i.dind.ramGb;
   const ramAvailable = Math.max(0, i.ramGb - i.reservedGb);
   const cpuAsked = light.runners * i.light.cpus + dind.runners * i.dind.cpus;
-  const status = ramNeeded > ramAvailable ? 'over' : ramNeeded > ramAvailable * 0.85 ? 'tight' : 'ok';
+  const status =
+    ramNeeded > ramAvailable ? 'over' : ramNeeded > ramAvailable * 0.85 ? 'tight' : 'ok';
   return { light, dind, ramNeeded, ramAvailable, cpuAsked, status };
 }
 
@@ -324,7 +354,8 @@ export function breakEven(i: BreakEvenInput): BreakEven {
   const hosted = Math.max(0, i.minutes - included) * i.rate;
   const self = fixed + i.minutes * perMinute;
   // past the included minutes: (m - included) * rate = fixed + m * perMinute
-  const breakEvenMinutes = i.rate > perMinute ? (fixed + included * i.rate) / (i.rate - perMinute) : null;
+  const breakEvenMinutes =
+    i.rate > perMinute ? (fixed + included * i.rate) / (i.rate - perMinute) : null;
   return { hosted, self, breakEvenMinutes };
 }
 
@@ -344,5 +375,8 @@ export interface CachePayoff {
 export function cachePayoff(rows: CacheRow[], mbps: number, daysPerMonth: number): CachePayoff {
   const mbPerDay = rows.reduce((s, r) => s + r.sizeMb * r.jobsPerDay, 0);
   const secondsPerDay = mbps > 0 ? (mbPerDay * 8) / mbps : 0;
-  return { gbPerMonth: (mbPerDay * daysPerMonth) / 1024, minutesPerMonth: (secondsPerDay * daysPerMonth) / 60 };
+  return {
+    gbPerMonth: (mbPerDay * daysPerMonth) / 1024,
+    minutesPerMonth: (secondsPerDay * daysPerMonth) / 60,
+  };
 }

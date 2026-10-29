@@ -16,7 +16,13 @@ interface Props {
 const WHO = 'KvCalc';
 const post = currentPost(Astro.locals, WHO);
 const { taxFrom = post.data, model = 'llama-3.2-1b-fp16', workspaceMb = 600 } = Astro.props;
-const totalMb = envNumber(post.data, (e) => e.gpu?.vram_total_mb, 'gpu.vram_total_mb', WHO, post.slug);
+const totalMb = envNumber(
+  post.data,
+  (e) => e.gpu?.vram_total_mb,
+  'gpu.vram_total_mb',
+  WHO,
+  post.slug,
+);
 const taxMb = envNumber(taxFrom, (e) => e.desktop_tax_mb, 'desktop_tax_mb', WHO, post.slug);
 const models = await getModels('vllm', model, WHO);
 const uid = `kv-${post.slug}`;
@@ -29,19 +35,23 @@ const ranges = [
 ];
 ---
 
-<div class="widget" data-widget="kv" data-total={totalMb} data-tax={taxMb} data-workspace={workspaceMb}>
+<div
+  class="widget"
+  data-widget="kv"
+  data-total={totalMb}
+  data-tax={taxMb}
+  data-workspace={workspaceMb}
+>
   <p class="wt">KV cache · after {gb(taxMb, 1)} desktop tax</p>
   <div class="sels">
     <label class="sel">
       Model
       <select data-in="model">
-        {
-          models.map((m) => (
-            <option value={m.id} selected={m.selected} {...m.attrs}>
-              {m.label}
-            </option>
-          ))
-        }
+        {models.map((m) => (
+          <option value={m.id} selected={m.selected} {...m.attrs}>
+            {m.label}
+          </option>
+        ))}
       </select>
     </label>
     <label class="sel">
@@ -54,42 +64,62 @@ const ranges = [
   </div>
   <div class="g2">
     <div>
-      {
-        ranges.map((r) => (
-          <div class="rng">
-            <div class="r">
-              <label for={`${uid}-${r.key}`}>{r.label}</label>
-              <output for={`${uid}-${r.key}`} data-show={r.key}>{r.value}</output>
-            </div>
-            <input id={`${uid}-${r.key}`} type="range" data-in={r.key} min={r.min} max={r.max} step={r.step} value={r.value} />
+      {ranges.map((r) => (
+        <div class="rng">
+          <div class="r">
+            <label for={`${uid}-${r.key}`}>{r.label}</label>
+            <output for={`${uid}-${r.key}`} data-show={r.key}>
+              {r.value}
+            </output>
           </div>
-        ))
-      }
+          <input
+            id={`${uid}-${r.key}`}
+            type="range"
+            data-in={r.key}
+            min={r.min}
+            max={r.max}
+            step={r.step}
+            value={r.value}
+          />
+        </div>
+      ))}
     </div>
     <div>
       <div class="sbar" aria-hidden="true">
-        <i data-bar="weights" style="background:#3a3a42"></i><i data-bar="workspace" style="background:#6b6b73"></i><i
-          data-bar="kv"
-          style="background:var(--ac)"></i>
+        <i data-bar="weights" style="background:#3a3a42"></i>
+        <i data-bar="workspace" style="background:#6b6b73"></i>
+        <i data-bar="kv" style="background:var(--ac)"></i>
       </div>
       <dl aria-live="polite">
-        <dt>asked for (total × utilization)</dt><dd data-out="budget">–</dd>
-        <dt>free after the desktop</dt><dd data-out="free">–</dd>
-        <dt>weights</dt><dd data-out="weights">–</dd>
-        <dt>KV pool</dt><dd data-out="pool">–</dd>
-        <dt>KV per token</dt><dd data-out="per">–</dd>
-        <dt>KV these sequences need</dt><dd data-out="need">–</dd>
-        <dt>max sequences at this length</dt><dd data-out="max">–</dd>
+        <dt>asked for (total × utilization)</dt>
+        <dd data-out="budget">–</dd>
+        <dt>free after the desktop</dt>
+        <dd data-out="free">–</dd>
+        <dt>weights</dt>
+        <dd data-out="weights">–</dd>
+        <dt>KV pool</dt>
+        <dd data-out="pool">–</dd>
+        <dt>KV per token</dt>
+        <dd data-out="per">–</dd>
+        <dt>KV these sequences need</dt>
+        <dd data-out="need">–</dd>
+        <dt>max sequences at this length</dt>
+        <dd data-out="max">–</dd>
       </dl>
       <p class="note" data-out="note" aria-live="polite"></p>
     </div>
   </div>
   <p class="formula">
-    pool = {totalMb.toLocaleString('en-US')} MB × utilization − weights − {workspaceMb} MB workspace (an estimate). KV per token
-    = 2 × layers × KV heads × head dim × dtype bytes. needed = sequences × (prompt + output) × KV per token. Desktop
-    tax {taxMb.toLocaleString('en-US')} MB from data/{taxFrom}/env.json; weights from models.yaml.
+    pool = {totalMb.toLocaleString('en-US')} MB × utilization − weights − {workspaceMb} MB workspace
+    (an estimate). KV per token = 2 × layers × KV heads × head dim × dtype bytes. needed = sequences
+    × (prompt + output) × KV per token. Desktop tax {taxMb.toLocaleString('en-US')} MB from data/
+    {taxFrom}/env.json; weights from models.yaml.
   </p>
-  <noscript><p class="formula">This widget needs JavaScript. The results table in this post has the measured numbers.</p></noscript>
+  <noscript>
+    <p class="formula">
+      This widget needs JavaScript. The results table in this post has the measured numbers.
+    </p>
+  </noscript>
 </div>
 
 <script>
@@ -98,7 +128,8 @@ const ranges = [
   import { onVisible } from '../../lib/onVisible';
 
   const NOTES: Record<KvStatus, string> = {
-    'over-free': 'vLLM refuses to start: it asks for more than the desktop leaves free. Lower utilization.',
+    'over-free':
+      'vLLM refuses to start: it asks for more than the desktop leaves free. Lower utilization.',
     'no-room': 'Weights and workspace take the whole budget. No KV pool at all.',
     preempt: 'KV pool exhausted: vLLM preempts and recomputes sequences.',
     tight: 'Above 85% of the pool. One long prompt will preempt.',

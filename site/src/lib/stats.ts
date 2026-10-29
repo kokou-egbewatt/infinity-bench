@@ -15,7 +15,9 @@ interface Stats {
 
 export function computeStats(posts: StatsInput[]): Stats {
   const live = posts.filter((p) => !p.data.draft);
-  const last = live.map((p) => p.data.updated ?? p.data.date).sort((a, b) => b.valueOf() - a.valueOf())[0];
+  const last = live
+    .map((p) => p.data.updated ?? p.data.date)
+    .sort((a, b) => b.valueOf() - a.valueOf())[0];
   return {
     postCount: live.length,
     errataCount: live.reduce((n, p) => n + p.data.errata.length, 0),

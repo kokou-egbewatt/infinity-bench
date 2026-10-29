@@ -46,7 +46,9 @@ const posts = defineCollection({
       hardware,
       cost: z.string(), // display line, e.g. "$0 · 18 h of runs"
       harness: z
-        .string({ message: 'quote the SHA, e.g. harness: "0c11b4e" (YAML reads some SHAs as numbers)' })
+        .string({
+          message: 'quote the SHA, e.g. harness: "0c11b4e" (YAML reads some SHAs as numbers)',
+        })
         .regex(/^[0-9a-f]{7,40}$/), // commit in `repo`
       data: z.string(), // folder under /data
       widgets: z.array(z.string()).default([]),
@@ -54,7 +56,10 @@ const posts = defineCollection({
       changes: z.array(change).default([]),
       draft: z.boolean().default(false),
     })
-    .refine((p) => !p.updated || p.updated >= p.date, { message: 'updated is before date', path: ['updated'] })
+    .refine((p) => !p.updated || p.updated >= p.date, {
+      message: 'updated is before date',
+      path: ['updated'],
+    })
     .refine((p) => p.errata.every((c) => c.date >= p.date), {
       message: 'erratum dated before the post',
       path: ['errata'],

@@ -10,7 +10,8 @@ export const WIDGETS = [
   {
     id: 'vram',
     name: 'What is stealing my VRAM',
-    blurb: 'Toggle what is running on the desktop and see how much of the 8 GB a model can actually have.',
+    blurb:
+      'Toggle what is running on the desktop and see how much of the 8 GB a model can actually have.',
     plan: 'vram-accounting',
     section: undefined as string | undefined,
     page: false as boolean,
@@ -28,7 +29,8 @@ export const WIDGETS = [
   {
     id: 'runner-fleet',
     name: 'Runner fleet lab',
-    blurb: 'Four tools from the runner fleet post: break-even against GitHub-hosted runners, which runner class each job needs, what a shared cache saves, and how many runners one machine holds.',
+    blurb:
+      'Four tools from the runner fleet post: break-even against GitHub-hosted runners, which runner class each job needs, what a shared cache saves, and how many runners one machine holds.',
     plan: 'desktop-runner-fleet',
     section: undefined as string | undefined,
     page: true as boolean,

@@ -18,7 +18,10 @@ import { url } from '../../lib/url';
 import '../../styles/post.css';
 
 export const getStaticPaths = (async () =>
-  (await getPosts()).map((post) => ({ params: { slug: post.id }, props: { post } }))) satisfies GetStaticPaths;
+  (await getPosts()).map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }))) satisfies GetStaticPaths;
 
 const { post } = Astro.props;
 const d = post.data;
@@ -28,14 +31,18 @@ const { Content, headings } = await render(post);
 const env = readEnv(d.data);
 const toc = [...headings.filter((h) => h.depth === 2), { slug: 'changelog', text: 'Changelog' }];
 const repoLink =
-  d.repo === 'NeuroMesh' ? commitUrl('NeuroMesh', d.harness) : `${repoUrl('infinity-bench')}/tree/main/bench/${d.data}`;
+  d.repo === 'NeuroMesh'
+    ? commitUrl('NeuroMesh', d.harness)
+    : `${repoUrl('infinity-bench')}/tree/main/bench/${d.data}`;
 ---
 
 <BaseLayout title={d.title} description={d.dek}>
   <div class="wrap">
     <div class="post">
       <article>
-        <a class="back" href={url('/')}>← Posts</a>
+        <a class="back" href={url('/')}>
+          ← Posts
+        </a>
         <h1>{d.title}</h1>
         <p class="dek">{d.dek}</p>
         <div class="meta">
@@ -48,7 +55,9 @@ const repoLink =
         </div>
         <HardwareBlock hardware={d.hardware} cost={d.cost} env={env} />
         <div class="prose">
-          <Content components={{ ResultsTable, PullQuote, VramAccount, KvCalc, RunnerFigure, LabLink }} />
+          <Content
+            components={{ ResultsTable, PullQuote, VramAccount, KvCalc, RunnerFigure, LabLink }}
+          />
           <Changelog post={post} />
         </div>
       </article>
@@ -56,7 +65,11 @@ const repoLink =
         <div class="toc">
           <div class="h">Contents</div>
           <nav aria-label="Contents">
-            {toc.map((h) => <a href={`#${h.slug}`} data-t={h.slug}>{h.text.replace(/^\d+\.\s*/, '')}</a>)}
+            {toc.map((h) => (
+              <a href={`#${h.slug}`} data-t={h.slug}>
+                {h.text.replace(/^\d+\.\s*/, '')}
+              </a>
+            ))}
           </nav>
           <EnvBlock env={env} repo={d.repo} harness={d.harness} />
         </div>
@@ -67,11 +80,14 @@ const repoLink =
 
 <script>
   const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc nav a')];
-  const targets = links.map((a) => document.getElementById(a.dataset.t ?? '')).filter((el): el is HTMLElement => !!el);
+  const targets = links
+    .map((a) => document.getElementById(a.dataset.t ?? ''))
+    .filter((el): el is HTMLElement => !!el);
   const observer = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
-        if (e.isIntersecting) links.forEach((a) => a.classList.toggle('active', a.dataset.t === e.target.id));
+        if (e.isIntersecting)
+          links.forEach((a) => a.classList.toggle('active', a.dataset.t === e.target.id));
       }
     },
     { rootMargin: '-15% 0px -75% 0px' },

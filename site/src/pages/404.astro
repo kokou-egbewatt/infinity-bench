@@ -34,7 +34,9 @@ const candidates = JSON.stringify({
 <BaseLayout title="Not found" description="No page at this path.">
   <div class="wrap">
     <div class="nf">
-      <p class="req"><span id="nf-method">GET</span> <span id="nf-path">/</span></p>
+      <p class="req">
+        <span id="nf-method">GET</span> <span id="nf-path">/</span>
+      </p>
       <p class="resp">HTTP/1.1 404 Not Found</p>
       <pre class="code"><code>{'{'}
   <span class="k">"error"</span>: {'{'}
@@ -45,22 +47,31 @@ const candidates = JSON.stringify({
 {'}'}</code></pre>
       <p class="note">
         That's the exact error the{' '}
-        <a href={`${REPOS.nm.url}/blob/main/services/gateway/internal/httpapi/httpapi.go`}>NeuroMesh gateway</a>{' '}
-        returns for a path it doesn't know. If a link on this site sent you here, it's my mistake and it goes on
-        the <a href={url('/errata')}>Errata</a>.
+        <a href={`${REPOS.nm.url}/blob/main/services/gateway/internal/httpapi/httpapi.go`}>
+          NeuroMesh gateway
+        </a>{' '}
+        returns for a path it doesn't know. If a link on this site sent you here, it's my mistake
+        and it goes on the <a href={url('/errata')}>Errata</a>.
       </p>
 
       <div class="sug">
         <div class="h">Closest routes</div>
         <div id="nf-sug">
-          {pages.slice(0, 2).map((p) => <a href={p.href}>{p.title}<span>{p.tag}</span></a>)}
+          {pages.slice(0, 2).map((p) => (
+            <a href={p.href}>
+              {p.title}
+              <span>{p.tag}</span>
+            </a>
+          ))}
         </div>
       </div>
 
       <div class="links">
         <a href={url('/')}>posts</a>
         <a href={url('/series')}>series</a>
-        <a class="warn" id="nf-report" href={`${REPOS.ib.url}/issues/new`}>report broken link</a>
+        <a class="warn" id="nf-report" href={`${REPOS.ib.url}/issues/new`}>
+          report broken link
+        </a>
       </div>
     </div>
   </div>
@@ -68,7 +79,11 @@ const candidates = JSON.stringify({
 </BaseLayout>
 
 <script>
-  interface Route { title: string; href: string; tag: string }
+  interface Route {
+    title: string;
+    href: string;
+    tag: string;
+  }
   const data = JSON.parse(document.getElementById('nf-data')!.textContent || '{}') as {
     base: string;
     newIssue: string;

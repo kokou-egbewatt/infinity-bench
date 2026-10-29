@@ -10,11 +10,21 @@ const DATA = 'gha-runners';
 const WHO = 'FleetSizing';
 const AT = 'labs/runner-fleet';
 const vmCpus = envNumber(DATA, (e) => e.host?.docker_vm?.cpus, 'host.docker_vm.cpus', WHO, AT);
-const vmGib = envNumber(DATA, (e) => e.host?.docker_vm?.memory_bytes, 'host.docker_vm.memory_bytes', WHO, AT) / 2 ** 30;
+const vmGib =
+  envNumber(DATA, (e) => e.host?.docker_vm?.memory_bytes, 'host.docker_vm.memory_bytes', WHO, AT) /
+  2 ** 30;
 const fleet = readEnv(DATA)?.fleet;
-const othersGib = envNumber(DATA, (e) => e.fleet?.vm_in_use_by_others_gib?.at(-1), 'fleet.vm_in_use_by_others_gib', WHO, AT);
+const othersGib = envNumber(
+  DATA,
+  (e) => e.fleet?.vm_in_use_by_others_gib?.at(-1),
+  'fleet.vm_in_use_by_others_gib',
+  WHO,
+  AT,
+);
 const pickup = (target: string, width: string) => {
-  const r = readCsv(DATA, 'latency.csv', WHO, AT).find((x) => x.target === target && x.width === width);
+  const r = readCsv(DATA, 'latency.csv', WHO, AT).find(
+    (x) => x.target === target && x.width === width,
+  );
   if (!r) throw new Error(`${WHO}: data/${DATA}/latency.csv has no ${target} width ${width}`);
   return r;
 };
@@ -25,7 +35,9 @@ const busy = pickup('fleet-light', '8');
 // runners next to a p95 measured with four of them queued would misreport the measurement.
 const busyRunners = fleet?.measured_on?.latency?.light_runners ?? fleet?.light?.runners;
 // Memory defaults: the peaks under the heaviest dind jobs, rounded up to the field's 0.5 GiB step.
-const peaks = new Map(readCsv(DATA, 'memory.csv', WHO, AT).map((x) => [x.name, Number(x.peak_mib)]));
+const peaks = new Map(
+  readCsv(DATA, 'memory.csv', WHO, AT).map((x) => [x.name, Number(x.peak_mib)]),
+);
 const peak = (name: string) => {
   const v = peaks.get(name);
   if (v === undefined) throw new Error(`${WHO}: data/${DATA}/memory.csv has no ${name}`);
@@ -52,7 +64,14 @@ const workload = [
 const machine = [
   { key: 'cores', label: 'CPU threads', min: 2, max: 64, step: 1, value: vmCpus },
   { key: 'ram', label: 'Memory (GiB)', min: 8, max: 256, step: 1, value: Math.floor(vmGib) },
-  { key: 'reserved', label: 'Memory kept for other things (GiB)', min: 0, max: 128, step: 1, value: othersGib },
+  {
+    key: 'reserved',
+    label: 'Memory kept for other things (GiB)',
+    min: 0,
+    max: 128,
+    step: 1,
+    value: othersGib,
+  },
 ];
 const per = [
   { key: 'lram', label: 'light runner, GiB', value: upHalf(lightPeak), step: 0.5, min: 0.5 },
@@ -68,79 +87,131 @@ const per = [
     <div>
       <fieldset>
         <legend>Workload</legend>
-        {
-          workload.map((r) => (
-            <div class="rng">
-              <div class="r">
-                <label for={`${uid}-${r.key}`}>{r.label}</label>
-                <output for={`${uid}-${r.key}`} data-show={r.key}>{r.value}</output>
-              </div>
-              <input id={`${uid}-${r.key}`} type="range" data-in={r.key} min={r.min} max={r.max} step={r.step} value={r.value} />
+        {workload.map((r) => (
+          <div class="rng">
+            <div class="r">
+              <label for={`${uid}-${r.key}`}>{r.label}</label>
+              <output for={`${uid}-${r.key}`} data-show={r.key}>
+                {r.value}
+              </output>
             </div>
-          ))
-        }
+            <input
+              id={`${uid}-${r.key}`}
+              type="range"
+              data-in={r.key}
+              min={r.min}
+              max={r.max}
+              step={r.step}
+              value={r.value}
+            />
+          </div>
+        ))}
       </fieldset>
       <fieldset>
         <legend>Machine</legend>
-        {
-          machine.map((r) => (
-            <div class="rng">
-              <div class="r">
-                <label for={`${uid}-${r.key}`}>{r.label}</label>
-                <output for={`${uid}-${r.key}`} data-show={r.key}>{r.value}</output>
-              </div>
-              <input id={`${uid}-${r.key}`} type="range" data-in={r.key} min={r.min} max={r.max} step={r.step} value={r.value} />
+        {machine.map((r) => (
+          <div class="rng">
+            <div class="r">
+              <label for={`${uid}-${r.key}`}>{r.label}</label>
+              <output for={`${uid}-${r.key}`} data-show={r.key}>
+                {r.value}
+              </output>
             </div>
-          ))
-        }
+            <input
+              id={`${uid}-${r.key}`}
+              type="range"
+              data-in={r.key}
+              min={r.min}
+              max={r.max}
+              step={r.step}
+              value={r.value}
+            />
+          </div>
+        ))}
       </fieldset>
       <fieldset>
         <legend>Per runner</legend>
         <div class="nums">
-          {
-            per.map((n) => (
-              <label class="num">
-                <input type="number" inputmode="decimal" data-in={n.key} value={n.value} min={n.min} step={n.step} />
-                <span>{n.label}</span>
-              </label>
-            ))
-          }
+          {per.map((n) => (
+            <label class="num">
+              <input
+                type="number"
+                inputmode="decimal"
+                data-in={n.key}
+                value={n.value}
+                min={n.min}
+                step={n.step}
+              />
+              <span>{n.label}</span>
+            </label>
+          ))}
         </div>
       </fieldset>
     </div>
     <div>
       <div class="sbar" aria-hidden="true">
-        <i data-bar="light" style="background:var(--ac)"></i><i data-bar="dind" style="background:var(--warn)"></i>
+        <i data-bar="light" style="background:var(--ac)"></i>
+        <i data-bar="dind" style="background:var(--warn)"></i>
       </div>
       <dl aria-live="polite">
-        <dt>light runners</dt><dd data-out="lrun">–</dd>
-        <dt>dind pairs</dt><dd data-out="drun">–</dd>
-        <dt>average wait, light</dt><dd data-out="lwait">–</dd>
-        <dt>average wait, dind</dt><dd data-out="dwait">–</dd>
-        <dt>memory needed</dt><dd data-out="ram">–</dd>
-        <dt>memory available</dt><dd data-out="avail">–</dd>
-        <dt>CPU limits / threads</dt><dd data-out="cpu">–</dd>
+        <dt>light runners</dt>
+        <dd data-out="lrun">–</dd>
+        <dt>dind pairs</dt>
+        <dd data-out="drun">–</dd>
+        <dt>average wait, light</dt>
+        <dd data-out="lwait">–</dd>
+        <dt>average wait, dind</dt>
+        <dd data-out="dwait">–</dd>
+        <dt>memory needed</dt>
+        <dd data-out="ram">–</dd>
+        <dt>memory available</dt>
+        <dd data-out="avail">–</dd>
+        <dt>CPU limits / threads</dt>
+        <dd data-out="cpu">–</dd>
       </dl>
       <p class="note" data-out="note" aria-live="polite"></p>
     </div>
   </div>
   <p class="formula">
-    Runners per class: the fewest that keep the average wait under your limit. Memory = runners × the memory per
-    runner.
+    Runners per class: the fewest that keep the average wait under your limit. Memory = runners ×
+    the memory per runner.
   </p>
   <p class="formula">{measured}</p>
-  <p class="src"><a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">code</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">tests</a> · <a href="https://en.wikipedia.org/wiki/Erlang_(unit)#Erlang_C_formula">Erlang C</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/gha-runners">data</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/gha-runners">harness</a></p>
-  <noscript><p class="formula">This lab needs JavaScript.</p></noscript>
+  <p class="src">
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">
+      code
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">
+      tests
+    </a>{' '}
+    · <a href="https://en.wikipedia.org/wiki/Erlang_(unit)#Erlang_C_formula">Erlang C</a> ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/gha-runners">data</a> ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/gha-runners">
+      harness
+    </a>
+  </p>
+  <noscript>
+    <p class="formula">This lab needs JavaScript.</p>
+  </noscript>
 </div>
 
 <script>
   import { fleetSize } from '../../lib/runners';
   import { onVisible } from '../../lib/onVisible';
 
-  const secs = (s: number) => (!Number.isFinite(s) ? 'never served' : s < 1 ? 'under 1 s' : s < 90 ? `${Math.round(s)} s` : `${(s / 60).toFixed(1)} min`);
+  const secs = (s: number) =>
+    !Number.isFinite(s)
+      ? 'never served'
+      : s < 1
+        ? 'under 1 s'
+        : s < 90
+          ? `${Math.round(s)} s`
+          : `${(s / 60).toFixed(1)} min`;
 
   function init(root: HTMLElement) {
-    const val = (k: string) => Number(root.querySelector<HTMLInputElement>(`[data-in="${k}"]`)!.value) || 0;
+    const val = (k: string) =>
+      Number(root.querySelector<HTMLInputElement>(`[data-in="${k}"]`)!.value) || 0;
     const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
     const bar = (k: string) => root.querySelector<HTMLElement>(`[data-bar="${k}"]`)!;
 
@@ -166,8 +237,8 @@ const per = [
       out('drun').textContent = `${p.dind.runners}  (load ${p.dind.load.toFixed(1)})`;
       out('lwait').textContent = p.light.runners ? secs(p.light.waitSec) : '–';
       out('dwait').textContent = p.dind.runners ? secs(p.dind.waitSec) : '–';
-      out("ram").textContent = `${p.ramNeeded.toFixed(1)} GiB`;
-      out("avail").textContent = `${p.ramAvailable.toFixed(1)} GiB`;
+      out('ram').textContent = `${p.ramNeeded.toFixed(1)} GiB`;
+      out('avail').textContent = `${p.ramAvailable.toFixed(1)} GiB`;
       const ratio = val('cores') ? p.cpuAsked / val('cores') : 0;
       out('cpu').textContent = `${p.cpuAsked.toFixed(1)} / ${val('cores')}  (${ratio.toFixed(1)}×)`;
       const scale = Math.max(p.ramAvailable, p.ramNeeded) || 1;
@@ -176,7 +247,8 @@ const per = [
       const notes = [];
       if (p.status === 'over') notes.push('Does not fit on one machine.');
       if (p.status === 'tight') notes.push('Fits, with under 15% memory to spare.');
-      if (ratio > 2) notes.push(`CPU limits are ${ratio.toFixed(1)}× the threads; jobs slow down at peak.`);
+      if (ratio > 2)
+        notes.push(`CPU limits are ${ratio.toFixed(1)}× the threads; jobs slow down at peak.`);
       out('note').textContent = notes.join(' ');
     };
 

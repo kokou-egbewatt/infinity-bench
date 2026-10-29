@@ -8,11 +8,13 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 <div class="status">
   <div class="wrap">
-    <span><span class="dot"></span><b>1 × RTX 5060</b> · 8 GB · Blackwell sm_120 · CUDA 13.4 · Ryzen 5 8400F</span>
+    <span>
+      <span class="dot"></span>
+      <b>1 × RTX 5060</b> · 8 GB · Blackwell sm_120 · CUDA 13.4 · Ryzen 5 8400F
+    </span>
     <span class="stats">
-      {plural(postCount, 'post')} · {errataCount(errata)}{
-        lastMeasured && ` · last measurement ${isoDate(lastMeasured)}`
-      }
+      {plural(postCount, 'post')} · {errataCount(errata)}
+      {lastMeasured && ` · last measurement ${isoDate(lastMeasured)}`}
     </span>
   </div>
 </div>

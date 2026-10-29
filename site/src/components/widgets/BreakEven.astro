@@ -1,7 +1,12 @@
 ---
 // When self-hosting costs less than GitHub-hosted minutes. Prices from
 // src/data/actionsPricing.ts; logic in src/lib/runners.ts. A model, not a measurement.
-import { PLANS, PRICING_CHECKED, RUNNER_PRICES, SELF_HOSTED_CHARGE } from '../../data/actionsPricing';
+import {
+  PLANS,
+  PRICING_CHECKED,
+  RUNNER_PRICES,
+  SELF_HOSTED_CHARGE,
+} from '../../data/actionsPricing';
 import '../../styles/widget.css';
 
 const uid = 'be';
@@ -9,19 +14,33 @@ const prices = JSON.stringify(RUNNER_PRICES);
 const plans = JSON.stringify(PLANS);
 ---
 
-<div class="widget" data-widget="break-even" data-prices={prices} data-plans={plans} data-charge={SELF_HOSTED_CHARGE}>
+<div
+  class="widget"
+  data-widget="break-even"
+  data-prices={prices}
+  data-plans={plans}
+  data-charge={SELF_HOSTED_CHARGE}
+>
   <p class="wt">Break-even against GitHub-hosted</p>
   <div class="sels">
     <label class="sel">
       Runner
       <select data-in="runner">
-        {RUNNER_PRICES.map((r) => <option value={r.id}>{r.label}, ${r.perMinute}/min</option>)}
+        {RUNNER_PRICES.map((r) => (
+          <option value={r.id}>
+            {r.label}, ${r.perMinute}/min
+          </option>
+        ))}
       </select>
     </label>
     <label class="sel">
       Plan
       <select data-in="plan">
-        {PLANS.map((p) => <option value={p.id} selected={p.id === 'team'}>{p.label}</option>)}
+        {PLANS.map((p) => (
+          <option value={p.id} selected={p.id === 'team'}>
+            {p.label}
+          </option>
+        ))}
       </select>
     </label>
   </div>
@@ -30,25 +49,74 @@ const plans = JSON.stringify(PLANS);
       <div class="rng">
         <div class="r">
           <label for={`${uid}-minutes`}>Job minutes a month</label>
-          <output for={`${uid}-minutes`} data-show="minutes">8,000</output>
+          <output for={`${uid}-minutes`} data-show="minutes">
+            8,000
+          </output>
         </div>
-        <input id={`${uid}-minutes`} type="range" data-in="minutes" min="0" max="100000" step="500" value="8000" />
+        <input
+          id={`${uid}-minutes`}
+          type="range"
+          data-in="minutes"
+          min="0"
+          max="100000"
+          step="500"
+          value="8000"
+        />
       </div>
       <div class="rng">
         <div class="r">
           <label for={`${uid}-watts`}>Extra power while jobs run (W)</label>
-          <output for={`${uid}-watts`} data-show="watts">120</output>
+          <output for={`${uid}-watts`} data-show="watts">
+            120
+          </output>
         </div>
-        <input id={`${uid}-watts`} type="range" data-in="watts" min="0" max="400" step="10" value="120" />
+        <input
+          id={`${uid}-watts`}
+          type="range"
+          data-in="watts"
+          min="0"
+          max="400"
+          step="10"
+          value="120"
+        />
       </div>
       <fieldset>
         <legend>Self-hosted costs</legend>
         <div class="nums two">
-          <label class="num"><input type="number" inputmode="decimal" data-in="machine" value="0" min="0" step="50" /><span>machine, USD</span></label>
-          <label class="num"><input type="number" inputmode="numeric" data-in="months" value="36" min="1" step="1" /><span>over months</span></label>
-          <label class="num"><input type="number" inputmode="decimal" data-in="kwh" value="0.15" min="0" step="0.01" /><span>USD per kWh</span></label>
-          <label class="num"><input type="number" inputmode="decimal" data-in="hours" value="2" min="0" step="0.5" /><span>upkeep, hours a month</span></label>
-          <label class="num"><input type="number" inputmode="decimal" data-in="hourly" value="0" min="0" step="5" /><span>your time, USD an hour</span></label>
+          <label class="num">
+            <input
+              type="number"
+              inputmode="decimal"
+              data-in="machine"
+              value="0"
+              min="0"
+              step="50"
+            />
+            <span>machine, USD</span>
+          </label>
+          <label class="num">
+            <input type="number" inputmode="numeric" data-in="months" value="36" min="1" step="1" />
+            <span>over months</span>
+          </label>
+          <label class="num">
+            <input
+              type="number"
+              inputmode="decimal"
+              data-in="kwh"
+              value="0.15"
+              min="0"
+              step="0.01"
+            />
+            <span>USD per kWh</span>
+          </label>
+          <label class="num">
+            <input type="number" inputmode="decimal" data-in="hours" value="2" min="0" step="0.5" />
+            <span>upkeep, hours a month</span>
+          </label>
+          <label class="num">
+            <input type="number" inputmode="decimal" data-in="hourly" value="0" min="0" step="5" />
+            <span>your time, USD an hour</span>
+          </label>
         </div>
       </fieldset>
       <label class="chk">
@@ -57,24 +125,52 @@ const plans = JSON.stringify(PLANS);
       </label>
     </div>
     <div>
-      <div class="sbar" aria-hidden="true"><i data-bar="hosted" style="background:#6b6b73"></i></div>
-      <div class="sbar" aria-hidden="true"><i data-bar="self" style="background:var(--ac)"></i></div>
+      <div class="sbar" aria-hidden="true">
+        <i data-bar="hosted" style="background:#6b6b73"></i>
+      </div>
+      <div class="sbar" aria-hidden="true">
+        <i data-bar="self" style="background:var(--ac)"></i>
+      </div>
       <dl aria-live="polite">
-        <dt>GitHub-hosted / month</dt><dd data-out="hosted">–</dd>
-        <dt>self-hosted / month</dt><dd data-out="self">–</dd>
-        <dt>difference</dt><dd data-out="diff">–</dd>
-        <dt>included minutes used</dt><dd data-out="included">–</dd>
-        <dt>break-even</dt><dd data-out="be">–</dd>
+        <dt>GitHub-hosted / month</dt>
+        <dd data-out="hosted">–</dd>
+        <dt>self-hosted / month</dt>
+        <dd data-out="self">–</dd>
+        <dt>difference</dt>
+        <dd data-out="diff">–</dd>
+        <dt>included minutes used</dt>
+        <dd data-out="included">–</dd>
+        <dt>break-even</dt>
+        <dd data-out="be">–</dd>
       </dl>
       <p class="note" data-out="note" aria-live="polite"></p>
     </div>
   </div>
   <p class="formula">
-    Hosted: minutes past the included ones × rate. Self-hosted: machine ÷ months + upkeep + power. Prices checked{' '}
-    {PRICING_CHECKED}.
+    Hosted: minutes past the included ones × rate. Self-hosted: machine ÷ months + upkeep + power.
+    Prices checked {PRICING_CHECKED}.
   </p>
-  <p class="src"><a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">code</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">tests</a> · <a href="https://docs.github.com/en/billing/reference/actions-runner-pricing">GitHub rates</a> · <a href="https://docs.github.com/en/billing/concepts/product-billing/github-actions">included minutes</a> · <a href="https://github.blog/changelog/2025-12-16-coming-soon-simpler-pricing-and-a-better-experience-for-github-actions/">self-hosted charge</a></p>
-  <noscript><p class="formula">This lab needs JavaScript.</p></noscript>
+  <p class="src">
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">
+      code
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">
+      tests
+    </a>{' '}
+    · <a href="https://docs.github.com/en/billing/reference/actions-runner-pricing">GitHub rates</a>{' '}
+    ·{' '}
+    <a href="https://docs.github.com/en/billing/concepts/product-billing/github-actions">
+      included minutes
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.blog/changelog/2025-12-16-coming-soon-simpler-pricing-and-a-better-experience-for-github-actions/">
+      self-hosted charge
+    </a>
+  </p>
+  <noscript>
+    <p class="formula">This lab needs JavaScript.</p>
+  </noscript>
 </div>
 
 <script>
@@ -82,13 +178,15 @@ const plans = JSON.stringify(PLANS);
   import type { Plan, RunnerPrice } from '../../data/actionsPricing';
   import { onVisible } from '../../lib/onVisible';
 
-  const usd = (v: number) => `$${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const usd = (v: number) =>
+    `$${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   function init(root: HTMLElement) {
     const prices = JSON.parse(root.dataset.prices!) as RunnerPrice[];
     const plans = JSON.parse(root.dataset.plans!) as Plan[];
     const charge = Number(root.dataset.charge);
-    const input = (k: string) => root.querySelector<HTMLInputElement & HTMLSelectElement>(`[data-in="${k}"]`)!;
+    const input = (k: string) =>
+      root.querySelector<HTMLInputElement & HTMLSelectElement>(`[data-in="${k}"]`)!;
     const num = (k: string) => Number(input(k).value) || 0;
     const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
     const bar = (k: string) => root.querySelector<HTMLElement>(`[data-bar="${k}"]`)!;
@@ -118,11 +216,15 @@ const plans = JSON.stringify(PLANS);
       out('hosted').textContent = usd(r.hosted);
       out('self').textContent = usd(r.self);
       const d = r.hosted - r.self;
-      out('diff').textContent = `${d >= 0 ? 'self-hosting saves' : 'GitHub-hosted saves'} ${usd(Math.abs(d))}`;
+      out('diff').textContent =
+        `${d >= 0 ? 'self-hosting saves' : 'GitHub-hosted saves'} ${usd(Math.abs(d))}`;
       out('included').textContent = runner.includedApplies
         ? `${Math.min(minutes, plan.included).toLocaleString('en-US')} of ${plan.included.toLocaleString('en-US')}`
         : 'none on larger runners';
-      out('be').textContent = r.breakEvenMinutes === null ? 'never at these costs' : `${Math.ceil(r.breakEvenMinutes).toLocaleString('en-US')} min`;
+      out('be').textContent =
+        r.breakEvenMinutes === null
+          ? 'never at these costs'
+          : `${Math.ceil(r.breakEvenMinutes).toLocaleString('en-US')} min`;
       const top = Math.max(r.hosted, r.self) || 1;
       bar('hosted').style.width = `${(r.hosted / top) * 100}%`;
       bar('self').style.width = `${(r.self / top) * 100}%`;
@@ -140,7 +242,14 @@ const plans = JSON.stringify(PLANS);
 </script>
 
 <style>
-  .widget .chk { margin-top: 12px; }
-  .widget .sbar { height: 8px; margin-bottom: 6px; }
-  .widget .sbar + dl { margin-top: 8px; }
+  .widget .chk {
+    margin-top: 12px;
+  }
+  .widget .sbar {
+    height: 8px;
+    margin-bottom: 6px;
+  }
+  .widget .sbar + dl {
+    margin-top: 8px;
+  }
 </style>

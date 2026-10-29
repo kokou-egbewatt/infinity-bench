@@ -17,8 +17,10 @@ function check(posts: Post[]): void {
     const { plan, data, harness, repo, draft } = p.data;
 
     const unknown = p.data.widgets.filter((w) => !WIDGET_IDS.has(w));
-    if (unknown.length) throw new Error(`${where}: unknown widget ${unknown.join(', ')}; see src/lib/widgets.ts`);
-    if (plan && !planIds.has(plan)) throw new Error(`${where}: plan "${plan}" is not an id in src/data/series.ts`);
+    if (unknown.length)
+      throw new Error(`${where}: unknown widget ${unknown.join(', ')}; see src/lib/widgets.ts`);
+    if (plan && !planIds.has(plan))
+      throw new Error(`${where}: plan "${plan}" is not an id in src/data/series.ts`);
 
     if (draft) continue;
     if (plan) {
@@ -32,7 +34,9 @@ function check(posts: Post[]): void {
     const git = env.git ?? {};
     const sha = String(git.sha ?? '');
     if (!sha || !(sha.startsWith(harness) || harness.startsWith(sha))) {
-      throw new Error(`${where}: harness ${harness} does not match env.json git.sha ${sha || '(missing)'}`);
+      throw new Error(
+        `${where}: harness ${harness} does not match env.json git.sha ${sha || '(missing)'}`,
+      );
     }
     if ((git.repo ?? 'infinity-bench') !== repo) {
       throw new Error(`${where}: repo ${repo} does not match env.json git.repo ${git.repo}`);
@@ -59,12 +63,16 @@ export async function getStats() {
 
 /** The series plan with each entry's published post attached. */
 export async function resolveSeries() {
-  const byPlan = new Map((await getPosts()).filter((p) => p.data.plan && !p.data.draft).map((p) => [p.data.plan!, p]));
+  const byPlan = new Map(
+    (await getPosts()).filter((p) => p.data.plan && !p.data.draft).map((p) => [p.data.plan!, p]),
+  );
   const series: ResolvedSeries[] = SERIES.map((s) => ({
     ...s,
     posts: s.posts.map((entry) => {
       const post = entry.id ? byPlan.get(entry.id) : undefined;
-      return post ? { ...entry, title: post.data.title, slug: post.id, published: isoDate(post.data.date) } : entry;
+      return post
+        ? { ...entry, title: post.data.title, slug: post.id, published: isoDate(post.data.date) }
+        : entry;
     }),
   }));
   const all = flatten(series);

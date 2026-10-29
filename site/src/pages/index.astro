@@ -25,28 +25,40 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
     <div class="hero">
       <div>
         <h1>Platform Engineering GPU Infrastructure</h1>
-        <p>I work on Kubernetes and GPU infrastructure. At home, most of my experiments run on a single 8 GB RTX 5060. It follows the same GPU fundamentals as an H100 or H200, just with less room to maneuver. I include the hardware, cost, results, and mistakes behind each post.</p>
+        <p>
+          I work on Kubernetes and GPU infrastructure. At home, most of my experiments run on a
+          single 8 GB RTX 5060. It follows the same GPU fundamentals as an H100 or H200, just with
+          less room to maneuver. I include the hardware, cost, results, and mistakes behind each
+          post.
+        </p>
       </div>
       <div class="rig">
         <div class="t">The rig</div>
         <dl>
-          <dt>gpu</dt><dd>GeForce RTX 5060, 8 GB GDDR7</dd>
-          <dt>arch</dt><dd>Blackwell sm_120, 30 SMs</dd>
-          <dt>driver</dt><dd>616.56, CUDA 13.4</dd>
-          <dt>cpu</dt><dd>Ryzen 5 8400F, 6c/12t</dd>
-          <dt>host</dt><dd>Windows 11, WSL2, k3s</dd>
+          <dt>gpu</dt>
+          <dd>GeForce RTX 5060, 8 GB GDDR7</dd>
+          <dt>arch</dt>
+          <dd>Blackwell sm_120, 30 SMs</dd>
+          <dt>driver</dt>
+          <dd>616.56, CUDA 13.4</dd>
+          <dt>cpu</dt>
+          <dd>Ryzen 5 8400F, 6c/12t</dd>
+          <dt>host</dt>
+          <dd>Windows 11, WSL2, k3s</dd>
         </dl>
-        <div class="sms" aria-hidden="true">{Array.from({ length: 30 }, () => <i class="sm" />)}</div>
+        <div class="sms" aria-hidden="true">
+          {Array.from({ length: 30 }, () => (
+            <i class="sm" />
+          ))}
+        </div>
         <div class="vbar">
           {measured && <i style={`width:${taxPct}%;background:#3a3a42`} title="desktop"></i>}
           <i style={`width:${100 - taxPct}%;background:var(--ac)`} title="free"></i>
         </div>
         <div class="cap">
-          {
-            measured
-              ? `${gb(totalMb, 1)} · ${gb(taxMb, 1)} taken by the desktop before anything loads`
-              : '8 GB nominal · what the desktop takes is measured'
-          }
+          {measured
+            ? `${gb(totalMb, 1)} · ${gb(taxMb, 1)} taken by the desktop before anything loads`
+            : '8 GB nominal · what the desktop takes is measured'}
         </div>
       </div>
     </div>
@@ -54,44 +66,64 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
     <div class="sec">
       <h2>Posts</h2>
       <nav class="filters" aria-label="Topics">
-        {topics.map((t) => <a href={`?topic=${t}`} data-topic={t} class:list={{ active: t === 'all' }}>{t}</a>)}
+        {topics.map((t) => (
+          <a href={`?topic=${t}`} data-topic={t} class:list={{ active: t === 'all' }}>
+            {t}
+          </a>
+        ))}
       </nav>
     </div>
     <div class="list">
-      {
-        posts.map((p, i) => {
-          const d = p.data;
-          const n = d.errata.length;
-          return (
-            <div class="row" data-topic={d.topic} style={`--i:${i}`}>
-              <span class="d">{isoDate(d.date)}</span>
-              <span>
-                <a class="t" href={url(`/posts/${p.id}`)}>{d.title}</a>
-                {d.draft && <span class="draft">draft</span>}
-                <span class="s">{d.dek}</span>
-              </span>
-              <span class="m">
-                {d.hardware.kind === 'rented' ? <span class="rent">rented {d.hardware.node}</span> : d.hardware.kind === 'cpu' ? 'no GPU' : 'RTX 5060'}
-                {d.repo === 'NeuroMesh' && (
-                  <>
-                    {' · '}
-                    <a class="repo" href={repoUrl('NeuroMesh')}>NeuroMesh</a>
-                  </>
-                )}
-                <br />
-                {readTime(p.body)} min · {n ? <b>{errataCount(n)}</b> : 'no errata'}
-              </span>
-            </div>
-          );
-        })
-      }
-      <p class="empty" hidden={posts.length > 0}>Nothing here yet.</p>
+      {posts.map((p, i) => {
+        const d = p.data;
+        const n = d.errata.length;
+        return (
+          <div class="row" data-topic={d.topic} style={`--i:${i}`}>
+            <span class="d">{isoDate(d.date)}</span>
+            <span>
+              <a class="t" href={url(`/posts/${p.id}`)}>
+                {d.title}
+              </a>
+              {d.draft && <span class="draft">draft</span>}
+              <span class="s">{d.dek}</span>
+            </span>
+            <span class="m">
+              {d.hardware.kind === 'rented' ? (
+                <span class="rent">rented {d.hardware.node}</span>
+              ) : d.hardware.kind === 'cpu' ? (
+                'no GPU'
+              ) : (
+                'RTX 5060'
+              )}
+              {d.repo === 'NeuroMesh' && (
+                <>
+                  {' · '}
+                  <a class="repo" href={repoUrl('NeuroMesh')}>
+                    NeuroMesh
+                  </a>
+                </>
+              )}
+              <br />
+              {readTime(p.body)} min · {n ? <b>{errataCount(n)}</b> : 'no errata'}
+            </span>
+          </div>
+        );
+      })}
+      <p class="empty" hidden={posts.length > 0}>
+        Nothing here yet.
+      </p>
     </div>
 
-    <div class="sec"><h2>Elsewhere</h2></div>
+    <div class="sec">
+      <h2>Elsewhere</h2>
+    </div>
     <div class="else">
       <ul>
-        {elsewhere.map((e) => <li><a href={e.data.url}>{e.data.title}</a> <span>· {e.data.note}</span></li>)}
+        {elsewhere.map((e) => (
+          <li>
+            <a href={e.data.url}>{e.data.title}</a> <span>· {e.data.note}</span>
+          </li>
+        ))}
       </ul>
     </div>
   </div>
@@ -102,7 +134,8 @@ const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
   const topic = new URLSearchParams(location.search).get('topic') ?? 'all';
   const rows = [...document.querySelectorAll<HTMLElement>('.list .row')];
   for (const row of rows) row.hidden = topic !== 'all' && row.dataset.topic !== topic;
-  for (const a of document.querySelectorAll<HTMLElement>('.filters a')) a.classList.toggle('active', a.dataset.topic === topic);
+  for (const a of document.querySelectorAll<HTMLElement>('.filters a'))
+    a.classList.toggle('active', a.dataset.topic === topic);
   const empty = document.querySelector<HTMLElement>('.list .empty');
   if (empty) empty.hidden = rows.some((r) => !r.hidden);
 
