@@ -13,17 +13,56 @@ const links = [
 ];
 ---
 
-<header class="top">
+<header class="top" data-top>
   <div class="wrap">
     <a href={url('/')} class="brand">
       <svg width="26" height="18" viewBox="0 0 26 18" fill="none" aria-hidden="true"><rect x="1" y="3" width="24" height="12" rx="2" stroke="#5eead4" stroke-width="1.3"></rect><rect x="4" y="6" width="6" height="6" rx="1" fill="#5eead4"></rect><path d="M13 7h9M13 9.5h9M13 12h6" stroke="#2c2d33" stroke-width="1.2"></path></svg>
       Kokou
     </a>
-    <nav class="main" aria-label="Main">
-      {links.map((l) => (
-        <a href={url(l.href)} class:list={{ active: l.active }} aria-current={l.active ? 'page' : undefined}>{l.label}</a>
-      ))}
+    <!-- Hidden until the script unhides it, so the nav stays reachable without JavaScript. -->
+    <button class="burger" type="button" aria-expanded="false" aria-controls="sitenav" aria-label="Menu" hidden data-burger>
+      <span></span><span></span><span></span>
+    </button>
+    <div class="menu" id="sitenav">
+      <nav class="main" aria-label="Main">
+        {links.map((l) => (
+          <a href={url(l.href)} class:list={{ active: l.active }} aria-current={l.active ? 'page' : undefined}>{l.label}</a>
+        ))}
+      </nav>
       <SocialIcons class="navsocial" />
-    </nav>
+    </div>
   </div>
 </header>
+
+<script>
+  const top = document.querySelector<HTMLElement>('[data-top]');
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const menu = document.getElementById('sitenav');
+
+  if (top && burger && menu) {
+    top.classList.add('js');
+    burger.hidden = false;
+
+    const set = (open: boolean) => {
+      top.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', String(open));
+    };
+
+    burger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      set(burger.getAttribute('aria-expanded') !== 'true');
+    });
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) set(false);
+    });
+    document.addEventListener('click', (e) => {
+      if (top.classList.contains('open') && !top.contains(e.target as Node)) set(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && top.classList.contains('open')) {
+        set(false);
+        burger.focus();
+      }
+    });
+  }
+</script>

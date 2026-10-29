@@ -8,18 +8,21 @@
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+:root { --hdr: 56px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--hdr) + 40px); }
 body { margin: 0; background: var(--bg); color: var(--tx); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
-.wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
 /* status bar + nav */
 .status { border-bottom: 1px solid var(--line); background: var(--bg2); font-family: var(--mono); font-size: 11px; color: var(--tx3); }
 .status .wrap { display: flex; justify-content: space-between; gap: 16px; height: 30px; align-items: center; flex-wrap: wrap; }
 .status b { color: var(--tx2); font-weight: 500; }
 .status .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); margin-right: 7px; vertical-align: 1px; }
-header.top { position: sticky; top: 0; z-index: 10; background: rgba(11, 11, 13, .92); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
-header.top .wrap { display: flex; align-items: center; height: 56px; gap: 28px; }
+header.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; height: var(--hdr); gap: 28px; }
+.menu { display: flex; align-items: center; gap: 22px; }
+.burger { display: none; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 19px; color: var(--hi); margin-right: auto; }
 nav.main { display: flex; gap: 22px; font-size: 13.5px; color: var(--tx2); }
 nav.main a:hover, nav.main a.active { color: var(--hi); }
@@ -70,7 +73,7 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 .else span { color: var(--tx3); }
 
 /* simple pages */
-.simple { padding: 56px 0 60px; max-width: 640px; }
+.simple { padding: 56px 0 60px; max-width: 640px; margin-inline: auto; }
 .simple h1 { font-family: var(--serif); font-weight: 400; font-size: 34px; color: var(--hi); margin: 0 0 20px; letter-spacing: -.01em; }
 .simple p { color: #b9b9c0; line-height: 1.75; margin: 0 0 18px; }
 .simple p a { color: var(--hi); border-bottom: 1px solid var(--line2); }
@@ -107,27 +110,41 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 .empty { font-family: var(--mono); font-size: 11.5px; color: var(--tx3); padding: 20px 0; margin: 0; }
 
 footer { border-top: 1px solid var(--line); margin-top: 40px; }
-footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 22px 24px; font-family: var(--mono); font-size: 11px; color: var(--tx3); }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-block: 22px; font-family: var(--mono); font-size: 11px; color: var(--tx3); }
 footer a:hover { color: var(--tx); }
 
 @media (max-width: 860px) {
+  :root { --hdr: 52px; }
   .hero { grid-template-columns: 1fr; gap: 28px; }
   .row { grid-template-columns: 1fr; }
   .row .m { text-align: left; }
-  .status .wrap { height: auto; padding: 6px 24px; }
-  header.top .wrap { height: auto; padding: 12px 24px; flex-wrap: wrap; gap: 10px 28px; }
+  .status .wrap { height: auto; padding-block: 6px; }
   nav.main { flex-wrap: wrap; gap: 2px 18px; }
+
+  /* without the script the nav stays inline and wraps, as it did before */
+  header.top.js .burger { display: grid; place-content: center; gap: 3.5px; width: 38px; height: 34px; padding: 0; background: var(--bg2); border: 1px solid var(--line2); border-radius: 6px; cursor: pointer; }
+  header.top.js .burger span { display: block; width: 15px; height: 1.5px; border-radius: 1px; background: var(--tx); transition: transform .2s ease, opacity .15s ease; }
+  header.top.js.open .burger span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+  header.top.js.open .burger span:nth-child(2) { opacity: 0; }
+  header.top.js.open .burger span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+  header.top.js .menu { display: none; position: absolute; inset: 100% 0 auto; flex-direction: column; align-items: stretch; gap: 10px; padding: 4px 24px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  header.top.js.open .menu { display: flex; }
+  header.top.js .menu nav.main { flex-direction: column; gap: 0; font-size: 15px; }
+  header.top.js .menu nav.main a { padding: 11px 0; border-bottom: 1px solid var(--line); }
+  header.top.js .menu nav.main a:last-of-type { border-bottom: 0; }
+  header.top.js .menu .navsocial { padding-top: 4px; }
 }
 
 /* phones and touch screens: links and filters get at least a 24px tall target */
 @media (max-width: 860px), (pointer: coarse) {
-  nav.main a, .filters a { display: inline-block; padding: 5px 0; }
+  nav.main a, .filters a { display: inline-block; padding: 8px 0; }
 }
 
 /* phones: the status bar keeps one line, the rig, and drops the post counts */
 @media (max-width: 600px) {
-  .status .stats { display: none; }
-  .status .wrap > span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wrap { padding: 0 16px; }
+  header.top.js .menu { padding-left: 16px; padding-right: 16px; }
+  .status .wrap > span:first-child { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
