@@ -65,143 +65,149 @@ const countLine = (posts: PlanEntry[]) => {
 >
   <div class="wrap">
     <article class="plan">
-      <h1>Series</h1>
-      <p>
-        Most of what I write here comes out of two repos. <a href={REPOS.nm.url}>NeuroMesh</a> is
-        the AI runtime I'm building; its roadmap is split into phases, and each phase below is
-        roughly one series. <a href={REPOS.ib.url}>infinity-bench</a> is this site and the harnesses
-        behind its numbers.
-      </p>
+      <div class="plan-head">
+        <h1>Series</h1>
+        <p>
+          Most of what I write here comes out of two repos. <a href={REPOS.nm.url}>NeuroMesh</a> is
+          the AI runtime I'm building; its roadmap is split into phases, and each phase below is
+          roughly one series. <a href={REPOS.ib.url}>infinity-bench</a> is this site and the
+          harnesses behind its numbers.
+        </p>
+      </div>
 
-      {publishedBySeries.length > 0 && (
-        <>
-          <h2 class="label">Published</h2>
-          <div class="published">
-            {publishedBySeries.map(({ s, posts }) => (
-              <div class="pgroup">
-                <a class="sname" href={`#${s.id}`}>
-                  {s.title}
-                </a>
-                <ul>
-                  {posts.map((p) => (
-                    <li>
-                      <a class="t" href={url(`/posts/${p.slug}`)}>
-                        {p.title}
-                      </a>
-                      {p.published && <span class="m">{fmtDate(p.published)}</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {nextUp.length > 0 && (
-        <>
-          <h2 class="label">Next up</h2>
-          <ul class="next">
-            {nextUp.map((p) => {
-              const n = note(p);
-              return (
-                <li>
-                  <span class="t">{p.title}</span>
-                  {p.summary && <p class="s">{p.summary}</p>}
-                  <span class="m">
-                    <a href={`#${p.series.id}`}>{p.series.title}</a>
-                    {links(p.sources).map((l) => (
-                      <>
-                        {', '}
-                        <a href={l.href} class:list={{ done: l.done }}>
-                          {l.text}
+      <aside class="plan-side">
+        {publishedBySeries.length > 0 && (
+          <>
+            <h2 class="label">Recently published</h2>
+            <div class="published">
+              {publishedBySeries.map(({ s, posts }) => (
+                <div class="pgroup">
+                  <a class="sname" href={`#${s.id}`}>
+                    {s.title}
+                  </a>
+                  <ul>
+                    {posts.map((p) => (
+                      <li>
+                        <a class="t" href={url(`/posts/${p.slug}`)}>
+                          {p.title}
                         </a>
-                      </>
+                        {p.published && <span class="m">{fmtDate(p.published)}</span>}
+                      </li>
                     ))}
-                    {n && <span class:list={['n', n.cls]}>{n.text}</span>}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          {nextUp.length > NEXT_SHOWN && (
-            <details class="later">
-              <summary>
-                <span class="chev" aria-hidden="true">
-                  ▸
-                </span>
-                <span class="closed-text">{nextUp.length - NEXT_SHOWN} more planned</span>
-                <span class="open-text">Show fewer</span>
-              </summary>
-            </details>
-          )}
-        </>
-      )}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
-      <h2 class="label">By series</h2>
-      {SERIES.map((s) => (
-        <details id={s.id} open={s.posts.some(isPublished)}>
-          <summary>
-            <span class="chev" aria-hidden="true">
-              ▸
-            </span>
-            <span class="st">{s.title}</span>
-            <span class="sm">{countLine(s.posts)}</span>
-            <span class="dots" aria-hidden="true">
-              {s.posts.map((p) => {
-                const st = postStatus(p, states);
-                return <i class:list={['dot', st]} title={`${p.title}: ${DOT_TITLE[st]}`} />;
-              })}
-            </span>
-          </summary>
-          <div class="body">
-            <p class="d">
-              {s.description}
-              {s.home.repo !== 'both' && s.home.milestone && (
-                <>
-                  {' '}
-                  <a href={milestoneUrl(s.home.repo, s.home.milestone)}>Milestone on GitHub</a>.
-                </>
-              )}
-            </p>
-            <ul>
-              {s.posts.map((p) => {
+        {nextUp.length > 0 && (
+          <>
+            <h2 class="label">Next up</h2>
+            <ul class="next">
+              {nextUp.map((p) => {
                 const n = note(p);
-                const ls = links(p.sources);
-                const pub = isPublished(p);
                 return (
                   <li>
-                    {pub ? (
-                      <a class="t" href={url(`/posts/${p.slug}`)}>
-                        {p.title}
-                      </a>
-                    ) : (
-                      <span class="t">{p.title}</span>
-                    )}
+                    <span class="t">{p.title}</span>
+                    {p.summary && <p class="s">{p.summary}</p>}
                     <span class="m">
-                      {pub && p.published ? (
-                        <span>{fmtDate(p.published)}</span>
-                      ) : (
+                      <a href={`#${p.series.id}`}>{p.series.title}</a>
+                      {links(p.sources).map((l) => (
                         <>
-                          {ls.map((l, i) => (
-                            <>
-                              {i > 0 && ', '}
-                              <a href={l.href} class:list={{ done: l.done }}>
-                                {l.text}
-                              </a>
-                            </>
-                          ))}
-                          {n && <span class:list={['n', n.cls]}>{n.text}</span>}
+                          {', '}
+                          <a href={l.href} class:list={{ done: l.done }}>
+                            {l.text}
+                          </a>
                         </>
-                      )}
+                      ))}
+                      {n && <span class:list={['n', n.cls]}>{n.text}</span>}
                     </span>
                   </li>
                 );
               })}
             </ul>
-          </div>
-        </details>
-      ))}
+            {nextUp.length > NEXT_SHOWN && (
+              <details class="later">
+                <summary>
+                  <span class="chev" aria-hidden="true">
+                    ▸
+                  </span>
+                  <span class="closed-text">{nextUp.length - NEXT_SHOWN} more planned</span>
+                  <span class="open-text">Show fewer</span>
+                </summary>
+              </details>
+            )}
+          </>
+        )}
+      </aside>
+
+      <div class="plan-main">
+        <h2 class="label">By series</h2>
+        {SERIES.map((s) => (
+          <details id={s.id} open={s.posts.some(isPublished)}>
+            <summary>
+              <span class="chev" aria-hidden="true">
+                ▸
+              </span>
+              <span class="st">{s.title}</span>
+              <span class="sm">{countLine(s.posts)}</span>
+              <span class="dots" aria-hidden="true">
+                {s.posts.map((p) => {
+                  const st = postStatus(p, states);
+                  return <i class:list={['dot', st]} title={`${p.title}: ${DOT_TITLE[st]}`} />;
+                })}
+              </span>
+            </summary>
+            <div class="body">
+              <p class="d">
+                {s.description}
+                {s.home.repo !== 'both' && s.home.milestone && (
+                  <>
+                    {' '}
+                    <a href={milestoneUrl(s.home.repo, s.home.milestone)}>Milestone on GitHub</a>.
+                  </>
+                )}
+              </p>
+              <ul>
+                {s.posts.map((p) => {
+                  const n = note(p);
+                  const ls = links(p.sources);
+                  const pub = isPublished(p);
+                  return (
+                    <li>
+                      {pub ? (
+                        <a class="t" href={url(`/posts/${p.slug}`)}>
+                          {p.title}
+                        </a>
+                      ) : (
+                        <span class="t">{p.title}</span>
+                      )}
+                      <span class="m">
+                        {pub && p.published ? (
+                          <span>{fmtDate(p.published)}</span>
+                        ) : (
+                          <>
+                            {ls.map((l, i) => (
+                              <>
+                                {i > 0 && ', '}
+                                <a href={l.href} class:list={{ done: l.done }}>
+                                  {l.text}
+                                </a>
+                              </>
+                            ))}
+                            {n && <span class:list={['n', n.cls]}>{n.text}</span>}
+                          </>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </details>
+        ))}
+      </div>
     </article>
   </div>
 </BaseLayout>
@@ -222,8 +228,54 @@ const countLine = (posts: PlanEntry[]) => {
 
 <style>
   .plan {
-    max-width: 680px;
+    display: grid;
+    grid-template-columns: minmax(0, 640px) minmax(0, 400px);
+    column-gap: 56px;
+    justify-content: center;
+    align-items: start;
     padding: 56px 0 64px;
+  }
+  .plan-head {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .plan-side {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 0;
+  }
+  .plan-main {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+  }
+  .plan-side > .label:first-child {
+    margin-top: 4px;
+  }
+  /* Below this the summary row loses the width it needs, so the columns stack. */
+  @media (max-width: 1080px) {
+    .plan {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 680px;
+      margin-inline: auto;
+    }
+    .plan-head,
+    .plan-side,
+    .plan-main {
+      grid-column: 1;
+    }
+    .plan-head {
+      grid-row: 1;
+    }
+    .plan-side {
+      grid-row: 2;
+    }
+    .plan-main {
+      grid-row: 3;
+    }
+    .plan-side > .label:first-child {
+      margin-top: 48px;
+    }
   }
   h1 {
     font-family: var(--serif);
@@ -233,17 +285,17 @@ const countLine = (posts: PlanEntry[]) => {
     color: var(--hi);
     margin: 0 0 20px;
   }
-  .plan > p {
+  .plan-head > p {
     color: #b9b9c0;
     line-height: 1.75;
     margin: 0 0 18px;
   }
-  .plan > p a,
+  .plan-head > p a,
   .d a {
     color: var(--hi);
     border-bottom: 1px solid var(--line2);
   }
-  .plan > p a:hover,
+  .plan-head > p a:hover,
   .d a:hover {
     border-color: var(--ac);
   }
@@ -372,7 +424,7 @@ const countLine = (posts: PlanEntry[]) => {
   .next li:nth-child(n + 3) {
     display: none;
   }
-  .plan:has(.later[open]) .next li:nth-child(n + 3) {
+  .plan-side:has(.later[open]) .next li:nth-child(n + 3) {
     display: list-item;
   }
 

@@ -22,6 +22,13 @@ of a wrapper almost twice their width.
 
 ### Changed
 
+- **The Series page splits the plan from what shipped.** The series accordion takes the 640px
+  column, because its summary row carries a title, a count line and up to seven status dots on one
+  line and stops fitting them at 400px. Recently published and Next up take the 400px column
+  beside it. They come first in the markup, so a phone reads what exists before what is planned
+  while a wide screen still reads left column then right. `.plan` also picks up the
+  `margin-inline: auto` it never had, so the page is no longer pinned to the left of the wrapper.
+
 - **The About page puts the core stack beside the prose.** 640px of text and a 400px column, so
   the prose keeps the measure the rest of the site uses and the page stops running twice as long
   as it needs to. Each role now sits above its own badges at every width rather than beside them:
