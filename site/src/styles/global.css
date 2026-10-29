@@ -182,7 +182,6 @@ footer a:hover { color: var(--tx); }
 /* About: the stack beside the prose, which keeps the 640px measure the other pages use */
 .aboutpage { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 400px); column-gap: 56px; justify-content: center; align-items: start; }
 .aboutstack { padding: 56px 0 60px; min-width: 0; }
-.aboutnote { padding-top: 0; }
 .sh { font-family: var(--serif); font-weight: 500; font-size: 21px; color: var(--hi); margin: 0 0 14px; letter-spacing: -.01em; }
 .corestack { border-top: 1px solid var(--line); margin: 0; }
 /* The role sits above its own badges at every width: beside them, 170px of the column goes to a
