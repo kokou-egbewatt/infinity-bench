@@ -22,6 +22,12 @@ of a wrapper almost twice their width.
 
 ### Changed
 
+- **The Series page's count lines are no longer grey squares.** `.sm` was the home page rig's
+  streaming multiprocessor cell, styled unscoped with `aspect-ratio: 1` and a fill, and the
+  Series page's count line is a `span.sm` too. Astro's scoped rule set the type but not those
+  two, so every count line rendered as a square as tall as its text was wide, which also set the
+  row height. The rig's rule is now `.sms .sm`, scoped to the grid it belongs to.
+
 - **The Series page splits the plan from what shipped.** The series accordion takes the 640px
   column, because its summary row carries a title, a count line and up to seven status dots on one
   line and stops fitting them at 400px. Recently published and Next up take the 400px column
