@@ -179,14 +179,24 @@ footer a:hover { color: var(--tx); }
 
 :focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
 
-/* About: core stack, one row per role, tools as small linked badges */
-.simple .sh { font-family: var(--serif); font-weight: 500; font-size: 21px; color: var(--hi); margin: 34px 0 14px; letter-spacing: -.01em; }
-.corestack { border-top: 1px solid var(--line); margin: 0 0 30px; }
-.cs-row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 8px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+/* About: the stack beside the prose, which keeps the 640px measure the other pages use */
+.aboutpage { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 400px); column-gap: 56px; justify-content: center; align-items: start; }
+.aboutstack { padding: 56px 0 60px; min-width: 0; }
+.aboutnote { padding-top: 0; }
+.sh { font-family: var(--serif); font-weight: 500; font-size: 21px; color: var(--hi); margin: 0 0 14px; letter-spacing: -.01em; }
+.corestack { border-top: 1px solid var(--line); margin: 0; }
+/* The role sits above its own badges at every width: beside them, 170px of the column goes to a
+   label and the longest badge no longer fits on the line it belongs to. */
+.cs-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .cs-role { font-size: 13.5px; color: var(--tx2); }
 .cs-tools { display: flex; flex-wrap: wrap; gap: 8px; }
 .cs-tools a { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 12.5px; color: var(--hi); background: var(--bg2); border: 1px solid var(--line2); border-radius: 6px; padding: 5px 10px; transition: border-color .15s; }
 .cs-tools a::before { content: ""; width: 6px; height: 6px; border-radius: 2px; background: var(--ac); flex: none; }
 .cs-tools a small { font-size: 10.5px; color: var(--tx3); }
 .cs-tools a:hover, .cs-tools a:focus-visible { border-color: var(--ac); }
-@media (max-width: 560px) { .cs-row { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
+/* Below this the two columns would each be under their measure, so they stack instead. */
+@media (max-width: 1080px) {
+  .aboutpage { grid-template-columns: minmax(0, 1fr); }
+  .aboutpage .simple { padding-bottom: 0; }
+  .aboutstack { padding-top: 34px; max-width: 640px; margin-inline: auto; width: 100%; }
+}

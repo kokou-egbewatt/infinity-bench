@@ -22,6 +22,12 @@ of a wrapper almost twice their width.
 
 ### Changed
 
+- **The About page puts the core stack beside the prose.** 640px of text and a 400px column, so
+  the prose keeps the measure the rest of the site uses and the page stops running twice as long
+  as it needs to. Each role now sits above its own badges at every width rather than beside them:
+  the label took 170px of the line, which left the longest badge, NVIDIA GPU Operator at 176px,
+  nowhere to go. The two columns stack below 1080px, where neither would be at its measure.
+
 - **The rig card follows the home page down.** The page is one grid now, an intro and the posts
   list in a column beside a rail the card sticks to, so the list no longer runs the full width
   underneath where the card used to be. On a phone the card still sits under the intro and is read
