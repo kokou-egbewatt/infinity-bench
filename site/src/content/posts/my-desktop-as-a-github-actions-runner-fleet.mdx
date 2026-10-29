@@ -12,19 +12,6 @@ cost: "$0 · one machine, GPU idle"
 harness: "ad4dee4"
 data: gha-runners
 draft: false
-errata:
-  - date: 2026-10-28
-    text: >-
-      Section 1 said branch protection on every repository stopped anything merging without a
-      passing CI. There is no branch protection on them: it needs a paid plan for private
-      repositories, and the lapsed billing that blocked the runners is the same lapse that would
-      have removed it. Not merging on red is a rule I keep by hand. The incident is unchanged,
-      since either way no check could run.
-  - date: 2026-10-28
-    text: >-
-      Section 10 said the Docker VM has 12 threads. It has 10: docker info reports ten, and this
-      post's own env.json recorded ten all along. The host has 12 threads, the VM is given 10.
-      Nothing in the results depends on the count.
 changes:
   - date: 2026-10-28
     text: >-

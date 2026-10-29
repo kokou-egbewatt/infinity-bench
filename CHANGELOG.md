@@ -77,8 +77,8 @@ pull request, and the whole configuration lives in the repository
   toolchains. `env.json` now records what each dataset was taken on, in `fleet.measured_on`, rather
   than one environment standing for all three, and the provenance line no longer reports a run from
   uncommitted changes.
-- **An erratum on the post**: it said the Docker VM has 12 threads. It has 10, which the post's own
-  `env.json` had recorded all along. The host has 12; the VM is given 10.
+- **The post said the Docker VM has 12 threads.** It has 10, which the post's own `env.json` had
+  recorded all along. The host has 12; the VM is given 10.
 - **`FleetSizing` takes the pickup line's runner count from the run that produced it.** The fleet has
   six light runners now and `latency.csv` was measured on four, so the widget had started reading
   "8 jobs on 6 runners" beside a p95 measured with four of the eight queued.
@@ -93,10 +93,10 @@ pull request, and the whole configuration lives in the repository
 - **The 28 October reproduction is committed** next to the October campaign it checks, including the
   one dind sweep that did not reproduce and the re-run that did, with what is and is not known about
   why. `env.json` names the folder each dataset came from.
-- **A second erratum on the post**: section 1 said branch protection stopped anything merging without
-  a passing CI. Branch protection needs a paid plan for private repositories, and the lapsed billing
-  that blocked the runners is the same lapse that would have removed it. Not merging on red is a rule
-  kept by hand, which is what the section now says.
+- **Section 1 no longer credits branch protection** for stopping anything merging without a passing
+  CI. Branch protection needs a paid plan for private repositories, and the lapsed billing that
+  blocked the runners is the same lapse that would have removed it. Not merging on red is a rule kept
+  by hand, which is what the section now says.
 
 ### Removed
 
