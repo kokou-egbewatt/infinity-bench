@@ -12,10 +12,15 @@ interface Props {
 
 const { id, section } = Astro.props;
 const lab = WIDGETS.find((w) => w.id === id);
-if (!lab || !lab.page) throw new Error(`LabLink: "${id}" is not a lab with its own page in src/lib/widgets.ts`);
+if (!lab || !lab.page)
+  throw new Error(`LabLink: "${id}" is not a lab with its own page in src/lib/widgets.ts`);
 if (section && !lab.sections.some((s) => s.id === section)) {
-  throw new Error(`LabLink: "${section}" is not a section of ${id}; it has ${lab.sections.map((s) => s.id).join(', ')}`);
+  throw new Error(
+    `LabLink: "${section}" is not a section of ${id}; it has ${lab.sections.map((s) => s.id).join(', ')}`,
+  );
 }
 ---
 
-<a href={url(`/labs/${id}${section ? `#${section}` : ''}`)}><slot /></a>
+<a href={url(`/labs/${id}${section ? `#${section}` : ''}`)}>
+  <slot />
+</a>

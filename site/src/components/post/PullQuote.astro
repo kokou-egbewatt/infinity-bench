@@ -6,4 +6,7 @@ interface Props {
 const { source } = Astro.props;
 ---
 
-<div class="pull"><slot />{source && <small>{source}</small>}</div>
+<div class="pull">
+  <slot />
+  {source && <small>{source}</small>}
+</div>

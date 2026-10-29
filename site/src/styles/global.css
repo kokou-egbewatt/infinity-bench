@@ -8,18 +8,21 @@
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+:root { --hdr: 56px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--hdr) + 40px); }
 body { margin: 0; background: var(--bg); color: var(--tx); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
-.wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
 /* status bar + nav */
 .status { border-bottom: 1px solid var(--line); background: var(--bg2); font-family: var(--mono); font-size: 11px; color: var(--tx3); }
 .status .wrap { display: flex; justify-content: space-between; gap: 16px; height: 30px; align-items: center; flex-wrap: wrap; }
 .status b { color: var(--tx2); font-weight: 500; }
 .status .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); margin-right: 7px; vertical-align: 1px; }
-header.top { position: sticky; top: 0; z-index: 10; background: rgba(11, 11, 13, .92); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
-header.top .wrap { display: flex; align-items: center; height: 56px; gap: 28px; }
+header.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; height: var(--hdr); gap: 28px; }
+.menu { display: flex; align-items: center; gap: 22px; }
+.burger { display: none; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 19px; color: var(--hi); margin-right: auto; }
 nav.main { display: flex; gap: 22px; font-size: 13.5px; color: var(--tx2); }
 nav.main a:hover, nav.main a.active { color: var(--hi); }
@@ -28,21 +31,27 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 @media (max-width: 860px) { nav.main .navsocial { border-left: 0; padding-left: 0; margin-left: 0; } }
 
 /* home */
-.hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start; }
-.hero h1 { font-family: var(--serif); font-weight: 400; font-size: 38px; line-height: 1.15; letter-spacing: -.01em; color: var(--hi); margin: 0 0 18px; }
-.hero p { color: var(--tx2); font-size: 16px; max-width: 56ch; margin: 0 0 10px; }
+.home { padding: 64px 0 40px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 48px; align-items: start; }
+.intro { grid-column: 1; grid-row: 1; }
+.feed { grid-column: 1; grid-row: 2; min-width: 0; }
+.rail { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: calc(var(--hdr) + 24px); }
+.intro h1 { font-family: var(--serif); font-weight: 400; font-size: 38px; line-height: 1.15; letter-spacing: -.01em; color: var(--hi); margin: 0 0 18px; }
+.intro p { color: var(--tx2); font-size: 16px; max-width: 56ch; margin: 0 0 10px; }
 .rig { border: 1px solid var(--line); border-radius: 8px; padding: 16px; background: var(--bg2); }
 .rig .t { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--tx3); margin-bottom: 10px; }
 .rig dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-family: var(--mono); font-size: 11.5px; }
 .rig dt { color: var(--tx3); }
 .rig dd { margin: 0; color: var(--tx); }
 .sms { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin: 14px 0 0; }
-.sm { aspect-ratio: 1; border-radius: 2px; background: var(--line); transition: background 1.2s ease, box-shadow 1.2s ease; }
-.sm.on { background: var(--ac2); box-shadow: inset 0 0 0 1px #1f4a44; }
-.sm.hot { background: #2f8f82; }
+.sms .sm { aspect-ratio: 1; border-radius: 2px; background: var(--line); transition: background 1.2s ease, box-shadow 1.2s ease; }
+.sms .sm.on { background: var(--ac2); box-shadow: inset 0 0 0 1px #1f4a44; }
+.sms .sm.hot { background: #2f8f82; }
 .vbar { margin: 12px 0 4px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; display: flex; }
 .vbar i { display: block; height: 100%; }
 .rig .cap { font-family: var(--mono); font-size: 10.5px; color: var(--tx3); }
+/* phones: the card scrolls away, then this takes over under the header */
+.rigbar { display: none; }
+.rigbar .t { margin: 0; }
 .sec { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; margin: 48px 0 6px; }
 .sec h2 { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--tx3); margin: 0; font-weight: 500; }
 .filters { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--mono); font-size: 11.5px; color: var(--tx3); }
@@ -70,7 +79,7 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 .else span { color: var(--tx3); }
 
 /* simple pages */
-.simple { padding: 56px 0 60px; max-width: 640px; }
+.simple { padding: 56px 0 60px; max-width: 640px; margin-inline: auto; }
 .simple h1 { font-family: var(--serif); font-weight: 400; font-size: 34px; color: var(--hi); margin: 0 0 20px; letter-spacing: -.01em; }
 .simple p { color: #b9b9c0; line-height: 1.75; margin: 0 0 18px; }
 .simple p a { color: var(--hi); border-bottom: 1px solid var(--line2); }
@@ -107,45 +116,86 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 .empty { font-family: var(--mono); font-size: 11.5px; color: var(--tx3); padding: 20px 0; margin: 0; }
 
 footer { border-top: 1px solid var(--line); margin-top: 40px; }
-footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 22px 24px; font-family: var(--mono); font-size: 11px; color: var(--tx3); }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-block: 22px; font-family: var(--mono); font-size: 11px; color: var(--tx3); }
 footer a:hover { color: var(--tx); }
 
 @media (max-width: 860px) {
+  :root { --hdr: 52px; }
   .hero { grid-template-columns: 1fr; gap: 28px; }
   .row { grid-template-columns: 1fr; }
   .row .m { text-align: left; }
-  .status .wrap { height: auto; padding: 6px 24px; }
-  header.top .wrap { height: auto; padding: 12px 24px; flex-wrap: wrap; gap: 10px 28px; }
+  .status .wrap { height: auto; padding-block: 6px; }
   nav.main { flex-wrap: wrap; gap: 2px 18px; }
+
+  .home { grid-template-columns: minmax(0, 1fr); padding-top: 40px; }
+  .intro, .feed, .rail { grid-column: 1; }
+  .rail { grid-row: 2; position: static; margin: 24px 0 4px; }
+  .feed { grid-row: 3; }
+
+  .rigbar { display: block; position: fixed; top: var(--hdr); left: 0; right: 0; z-index: 9; background: var(--bg2); border-bottom: 1px solid var(--line); }
+  .rigbar-in { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .rigbar button { display: flex; align-items: center; gap: 12px; width: 100%; height: 36px; padding: 0; background: none; border: 0; cursor: pointer; }
+  .rigbar .vbar { flex: 1; margin: 0; height: 6px; }
+  .rigbar .chev { width: 7px; height: 7px; border-right: 1.4px solid var(--tx3); border-bottom: 1.4px solid var(--tx3); transform: translateY(-2px) rotate(45deg); transition: transform .2s ease; flex: none; }
+  .rigbar button[aria-expanded='true'] .chev { transform: translateY(1px) rotate(-135deg); }
+  .rigbar-panel { padding: 2px 0 12px; }
+  .rigbar-panel dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-family: var(--mono); font-size: 11.5px; }
+  .rigbar-panel dt { color: var(--tx3); }
+  .rigbar-panel dd { margin: 0; color: var(--tx); }
+  .rigbar-panel .cap { margin: 8px 0 0; }
+
+  /* without the script the nav stays inline and wraps, as it did before */
+  header.top.js .burger { display: grid; place-content: center; gap: 3.5px; width: 38px; height: 34px; padding: 0; background: var(--bg2); border: 1px solid var(--line2); border-radius: 6px; cursor: pointer; }
+  header.top.js .burger span { display: block; width: 15px; height: 1.5px; border-radius: 1px; background: var(--tx); transition: transform .2s ease, opacity .15s ease; }
+  header.top.js.open .burger span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+  header.top.js.open .burger span:nth-child(2) { opacity: 0; }
+  header.top.js.open .burger span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+  header.top.js .menu { display: none; position: absolute; inset: 100% 0 auto; flex-direction: column; align-items: stretch; gap: 10px; padding: 4px 24px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  header.top.js.open .menu { display: flex; }
+  header.top.js .menu nav.main { flex-direction: column; gap: 0; font-size: 15px; }
+  header.top.js .menu nav.main a { padding: 11px 0; border-bottom: 1px solid var(--line); }
+  header.top.js .menu nav.main a:last-of-type { border-bottom: 0; }
+  header.top.js .menu .navsocial { padding-top: 4px; }
 }
 
 /* phones and touch screens: links and filters get at least a 24px tall target */
 @media (max-width: 860px), (pointer: coarse) {
-  nav.main a, .filters a { display: inline-block; padding: 5px 0; }
+  nav.main a, .filters a { display: inline-block; padding: 8px 0; }
 }
 
 /* phones: the status bar keeps one line, the rig, and drops the post counts */
 @media (max-width: 600px) {
-  .status .stats { display: none; }
-  .status .wrap > span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wrap { padding: 0 16px; }
+  header.top.js .menu { padding-left: 16px; padding-right: 16px; }
+  .rigbar-in { padding: 0 16px; }
+  .status .wrap > span:first-child { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .list .row { animation: none; }
-  .sm { transition: none; }
+  .sms .sm { transition: none; }
 }
 
 :focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
 
-/* About: core stack, one row per role, tools as small linked badges */
-.simple .sh { font-family: var(--serif); font-weight: 500; font-size: 21px; color: var(--hi); margin: 34px 0 14px; letter-spacing: -.01em; }
-.corestack { border-top: 1px solid var(--line); margin: 0 0 30px; }
-.cs-row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 8px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+/* About: the stack beside the prose, which keeps the 640px measure the other pages use */
+.aboutpage { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 400px); column-gap: 56px; justify-content: center; align-items: start; }
+.aboutstack { padding: 56px 0 60px; min-width: 0; }
+.sh { font-family: var(--serif); font-weight: 500; font-size: 21px; color: var(--hi); margin: 0 0 14px; letter-spacing: -.01em; }
+.corestack { border-top: 1px solid var(--line); margin: 0; }
+/* The role sits above its own badges at every width: beside them, 170px of the column goes to a
+   label and the longest badge no longer fits on the line it belongs to. */
+.cs-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .cs-role { font-size: 13.5px; color: var(--tx2); }
 .cs-tools { display: flex; flex-wrap: wrap; gap: 8px; }
 .cs-tools a { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 12.5px; color: var(--hi); background: var(--bg2); border: 1px solid var(--line2); border-radius: 6px; padding: 5px 10px; transition: border-color .15s; }
 .cs-tools a::before { content: ""; width: 6px; height: 6px; border-radius: 2px; background: var(--ac); flex: none; }
 .cs-tools a small { font-size: 10.5px; color: var(--tx3); }
 .cs-tools a:hover, .cs-tools a:focus-visible { border-color: var(--ac); }
-@media (max-width: 560px) { .cs-row { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
+/* Below this the two columns would each be under their measure, so they stack instead. */
+@media (max-width: 1080px) {
+  .aboutpage { grid-template-columns: minmax(0, 1fr); }
+  .aboutpage .simple { padding-bottom: 0; }
+  .aboutstack { padding-top: 34px; max-width: 640px; margin-inline: auto; width: 100%; }
+}

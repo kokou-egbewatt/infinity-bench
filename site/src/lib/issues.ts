@@ -8,8 +8,16 @@ export type RepoKey = 'nm' | 'ib';
 type IssueState = 'open' | 'closed' | 'unknown';
 
 export const REPOS: Record<RepoKey, { slug: string; short: string; url: string }> = {
-  nm: { slug: 'kokou-egbewatt/NeuroMesh', short: 'NM', url: 'https://github.com/kokou-egbewatt/NeuroMesh' },
-  ib: { slug: 'kokou-egbewatt/infinity-bench', short: 'IB', url: 'https://github.com/kokou-egbewatt/infinity-bench' },
+  nm: {
+    slug: 'kokou-egbewatt/NeuroMesh',
+    short: 'NM',
+    url: 'https://github.com/kokou-egbewatt/NeuroMesh',
+  },
+  ib: {
+    slug: 'kokou-egbewatt/infinity-bench',
+    short: 'IB',
+    url: 'https://github.com/kokou-egbewatt/infinity-bench',
+  },
 };
 
 export interface IssueStates {
@@ -20,7 +28,10 @@ export interface IssueStates {
 
 const MAX_PAGES = 5;
 
-async function fetchRepo(slug: string, token: string | undefined): Promise<Map<number, IssueState>> {
+async function fetchRepo(
+  slug: string,
+  token: string | undefined,
+): Promise<Map<number, IssueState>> {
   const states = new Map<number, IssueState>();
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
@@ -46,15 +57,24 @@ let cached: Promise<IssueStates> | undefined;
 
 export function getIssueStates(): Promise<IssueStates> {
   cached ??= (async () => {
-    const token = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
-      ?.GITHUB_TOKEN;
+    const token = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+      ?.env?.GITHUB_TOKEN;
     const fetchedAt = new Date();
     try {
-      const [nm, ib] = await Promise.all([fetchRepo(REPOS.nm.slug, token), fetchRepo(REPOS.ib.slug, token)]);
+      const [nm, ib] = await Promise.all([
+        fetchRepo(REPOS.nm.slug, token),
+        fetchRepo(REPOS.ib.slug, token),
+      ]);
       const byRepo: Record<RepoKey, Map<number, IssueState>> = { nm, ib };
-      return { fetched: true, fetchedAt, get: (repo, issue) => byRepo[repo].get(issue) ?? 'unknown' };
+      return {
+        fetched: true,
+        fetchedAt,
+        get: (repo, issue) => byRepo[repo].get(issue) ?? 'unknown',
+      };
     } catch (err) {
-      console.warn(`[issues] could not fetch issue states, statuses will show as unknown: ${String(err)}`);
+      console.warn(
+        `[issues] could not fetch issue states, statuses will show as unknown: ${String(err)}`,
+      );
       return { fetched: false, fetchedAt, get: () => 'unknown' };
     }
   })();

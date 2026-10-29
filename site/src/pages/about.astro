@@ -16,7 +16,10 @@ const STACK = [
   {
     role: 'GPUs and scheduling',
     tools: [
-      { name: 'NVIDIA GPU Operator', href: 'https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/' },
+      {
+        name: 'NVIDIA GPU Operator',
+        href: 'https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/',
+      },
       { name: 'Kueue', href: 'https://kueue.sigs.k8s.io/' },
     ],
   },
@@ -54,25 +57,60 @@ const STACK = [
 
 <BaseLayout title="About">
   <div class="wrap">
-    <div class="simple">
-      <h1>About</h1>
+    <div class="aboutpage">
+      <div class="simple">
+        <h1>About</h1>
 
-      <div class="me">
-        <img src={url('/kokou.webp')} width="112" height="112" alt="Kokou Egbewatt" decoding="async" />
-        <div>
-          <div class="name">Kokou Egbewatt</div>
-          <div class="role">Senior DevOps and Platform Engineer</div>
-          <div class="links"><SocialIcons email size={20} /></div>
+        <div class="me">
+          <img
+            src={url('/kokou.webp')}
+            width="112"
+            height="112"
+            alt="Kokou Egbewatt"
+            decoding="async"
+          />
+          <div>
+            <div class="name">Kokou Egbewatt</div>
+            <div class="role">Senior DevOps and Platform Engineer</div>
+            <div class="links">
+              <SocialIcons email size={20} />
+            </div>
+          </div>
         </div>
+
+        <p>
+          I work on data and ML infrastructure, from bare-metal and EKS GPU clusters to
+          high-throughput model serving. I also build the eBPF and DCGM observability that helps
+          pinpoint which node is under pressure.
+        </p>
+        <p>
+          My home lab is an 8 GB RTX 5060, a six-core Ryzen, and WSL2. I use it to profile and
+          benchmark locally instead of waiting for cloud quota. The scale is smaller, but the
+          engineering questions carry over: memory pressure, KV-cache sizing, scheduler behavior,
+          and NVIDIA DRA semantics matter whether you're pushing batch 4 on one workstation or batch
+          128 across a cluster.
+        </p>
+        <p>
+          Much of the work I write about grows out of{' '}
+          <a href="https://github.com/kokou-egbewatt/NeuroMesh" target="_blank" rel="noopener">
+            NeuroMesh
+          </a>
+          , the AI runtime I'm building, and{' '}
+          <a href="https://github.com/kokou-egbewatt/infinity-bench" target="_blank" rel="noopener">
+            infinity-bench
+          </a>
+          , which contains this site and the harnesses behind its numbers.
+        </p>
+        <p>
+          If something I published is wrong, <a href="mailto:kokou.egbewatt@gmail.com">email me</a>.
+          I'll fix it and credit you in the <a href={url('/errata')}>Errata</a>.
+        </p>
       </div>
 
-      <p>I work on data and ML infrastructure, from bare-metal and EKS GPU clusters to high-throughput model serving. I also build the eBPF and DCGM observability that helps pinpoint which node is under pressure.</p>
-      <p>My home lab is an 8 GB RTX 5060, a six-core Ryzen, and WSL2. I use it to profile and benchmark locally instead of waiting for cloud quota. The scale is smaller, but the engineering questions carry over: memory pressure, KV-cache sizing, scheduler behavior, and NVIDIA DRA semantics matter whether you're pushing batch 4 on one workstation or batch 128 across a cluster.</p>
-      <p>Much of the work I write about grows out of <a href="https://github.com/kokou-egbewatt/NeuroMesh" target="_blank" rel="noopener">NeuroMesh</a>, the AI runtime I'm building, and <a href="https://github.com/kokou-egbewatt/infinity-bench" target="_blank" rel="noopener">infinity-bench</a>, which contains this site and the harnesses behind its numbers.</p>
-      <h2 class="sh">Core stack</h2>
-      <div class="corestack">
-        {
-          STACK.map((g) => (
+      <aside class="aboutstack" aria-label="Core stack">
+        <h2 class="sh">Core stack</h2>
+        <div class="corestack">
+          {STACK.map((g) => (
             <div class="cs-row">
               <span class="cs-role">{g.role}</span>
               <span class="cs-tools">
@@ -84,10 +122,9 @@ const STACK = [
                 ))}
               </span>
             </div>
-          ))
-        }
-      </div>
-      <p>If something I published is wrong, <a href="mailto:kokou.egbewatt@gmail.com">email me</a>. I'll fix it and credit you in the <a href={url('/errata')}>Errata</a>.</p>
+          ))}
+        </div>
+      </aside>
     </div>
   </div>
 </BaseLayout>

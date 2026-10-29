@@ -34,11 +34,23 @@ export function postEvents(p: ChangeInput): ChangeEvent[] {
   const events: ChangeEvent[] = [
     { date: p.data.date, kind: 'published', text: 'Published.', post },
     ...p.data.changes.map((c) => ({ date: c.date, kind: 'updated' as const, text: c.text, post })),
-    ...p.data.errata.map((e) => ({ date: e.date, kind: 'erratum' as const, text: e.text, credit: e.credit, post })),
+    ...p.data.errata.map((e) => ({
+      date: e.date,
+      kind: 'erratum' as const,
+      text: e.text,
+      credit: e.credit,
+      post,
+    })),
   ];
   for (const w of WIDGETS) {
     if (w.page && p.data.plan && w.plan === p.data.plan) {
-      events.push({ date: p.data.date, kind: 'lab', text: w.blurb, post, lab: { id: w.id, name: w.name } });
+      events.push({
+        date: p.data.date,
+        kind: 'lab',
+        text: w.blurb,
+        post,
+        lab: { id: w.id, name: w.name },
+      });
     }
   }
   return sortEvents(events);
@@ -49,7 +61,9 @@ export function siteEvents(posts: ChangeInput[]): ChangeEvent[] {
 }
 
 export function sortEvents(events: ChangeEvent[]): ChangeEvent[] {
-  return [...events].sort((a, b) => b.date.valueOf() - a.date.valueOf() || ORDER[a.kind] - ORDER[b.kind]);
+  return [...events].sort(
+    (a, b) => b.date.valueOf() - a.date.valueOf() || ORDER[a.kind] - ORDER[b.kind],
+  );
 }
 
 export const KIND_LABEL: Record<ChangeKind, string> = {

@@ -8,6 +8,71 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.9.0] - Reads on a phone (2026-10-28)
+
+**The nav fits one row and the text column is centred.** The header hid six links and three icons
+behind nothing on a phone, so it wrapped to three rows; the narrow pages sat against the left edge
+of a wrapper almost twice their width.
+
+### Added
+
+- **A menu button in the header below 860px.** It opens the full nav, closes on Escape, on a link
+  and on a tap outside, and its links are 38px tall. The button is hidden until the script unhides
+  it, so without JavaScript the nav stays inline and wraps as before.
+
+### Changed
+
+- **The Series page's count lines are no longer grey squares.** `.sm` was the home page rig's
+  streaming multiprocessor cell, styled unscoped with `aspect-ratio: 1` and a fill, and the
+  Series page's count line is a `span.sm` too. Astro's scoped rule set the type but not those
+  two, so every count line rendered as a square as tall as its text was wide, which also set the
+  row height. The rig's rule is now `.sms .sm`, scoped to the grid it belongs to.
+
+- **The Series page splits the plan from what shipped.** The series accordion takes the 640px
+  column, because its summary row carries a title, a count line and up to seven status dots on one
+  line and stops fitting them at 400px. Recently published and Next up take the 400px column
+  beside it. They come first in the markup, so a phone reads what exists before what is planned
+  while a wide screen still reads left column then right. `.plan` also picks up the
+  `margin-inline: auto` it never had, so the page is no longer pinned to the left of the wrapper.
+  Opening the `10 more planned` fold reveals titles rather than ten more full entries: a summary
+  runs four or five lines at 400px, and the accordion beside it does not grow when the fold does.
+
+- **The About page puts the core stack beside the prose.** 640px of text and a 400px column, so
+  the prose keeps the measure the rest of the site uses and the page stops running twice as long
+  as it needs to. Each role now sits above its own badges at every width rather than beside them:
+  the label took 170px of the line, which left the longest badge, NVIDIA GPU Operator at 176px,
+  nowhere to go. The two columns stack below 1080px, where neither would be at its measure. The errata note stays in the prose column, where it closes the text it belongs to.
+
+- **The rig card follows the home page down.** The page is one grid now, an intro and the posts
+  list in a column beside a rail the card sticks to, so the list no longer runs the full width
+  underneath where the card used to be. On a phone the card still sits under the intro and is read
+  in full; once it scrolls away a 36px strip takes over under the header, carrying the VRAM bar,
+  and opens the same rows on a tap. The card itself never moves, so nothing jumps, and only one of
+  the two is in the accessibility tree at a time.
+
+- **The post's reading column is centred.** `.post` is `1fr minmax(0, 640px) 1fr` with the
+  contents in the third track, so the text is centred at every width instead of sitting 176px left
+  of it. The wrapper is 1200px, which is what gives the contents a usable 200px.
+- **`.simple` pages are centred**: About, Labs, Changelog, Errata and the 404 page, which were
+  640px columns pinned to the left of a 1040px wrapper. The lab pages are capped at 900px rather
+  than stretching across the full width.
+- **Anchors and the sticky contents follow the header height** through `--hdr`, rather than a
+  96px offset fixed for a header that is 52px tall on a phone.
+- **The header background is `var(--bg)`** through `color-mix`, not a hard-coded rgba.
+- **A 16px gutter below 600px**, down from 24px, which gives the result tables that much more room.
+  Figures bleed to the new edge.
+- **The status bar keeps the post counts on phones** and drops the hardware string, which was
+  ellipsised to nothing anyway and is on the home page.
+- **CI runs in two jobs rather than three.** The documentation links check moves in beside the
+  version and changelog gates, which need no Node either, and every step after the first is
+  guarded with `!cancelled()` so a failing gate no longer hides the ones behind it. Taken from
+  the AA Grace Counseling site, whose pipeline this one is otherwise a copy of.
+- **Prettier and ESLint run in CI and in `pnpm verify`**, with the same configuration as that
+  site: `eslint-plugin-astro` with its accessibility rules, and Prettier at 100 columns with
+  single quotes. The stylesheets, the generated figure components and the post itself are left
+  out, because the first is written one rule per line on purpose, the second is rebuilt by
+  `build.py`, and the third is prose.
+
 ## [0.8.0] - Live at kokou.dev (2026-10-28)
 
 **The site deploys to Cloudflare at kokou.dev.** It deploys the way the AA Grace Counseling site
@@ -355,6 +420,7 @@ and code and content carry different licenses
   `LICENSE` for code.
 - **README** in the house layout, with license badges.
 
+[0.9.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/26
 [0.8.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.7.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/24
 [0.6.0]: https://github.com/kokou-egbewatt/infinity-bench/pull/21

@@ -8,33 +8,49 @@ import FleetSizing from './FleetSizing.astro';
 import RunnerClassChecker from './RunnerClassChecker.astro';
 
 const SECTIONS = [
-  { id: 'break-even', title: 'Break-even', blurb: 'When self-hosting costs less than hosted minutes', Lab: BreakEven },
-  { id: 'runner-class', title: 'Runner class', blurb: 'Paste a workflow, see where each job runs', Lab: RunnerClassChecker },
-  { id: 'cache-payoff', title: 'Cache savings', blurb: 'Downloads a shared cache stops repeating', Lab: CachePayoff },
-  { id: 'fleet-size', title: 'Fleet sizing', blurb: 'How many runners one machine holds', Lab: FleetSizing },
+  {
+    id: 'break-even',
+    title: 'Break-even',
+    blurb: 'When self-hosting costs less than hosted minutes',
+    Lab: BreakEven,
+  },
+  {
+    id: 'runner-class',
+    title: 'Runner class',
+    blurb: 'Paste a workflow, see where each job runs',
+    Lab: RunnerClassChecker,
+  },
+  {
+    id: 'cache-payoff',
+    title: 'Cache savings',
+    blurb: 'Downloads a shared cache stops repeating',
+    Lab: CachePayoff,
+  },
+  {
+    id: 'fleet-size',
+    title: 'Fleet sizing',
+    blurb: 'How many runners one machine holds',
+    Lab: FleetSizing,
+  },
 ];
 ---
 
 <div class="lab" data-lab>
   <nav class="list" aria-label="Tools">
-    {
-      SECTIONS.map((s) => (
-        <a href={`#${s.id}`} data-t={s.id}>
-          <span class="t">{s.title}</span>
-          <span class="s">{s.blurb}</span>
-        </a>
-      ))
-    }
+    {SECTIONS.map((s) => (
+      <a href={`#${s.id}`} data-t={s.id}>
+        <span class="t">{s.title}</span>
+        <span class="s">{s.blurb}</span>
+      </a>
+    ))}
   </nav>
   <div class="panel">
-    {
-      SECTIONS.map(({ id, title, Lab }) => (
-        <section class="part" id={id} data-part={id} aria-labelledby={`${id}-h`}>
-          <h2 id={`${id}-h`}>{title}</h2>
-          <Lab />
-        </section>
-      ))
-    }
+    {SECTIONS.map(({ id, title, Lab }) => (
+      <section class="part" id={id} data-part={id} aria-labelledby={`${id}-h`}>
+        <h2 id={`${id}-h`}>{title}</h2>
+        <Lab />
+      </section>
+    ))}
   </div>
 </div>
 
@@ -79,30 +95,105 @@ const SECTIONS = [
 </script>
 
 <style>
-  .lab { display: grid; grid-template-columns: 250px minmax(0, 1fr); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg); }
-  .list { border-right: 1px solid var(--line); background: var(--bg2); }
-  .list a { display: block; padding: 14px 16px; border-bottom: 1px solid var(--line); }
-  .list a:last-child { border-bottom: 0; }
-  .list .t { display: block; font-family: var(--serif); font-size: 16.5px; color: var(--hi); }
-  .list .s { display: block; font-size: 12.5px; line-height: 1.45; color: var(--tx3); margin-top: 2px; }
-  .list a:hover .t { color: var(--ac); }
-  .list a[aria-current] { background: var(--bg); box-shadow: inset 2px 0 0 var(--ac); }
-  .list a[aria-current] .s { color: var(--tx2); }
-  .panel { padding: 20px 22px 22px; min-width: 0; }
-  .part + .part { margin-top: 32px; }
-  .js .part + .part { margin-top: 0; }
-  h2 { font-family: var(--serif); font-weight: 500; font-size: 22px; color: var(--hi); margin: 0 0 14px; scroll-margin-top: 80px; }
+  .lab {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .list {
+    border-right: 1px solid var(--line);
+    background: var(--bg2);
+  }
+  .list a {
+    display: block;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .list a:last-child {
+    border-bottom: 0;
+  }
+  .list .t {
+    display: block;
+    font-family: var(--serif);
+    font-size: 16.5px;
+    color: var(--hi);
+  }
+  .list .s {
+    display: block;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--tx3);
+    margin-top: 2px;
+  }
+  .list a:hover .t {
+    color: var(--ac);
+  }
+  .list a[aria-current] {
+    background: var(--bg);
+    box-shadow: inset 2px 0 0 var(--ac);
+  }
+  .list a[aria-current] .s {
+    color: var(--tx2);
+  }
+  .panel {
+    padding: 20px 22px 22px;
+    min-width: 0;
+  }
+  .part + .part {
+    margin-top: 32px;
+  }
+  .js .part + .part {
+    margin-top: 0;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--hi);
+    margin: 0 0 14px;
+    scroll-margin-top: 80px;
+  }
   /* the list names each tool, so the widget's own title line and box would repeat it */
-  .part :global(.widget) { border: 0; padding: 0; margin: 0; background: none; }
-  .part :global(.widget .wt) { display: none; }
+  .part :global(.widget) {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: none;
+  }
+  .part :global(.widget .wt) {
+    display: none;
+  }
 
   @media (max-width: 860px) {
-    .lab { grid-template-columns: minmax(0, 1fr); }
-    .list { display: flex; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
-    .list a { flex: none; border-bottom: 0; border-right: 1px solid var(--line); padding: 12px 14px; }
-    .list a:last-child { border-right: 0; }
-    .list .s { display: none; }
-    .list a[aria-current] { box-shadow: inset 0 -2px 0 var(--ac); }
-    .panel { padding: 18px 16px 20px; }
+    .lab {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .list {
+      display: flex;
+      overflow-x: auto;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .list a {
+      flex: none;
+      border-bottom: 0;
+      border-right: 1px solid var(--line);
+      padding: 12px 14px;
+    }
+    .list a:last-child {
+      border-right: 0;
+    }
+    .list .s {
+      display: none;
+    }
+    .list a[aria-current] {
+      box-shadow: inset 0 -2px 0 var(--ac);
+    }
+    .panel {
+      padding: 18px 16px 20px;
+    }
   }
 </style>

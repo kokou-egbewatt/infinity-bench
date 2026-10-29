@@ -21,47 +21,99 @@ const ROWS = [
   <div class="stack">
     <div>
       <div class="tbl" role="group" aria-label="Toolchains">
-        <span class="th">toolchain</span><span class="th">MB</span><span class="th">jobs a day</span>
-        {
-          ROWS.map((r) => (
-            <>
-              <span class="tn">{r.label}</span>
-              <input type="number" inputmode="numeric" min="0" step="5" value={r.size} data-size aria-label={`${r.label}, MB`} />
-              <input type="number" inputmode="numeric" min="0" step="1" value={r.jobs} data-jobs aria-label={`${r.label}, jobs a day`} />
-            </>
-          ))
-        }
+        <span class="th">toolchain</span>
+        <span class="th">MB</span>
+        <span class="th">jobs a day</span>
+        {ROWS.map((r) => (
+          <>
+            <span class="tn">{r.label}</span>
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              step="5"
+              value={r.size}
+              data-size
+              aria-label={`${r.label}, MB`}
+            />
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              step="1"
+              value={r.jobs}
+              data-jobs
+              aria-label={`${r.label}, jobs a day`}
+            />
+          </>
+        ))}
       </div>
       <div class="rng">
         <div class="r">
           <label for={`${uid}-mbps`}>Download speed (Mbit/s)</label>
-          <output for={`${uid}-mbps`} data-show="mbps">100</output>
+          <output for={`${uid}-mbps`} data-show="mbps">
+            100
+          </output>
         </div>
-        <input id={`${uid}-mbps`} type="range" data-in="mbps" min="10" max="1000" step="10" value="100" />
+        <input
+          id={`${uid}-mbps`}
+          type="range"
+          data-in="mbps"
+          min="10"
+          max="1000"
+          step="10"
+          value="100"
+        />
       </div>
       <div class="rng">
         <div class="r">
           <label for={`${uid}-days`}>Working days a month</label>
-          <output for={`${uid}-days`} data-show="days">22</output>
+          <output for={`${uid}-days`} data-show="days">
+            22
+          </output>
         </div>
-        <input id={`${uid}-days`} type="range" data-in="days" min="1" max="31" step="1" value="22" />
+        <input
+          id={`${uid}-days`}
+          type="range"
+          data-in="days"
+          min="1"
+          max="31"
+          step="1"
+          value="22"
+        />
       </div>
     </div>
     <div>
       <dl aria-live="polite">
-        <dt>downloaded without a cache</dt><dd data-out="gb">–</dd>
-        <dt>minutes spent downloading</dt><dd data-out="min">–</dd>
-        <dt>cost on Linux 2-core</dt><dd data-out="usd">–</dd>
-        <dt>with a shared cache</dt><dd>one download per version</dd>
+        <dt>downloaded without a cache</dt>
+        <dd data-out="gb">–</dd>
+        <dt>minutes spent downloading</dt>
+        <dd data-out="min">–</dd>
+        <dt>cost on Linux 2-core</dt>
+        <dd data-out="usd">–</dd>
+        <dt>with a shared cache</dt>
+        <dd>one download per version</dd>
       </dl>
       <p class="note" data-out="note" aria-live="polite"></p>
     </div>
   </div>
   <p class="formula">
-    Data = size × jobs a day × days. Time = data ÷ download speed. The browser and <code>target/</code> sizes are measured in the post; the rest are examples. GitHub's own cache counts as a download: it is restored on every run.
+    Data = size × jobs a day × days. Time = data ÷ download speed. The browser and{' '}
+    <code>target/</code> sizes are measured in the post; the rest are examples. GitHub's own cache
+    counts as a download: it is restored on every run.
   </p>
-  <p class="src"><a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">code</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">tests</a></p>
-  <noscript><p class="formula">This lab needs JavaScript.</p></noscript>
+  <p class="src">
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">
+      code
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">
+      tests
+    </a>
+  </p>
+  <noscript>
+    <p class="formula">This lab needs JavaScript.</p>
+  </noscript>
 </div>
 
 <script>
@@ -86,7 +138,8 @@ const ROWS = [
       root.querySelector<HTMLElement>('[data-show="days"]')!.textContent = String(days);
       const p = cachePayoff(rows, mbps, days);
       out('gb').textContent = `${p.gbPerMonth.toFixed(1)} GB a month`;
-      out('min').textContent = `${Math.round(p.minutesPerMonth).toLocaleString('en-US')} min a month`;
+      out('min').textContent =
+        `${Math.round(p.minutesPerMonth).toLocaleString('en-US')} min a month`;
       out('usd').textContent = `$${(p.minutesPerMonth * rate).toFixed(2)}`;
       out('note').textContent = p.gbPerMonth > 100 ? 'Over 100 GB a month of the same files.' : '';
     };
@@ -99,12 +152,37 @@ const ROWS = [
 </script>
 
 <style>
-  .tbl { display: grid; grid-template-columns: minmax(0, 1fr) 70px 70px; gap: 6px 8px; align-items: center; margin-bottom: 14px; }
-  .th { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tx2); }
-  .tn { font-size: 13px; color: var(--tx); }
-  .tbl input {
-    width: 100%; box-sizing: border-box; background: #08080a; border: 1px solid var(--line2); border-radius: 4px;
-    color: var(--tx); font-family: var(--mono); font-size: 12px; padding: 5px 7px;
+  .tbl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 70px 70px;
+    gap: 6px 8px;
+    align-items: center;
+    margin-bottom: 14px;
   }
-  .tbl input:focus-visible { outline: 2px solid var(--ac); outline-offset: 1px; }
+  .th {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tx2);
+  }
+  .tn {
+    font-size: 13px;
+    color: var(--tx);
+  }
+  .tbl input {
+    width: 100%;
+    box-sizing: border-box;
+    background: #08080a;
+    border: 1px solid var(--line2);
+    border-radius: 4px;
+    color: var(--tx);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 7px;
+  }
+  .tbl input:focus-visible {
+    outline: 2px solid var(--ac);
+    outline-offset: 1px;
+  }
 </style>

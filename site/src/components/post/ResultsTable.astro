@@ -21,7 +21,10 @@ if (sort) rows.sort(sort);
 
 const keys = columns ? Object.keys(columns) : Object.keys(rows[0]);
 const missing = keys.filter((k) => !(k in rows[0]));
-if (missing.length) throw new Error(`ResultsTable: data/${post.data}/${file} has no column ${missing.join(', ')} (post: ${post.slug})`);
+if (missing.length)
+  throw new Error(
+    `ResultsTable: data/${post.data}/${file} has no column ${missing.join(', ')} (post: ${post.slug})`,
+  );
 
 const label = (k: string) => {
   const c = columns?.[k];
@@ -31,27 +34,32 @@ const format = (k: string, v: string) => {
   const c = columns?.[k];
   return typeof c === 'object' && c.format ? c.format(v) : v;
 };
-const isNum = (v: string) => v === '' || /^[-+]?[\d,]*\.?\d+%?$/.test(v) || /^\d[\d,.]*-\d[\d,.]*$/.test(v);
+const isNum = (v: string) =>
+  v === '' || /^[-+]?[\d,]*\.?\d+%?$/.test(v) || /^\d[\d,.]*-\d[\d,.]*$/.test(v);
 const oneToken = (v: string) => !/\s/.test(v);
 const numeric = keys.map((k, i) => i > 0 && rows.every((r) => isNum(r[k])));
 ---
 
 <div class="tablewrap">
-<table>
-  <thead>
-    <tr>{keys.map((k, i) => <th class:list={{ num: numeric[i] }}>{label(k)}</th>)}</tr>
-  </thead>
-  <tbody>
-    {
-      rows.map((r) => (
+  <table>
+    <thead>
+      <tr>
+        {keys.map((k, i) => (
+          <th class:list={{ num: numeric[i] }}>{label(k)}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
         <tr class:list={{ hl: highlight?.(r) }}>
           {keys.map((k, i) => (
-            <td class:list={{ num: numeric[i], nw: !numeric[i] && oneToken(format(k, r[k])) }}>{format(k, r[k])}</td>
+            <td class:list={{ num: numeric[i], nw: !numeric[i] && oneToken(format(k, r[k])) }}>
+              {format(k, r[k])}
+            </td>
           ))}
         </tr>
-      ))
-    }
-  </tbody>
-</table>
+      ))}
+    </tbody>
+  </table>
 </div>
 {caption && <p class="cap">{caption}</p>}

@@ -13,62 +13,72 @@ const KINDS: ChangeKind[] = ['published', 'updated', 'erratum', 'lab'];
 const count = (k: ChangeKind) => events.filter((e) => e.kind === k).length;
 ---
 
-<BaseLayout title="Changelog" description="Every post published, updated or corrected, newest first.">
+<BaseLayout
+  title="Changelog"
+  description="Every post published, updated or corrected, newest first."
+>
   <div class="wrap">
     <div class="simple log" data-log>
       <h1>Changelog</h1>
       <p>
-        Every post published, updated or corrected, and every new lab, newest first. Errors also have a page of their
-        own, the <a href={url('/errata')}>errata</a>. Changes to the site's code are in the repository's <a
-          href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/CHANGELOG.md">CHANGELOG.md</a
-        >.
+        Every post published, updated or corrected, and every new lab, newest first. Errors also
+        have a page of their own, the <a href={url('/errata')}>errata</a>. Changes to the site's
+        code are in the repository's{' '}
+        <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/CHANGELOG.md">
+          CHANGELOG.md
+        </a>
+        .
       </p>
-      {
-        events.length ? (
-          <>
-            <div class="chips" role="group" aria-label="Show">
-              <button type="button" data-k="all" aria-pressed="true">
-                all <span>{events.length}</span>
+      {events.length ? (
+        <>
+          <div class="chips" role="group" aria-label="Show">
+            <button type="button" data-k="all" aria-pressed="true">
+              all <span>{events.length}</span>
+            </button>
+            {KINDS.filter(count).map((k) => (
+              <button type="button" data-k={k} aria-pressed="false" class={k}>
+                {KIND_LABEL[k]} <span>{count(k)}</span>
               </button>
-              {KINDS.filter(count).map((k) => (
-                <button type="button" data-k={k} aria-pressed="false" class={k}>
-                  {KIND_LABEL[k]} <span>{count(k)}</span>
-                </button>
-              ))}
-            </div>
-            <ul>
-              {events.map((e) => (
-                <li class={e.kind} data-kind={e.kind}>
-                  <span class="d">{isoDate(e.date)}</span>
-                  <span>
-                    <em class="k">{KIND_LABEL[e.kind]}</em>
-                    {e.kind === 'published' ? (
-                      <a class="t" href={url(`/posts/${e.post.id}`)}>{e.post.title}</a>
-                    ) : e.kind === 'lab' && e.lab ? (
-                      <>
-                        <a class="t" href={url(`/labs/${e.lab.id}`)}>{e.lab.name}</a>
-                        <span class="x">{e.text}</span>
-                      </>
-                    ) : (
-                      <>
-                        {e.text}
-                        {e.credit && ` Thanks to ${e.credit}.`}
-                      </>
-                    )}
-                    {e.kind !== 'published' && (
-                      <span class="p">
-                        <a href={url(`/posts/${e.post.id}${e.kind === 'lab' ? '' : '#changelog'}`)}>{e.post.title}</a>
-                      </span>
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p class="empty">Nothing published yet.</p>
-        )
-      }
+            ))}
+          </div>
+          <ul>
+            {events.map((e) => (
+              <li class={e.kind} data-kind={e.kind}>
+                <span class="d">{isoDate(e.date)}</span>
+                <span>
+                  <em class="k">{KIND_LABEL[e.kind]}</em>
+                  {e.kind === 'published' ? (
+                    <a class="t" href={url(`/posts/${e.post.id}`)}>
+                      {e.post.title}
+                    </a>
+                  ) : e.kind === 'lab' && e.lab ? (
+                    <>
+                      <a class="t" href={url(`/labs/${e.lab.id}`)}>
+                        {e.lab.name}
+                      </a>
+                      <span class="x">{e.text}</span>
+                    </>
+                  ) : (
+                    <>
+                      {e.text}
+                      {e.credit && ` Thanks to ${e.credit}.`}
+                    </>
+                  )}
+                  {e.kind !== 'published' && (
+                    <span class="p">
+                      <a href={url(`/posts/${e.post.id}${e.kind === 'lab' ? '' : '#changelog'}`)}>
+                        {e.post.title}
+                      </a>
+                    </span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p class="empty">Nothing published yet.</p>
+      )}
     </div>
   </div>
 </BaseLayout>

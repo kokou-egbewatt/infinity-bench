@@ -17,15 +17,28 @@ interface Props {
   workspaceMb?: number;
 }
 
-const { file = 'results.csv', fixed = ['dwm'], off = [], model = 'llama-3.2-3b-q4km', workspaceMb = 600 } = Astro.props;
+const {
+  file = 'results.csv',
+  fixed = ['dwm'],
+  off = [],
+  model = 'llama-3.2-3b-q4km',
+  workspaceMb = 600,
+} = Astro.props;
 const WHO = 'VramAccount';
 const post = currentPost(Astro.locals, WHO);
 const rows = readCsv(post.data, file, WHO, post.slug);
-const totalMb = envNumber(post.data, (e) => e.gpu?.vram_total_mb, 'gpu.vram_total_mb', WHO, post.slug);
+const totalMb = envNumber(
+  post.data,
+  (e) => e.gpu?.vram_total_mb,
+  'gpu.vram_total_mb',
+  WHO,
+  post.slug,
+);
 
 const consumers = rows.map((r) => {
   const mb = Number(r.vram_mb);
-  if (!r.consumer_id || !Number.isFinite(mb)) throw new Error(`${WHO}: ${file} needs consumer_id and a numeric vram_mb (post: ${post.slug})`);
+  if (!r.consumer_id || !Number.isFinite(mb))
+    throw new Error(`${WHO}: ${file} needs consumer_id and a numeric vram_mb (post: ${post.slug})`);
   return { id: r.consumer_id, label: r.label || r.consumer_id, mb };
 });
 const models = await getModels('llama.cpp', model, WHO);
@@ -37,50 +50,61 @@ const models = await getModels('llama.cpp', model, WHO);
     <div>
       <fieldset>
         <legend>Running on the desktop</legend>
-        {
-          consumers.map((c) => (
-            <label class="chk">
-              <input type="checkbox" data-mb={c.mb} checked={!off.includes(c.id)} disabled={fixed.includes(c.id)} />
-              <span>
-                {c.label} · {c.mb.toLocaleString('en-US')} MB{fixed.includes(c.id) && ' · cannot turn off'}
-              </span>
-            </label>
-          ))
-        }
+        {consumers.map((c) => (
+          <label class="chk">
+            <input
+              type="checkbox"
+              data-mb={c.mb}
+              checked={!off.includes(c.id)}
+              disabled={fixed.includes(c.id)}
+            />
+            <span>
+              {c.label} · {c.mb.toLocaleString('en-US')} MB
+              {fixed.includes(c.id) && ' · cannot turn off'}
+            </span>
+          </label>
+        ))}
       </fieldset>
       <label class="sel">
         Model
         <select data-model>
-          {
-            models.map((m) => (
-              <option value={m.id} selected={m.selected} {...m.attrs}>
-                {m.label} · {gb(m.size_mb, 1)}
-              </option>
-            ))
-          }
+          {models.map((m) => (
+            <option value={m.id} selected={m.selected} {...m.attrs}>
+              {m.label} · {gb(m.size_mb, 1)}
+            </option>
+          ))}
         </select>
       </label>
     </div>
     <div>
       <div class="sbar" aria-hidden="true">
-        <i data-bar="taken" style="background:#3a3a42"></i><i data-bar="weights" style="background:var(--ac)"></i><i
-          data-bar="left"
-          style="background:var(--ac2)"></i>
+        <i data-bar="taken" style="background:#3a3a42"></i>
+        <i data-bar="weights" style="background:var(--ac)"></i>
+        <i data-bar="left" style="background:var(--ac2)"></i>
       </div>
       <dl aria-live="polite">
-        <dt>taken before load</dt><dd data-out="taken">–</dd>
-        <dt>model weights</dt><dd data-out="weights">–</dd>
-        <dt>left for KV cache + workspace</dt><dd data-out="left">–</dd>
-        <dt>max context, FP16 KV</dt><dd data-out="ctx">–</dd>
+        <dt>taken before load</dt>
+        <dd data-out="taken">–</dd>
+        <dt>model weights</dt>
+        <dd data-out="weights">–</dd>
+        <dt>left for KV cache + workspace</dt>
+        <dd data-out="left">–</dd>
+        <dt>max context, FP16 KV</dt>
+        <dd data-out="ctx">–</dd>
       </dl>
       <p class="note" data-out="note" aria-live="polite"></p>
     </div>
   </div>
   <p class="formula">
-    left = {totalMb.toLocaleString('en-US')} MB − checked consumers − weights. context = (left − {workspaceMb} MB workspace,
-    an estimate) ÷ (2 × layers × KV heads × head dim × 2 bytes). Consumers from {file}; weights from models.yaml.
+    left = {totalMb.toLocaleString('en-US')} MB − checked consumers − weights. context = (left −{' '}
+    {workspaceMb} MB workspace, an estimate) ÷ (2 × layers × KV heads × head dim × 2 bytes).
+    Consumers from {file}; weights from models.yaml.
   </p>
-  <noscript><p class="formula">This widget needs JavaScript. The results table in this post has the same numbers.</p></noscript>
+  <noscript>
+    <p class="formula">
+      This widget needs JavaScript. The results table in this post has the same numbers.
+    </p>
+  </noscript>
 </div>
 
 <script>

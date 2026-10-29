@@ -14,7 +14,10 @@ permissions:
   contents: read
 
 jobs:
-  version_control:
+  # Every check here is a bash script over tracked files: no Node, no dependencies, nothing to
+  # install. One runner does all three. `!cancelled()` keeps a failing script from hiding the
+  # ones after it, which is what separate jobs used to give us.
+  repository:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -25,10 +28,15 @@ jobs:
         run: bash ci/scripts/version-gate.sh
 
       - name: Changelog is sound
+        if: ${{ !cancelled() }}
         run: bash ci/scripts/changelog-integrity.sh
 
+      - name: Relative links resolve
+        if: ${{ !cancelled() }}
+        run: bash ci/scripts/check-doc-links.sh
+
       - name: Summary
-        if: always()
+        if: ${{ !cancelled() }}
         run: |
           version=$(grep -m1 -E '^\s*"version":' site/package.json | sed -E 's/.*"version":\s*"([^"]+)".*/\1/')
           {
@@ -36,14 +44,6 @@ jobs:
             echo
             awk -v h="## [$version]" 'index($0, h) == 1 {p=1; print; next} p && /^## \[/ {exit} p' CHANGELOG.md
           } >> "$GITHUB_STEP_SUMMARY"
-
-  docs:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Relative links resolve
-        run: bash ci/scripts/check-doc-links.sh
 
   site:
     runs-on: ubuntu-24.04
@@ -67,14 +67,24 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Formatting
+        run: pnpm format:check
+
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: pnpm lint
+
       - name: Types and props
+        if: ${{ !cancelled() }}
         run: pnpm check
 
       - name: Tests
+        if: ${{ !cancelled() }}
         run: pnpm test
 
       # wrangler deploy --dry-run: builds through the build block in wrangler.jsonc, exactly as
       # the deploy does, then checks the deployment. Drafts are left out of that build, so this is
       # also what a merge to main would publish. A separate pnpm build would build the site twice.
       - name: Build and deployment config
+        if: ${{ !cancelled() }}
         run: pnpm deploy:check

@@ -16,7 +16,13 @@ describe('changes', () => {
     const e = postEvents(
       post('a', '2026-10-01', {
         changes: [{ date: new Date('2026-10-05'), text: 'Added round 2 of the cache runs.' }],
-        errata: [{ date: new Date('2026-10-05'), text: 'The browser cache is 278 MB, not 115 MB.', credit: 'R' }],
+        errata: [
+          {
+            date: new Date('2026-10-05'),
+            text: 'The browser cache is 278 MB, not 115 MB.',
+            credit: 'R',
+          },
+        ],
       }),
     );
     expect(e.map((x) => x.kind)).toEqual(['erratum', 'updated', 'published']);

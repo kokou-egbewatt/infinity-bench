@@ -9,21 +9,43 @@ const uid = 'rcc';
 
 <div class="widget rcc" data-widget="runner-class" data-sample={SAMPLE_WORKFLOW}>
   <p class="wt">Which runner class does each job need?</p>
-  <label class="lbl" for={`${uid}-yaml`}>Paste a workflow file.</label>
-  <textarea id={`${uid}-yaml`} data-in="yaml" spellcheck="false" autocomplete="off" rows="14">{SAMPLE_WORKFLOW}</textarea>
+  <label class="lbl" for={`${uid}-yaml`}>
+    Paste a workflow file.
+  </label>
+  <textarea
+    id={`${uid}-yaml`}
+    data-in="yaml"
+    spellcheck="false"
+    autocomplete="off"
+    rows="14"
+  >{SAMPLE_WORKFLOW}</textarea>
   <div class="acts">
-    <button type="button" data-act="sample">reset to the example</button>
-    <button type="button" data-act="clear">clear</button>
+    <button type="button" data-act="sample">
+      reset to the example
+    </button>
+    <button type="button" data-act="clear">
+      clear
+    </button>
   </div>
   <p class="sum" data-out="summary" aria-live="polite"></p>
   <ol class="jobs" data-out="jobs"></ol>
   <div data-out="collisions"></div>
   <p class="formula">
-    dind: services, a job container or Docker commands. Neither: container actions, Windows and macOS. Light:
-    everything else. Nothing you paste leaves the page.
+    dind: services, a job container or Docker commands. Neither: container actions, Windows and
+    macOS. Light: everything else. Nothing you paste leaves the page.
   </p>
-  <p class="src"><a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">code</a> · <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">tests</a></p>
-  <noscript><p class="formula">This lab needs JavaScript.</p></noscript>
+  <p class="src">
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.ts">
+      code
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/runners.test.ts">
+      tests
+    </a>
+  </p>
+  <noscript>
+    <p class="formula">This lab needs JavaScript.</p>
+  </noscript>
 </div>
 
 <script>
@@ -81,7 +103,13 @@ const uid = 'rcc';
         box.append(el('p', 'ch', 'Ports that collide on a shared daemon'));
         const ul = el('ul');
         for (const c of r.collisions) {
-          ul.append(el('li', undefined, `:${c.port}, published by ${c.jobs[0]} and ${c.jobs[1]}, which can run at the same time`));
+          ul.append(
+            el(
+              'li',
+              undefined,
+              `:${c.port}, published by ${c.jobs[0]} and ${c.jobs[1]}, which can run at the same time`,
+            ),
+          );
         }
         box.append(ul, el('p', 'cn', 'No collision with a daemon per runner.'));
         coll.append(box);
@@ -109,42 +137,180 @@ const uid = 'rcc';
 </script>
 
 <style>
-  .lbl { display: block; font-size: 12.5px; color: var(--tx2); margin: 0 0 6px; }
+  .lbl {
+    display: block;
+    font-size: 12.5px;
+    color: var(--tx2);
+    margin: 0 0 6px;
+  }
   textarea {
-    display: block; width: 100%; resize: vertical; min-height: 180px; box-sizing: border-box;
-    background: #08080a; color: var(--tx); border: 1px solid var(--line2); border-radius: 6px;
-    font-family: var(--mono); font-size: 12px; line-height: 1.55; padding: 10px 12px; tab-size: 2;
+    display: block;
+    width: 100%;
+    resize: vertical;
+    min-height: 180px;
+    box-sizing: border-box;
+    background: #08080a;
+    color: var(--tx);
+    border: 1px solid var(--line2);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.55;
+    padding: 10px 12px;
+    tab-size: 2;
   }
-  textarea:focus-visible { outline: 2px solid var(--ac); outline-offset: 1px; }
-  .acts { display: flex; gap: 8px; margin: 8px 0 14px; }
+  textarea:focus-visible {
+    outline: 2px solid var(--ac);
+    outline-offset: 1px;
+  }
+  .acts {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 14px;
+  }
   .acts button {
-    font-family: var(--mono); font-size: 11px; color: var(--tx2); background: var(--bg); border: 1px solid var(--line2);
-    border-radius: 4px; padding: 6px 12px; cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx2);
+    background: var(--bg);
+    border: 1px solid var(--line2);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
   }
-  .acts button:hover { color: var(--hi); }
-  .widget p.sum { font-size: 13.5px; color: var(--tx); margin: 0 0 10px; line-height: 1.5; }
-  .widget p.sum.err { color: var(--warn); }
-  .jobs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-  .jobs :global(.job) { border: 1px solid var(--line); border-left: 3px solid var(--line2); border-radius: 6px; background: var(--bg); padding: 10px 12px; }
-  .jobs :global(.job.light) { border-left-color: var(--ac); }
-  .jobs :global(.job.dind) { border-left-color: var(--warn); }
-  .jobs :global(.job.neither) { border-left-color: #f87171; }
-  .jobs :global(.jh) { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
-  .jobs :global(.id) { font-family: var(--mono); font-size: 13px; color: var(--hi); background: none; padding: 0; }
-  .jobs :global(.badge) { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; border: 1px solid; }
-  .jobs :global(.badge.light) { color: var(--ac); border-color: var(--ac2); }
-  .jobs :global(.badge.dind) { color: var(--warn); border-color: #4a3a1a; }
-  .jobs :global(.badge.neither) { color: #f87171; border-color: #4a2222; }
-  .widget .jobs :global(p) { margin: 0 0 4px; font-size: 13px; line-height: 1.5; }
-  .widget .jobs :global(p.why) { color: var(--tx2); }
-  .widget .jobs :global(p.flag) { color: var(--warn); }
-  .widget .jobs :global(p.use) { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; margin: 6px 0 0; }
-  .jobs :global(.k) { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
-  .jobs :global(.use code) { font-family: var(--mono); font-size: 12px; color: var(--tx); background: #1a1b1f; padding: 0.1em 0.4em; border-radius: 3px; overflow-wrap: anywhere; }
-  .jobs :global(.adv) { font-size: 13px; color: var(--tx); }
-  [data-out='collisions'] :global(.coll) { margin-top: 12px; border: 1px solid #4a2222; border-radius: 6px; padding: 10px 12px; background: rgba(248, 113, 113, 0.05); }
-  .widget [data-out='collisions'] :global(p) { margin: 0; font-size: 13px; line-height: 1.5; }
-  [data-out='collisions'] :global(.ch) { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #f87171; margin-bottom: 6px !important; }
-  [data-out='collisions'] :global(ul) { margin: 0 0 6px 18px; padding: 0; font-size: 13px; color: var(--tx); }
-  [data-out='collisions'] :global(.cn) { color: var(--tx2); }
+  .acts button:hover {
+    color: var(--hi);
+  }
+  .widget p.sum {
+    font-size: 13.5px;
+    color: var(--tx);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  .widget p.sum.err {
+    color: var(--warn);
+  }
+  .jobs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .jobs :global(.job) {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line2);
+    border-radius: 6px;
+    background: var(--bg);
+    padding: 10px 12px;
+  }
+  .jobs :global(.job.light) {
+    border-left-color: var(--ac);
+  }
+  .jobs :global(.job.dind) {
+    border-left-color: var(--warn);
+  }
+  .jobs :global(.job.neither) {
+    border-left-color: #f87171;
+  }
+  .jobs :global(.jh) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .jobs :global(.id) {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--hi);
+    background: none;
+    padding: 0;
+  }
+  .jobs :global(.badge) {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+  .jobs :global(.badge.light) {
+    color: var(--ac);
+    border-color: var(--ac2);
+  }
+  .jobs :global(.badge.dind) {
+    color: var(--warn);
+    border-color: #4a3a1a;
+  }
+  .jobs :global(.badge.neither) {
+    color: #f87171;
+    border-color: #4a2222;
+  }
+  .widget .jobs :global(p) {
+    margin: 0 0 4px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .widget .jobs :global(p.why) {
+    color: var(--tx2);
+  }
+  .widget .jobs :global(p.flag) {
+    color: var(--warn);
+  }
+  .widget .jobs :global(p.use) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    align-items: baseline;
+    margin: 6px 0 0;
+  }
+  .jobs :global(.k) {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+  }
+  .jobs :global(.use code) {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--tx);
+    background: #1a1b1f;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    overflow-wrap: anywhere;
+  }
+  .jobs :global(.adv) {
+    font-size: 13px;
+    color: var(--tx);
+  }
+  [data-out='collisions'] :global(.coll) {
+    margin-top: 12px;
+    border: 1px solid #4a2222;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: rgba(248, 113, 113, 0.05);
+  }
+  .widget [data-out='collisions'] :global(p) {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  [data-out='collisions'] :global(.ch) {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #f87171;
+    margin-bottom: 6px !important;
+  }
+  [data-out='collisions'] :global(ul) {
+    margin: 0 0 6px 18px;
+    padding: 0;
+    font-size: 13px;
+    color: var(--tx);
+  }
+  [data-out='collisions'] :global(.cn) {
+    color: var(--tx2);
+  }
 </style>

@@ -17,7 +17,10 @@ describe('computeStats', () => {
   });
 
   it('prefers updated over date for lastMeasured', () => {
-    const s = computeStats([post('2026-10-01', { updated: new Date('2026-11-15') }), post('2026-11-01')]);
+    const s = computeStats([
+      post('2026-10-01', { updated: new Date('2026-11-15') }),
+      post('2026-11-01'),
+    ]);
     expect(s.lastMeasured).toEqual(new Date('2026-11-15'));
   });
 

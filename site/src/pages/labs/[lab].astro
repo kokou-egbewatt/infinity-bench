@@ -13,14 +13,24 @@ const COMPONENTS = {
 } as const;
 
 export const getStaticPaths = (async () => {
-  const byPlan = new Map((await getPosts()).filter((p) => p.data.plan).map((p) => [p.data.plan!, p]));
+  const byPlan = new Map(
+    (await getPosts()).filter((p) => p.data.plan).map((p) => [p.data.plan!, p]),
+  );
   return WIDGETS.filter((w) => w.page).flatMap((w) => {
     const post = byPlan.get(w.plan);
     if (!post) return [];
     // getStaticPaths runs before the page, so it cannot see COMPONENTS below; keep the two lists in step
     const ids = ['runner-fleet'];
-    if (!ids.includes(w.id)) throw new Error(`Labs: ${w.id} has page: true but no component in src/pages/labs/[lab].astro`);
-    return [{ params: { lab: w.id }, props: { name: w.name, blurb: w.blurb, postTitle: post.data.title, postSlug: post.id } }];
+    if (!ids.includes(w.id))
+      throw new Error(
+        `Labs: ${w.id} has page: true but no component in src/pages/labs/[lab].astro`,
+      );
+    return [
+      {
+        params: { lab: w.id },
+        props: { name: w.name, blurb: w.blurb, postTitle: post.data.title, postSlug: post.id },
+      },
+    ];
   });
 }) satisfies GetStaticPaths;
 
@@ -32,20 +42,51 @@ const Lab = COMPONENTS[lab as keyof typeof COMPONENTS];
 <BaseLayout title={name} description={blurb}>
   <div class="wrap">
     <div class="labpage">
-      <a class="back" href={url('/labs')}>← Labs</a>
+      <a class="back" href={url('/labs')}>
+        ← Labs
+      </a>
       <h1>{name}</h1>
-      <p class="from">From <a href={url(`/posts/${postSlug}`)}>{postTitle}</a></p>
+      <p class="from">
+        From <a href={url(`/posts/${postSlug}`)}>{postTitle}</a>
+      </p>
       <Lab />
     </div>
   </div>
 </BaseLayout>
 
 <style>
-  .labpage { padding: 40px 0 60px; }
-  .back { font-family: var(--mono); font-size: 11.5px; color: var(--tx3); }
-  .back:hover { color: var(--tx); }
-  h1 { font-family: var(--serif); font-weight: 400; font-size: 34px; line-height: 1.15; color: var(--hi); margin: 18px 0 8px; }
-  .from { font-size: 14px; color: var(--tx2); margin: 0 0 22px; }
-  .from a { color: var(--hi); border-bottom: 1px solid var(--line2); }
-  .from a:hover { border-color: var(--ac); }
+  /* the tools read better in a column than stretched across the full wrap */
+  .labpage {
+    padding: 40px 0 60px;
+    max-width: 900px;
+    margin-inline: auto;
+  }
+  .back {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--tx3);
+  }
+  .back:hover {
+    color: var(--tx);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.15;
+    color: var(--hi);
+    margin: 18px 0 8px;
+  }
+  .from {
+    font-size: 14px;
+    color: var(--tx2);
+    margin: 0 0 22px;
+  }
+  .from a {
+    color: var(--hi);
+    border-bottom: 1px solid var(--line2);
+  }
+  .from a:hover {
+    border-color: var(--ac);
+  }
 </style>

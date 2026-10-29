@@ -14,19 +14,13 @@ const events = postEvents(Astro.props.post);
 <section class="chg">
   <h2 id="changelog">Changelog</h2>
   <ul>
-    {
-      events.map((e) => (
-        <li class:list={[e.kind]}>
-          <span>{isoDate(e.date)}</span>
-          {e.kind !== 'published' && <em>{KIND_LABEL[e.kind]}</em>}
-          {e.kind === 'lab' && e.lab ? (
-            <a href={url(`/labs/${e.lab.id}`)}>{e.lab.name}</a>
-          ) : (
-            e.text
-          )}
-          {e.credit && ` Thanks to ${e.credit}.`}
-        </li>
-      ))
-    }
+    {events.map((e) => (
+      <li class:list={[e.kind]}>
+        <span>{isoDate(e.date)}</span>
+        {e.kind !== 'published' && <em>{KIND_LABEL[e.kind]}</em>}
+        {e.kind === 'lab' && e.lab ? <a href={url(`/labs/${e.lab.id}`)}>{e.lab.name}</a> : e.text}
+        {e.credit && ` Thanks to ${e.credit}.`}
+      </li>
+    ))}
   </ul>
 </section>

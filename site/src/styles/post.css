@@ -1,5 +1,7 @@
 .post > * { min-width: 0; }
-.post { padding: 40px 0 60px; display: grid; grid-template-columns: minmax(0, 640px) 1fr; gap: 64px; }
+.post { padding: 40px 0 60px; display: grid; grid-template-columns: 1fr minmax(0, 640px) 1fr; gap: 56px; }
+.post > article { grid-column: 2; }
+.post > aside { grid-column: 3; }
 .back { font-family: var(--mono); font-size: 11.5px; color: var(--tx3); }
 .back:hover { color: var(--tx); }
 .post h1 { font-family: var(--serif); font-weight: 400; font-size: 36px; line-height: 1.15; letter-spacing: -.01em; color: var(--hi); margin: 18px 0 12px; }
@@ -61,7 +63,7 @@
 .chg .lab em { color: var(--ac); }
 .chg a { color: var(--hi); border-bottom: 1px solid var(--line2); }
 
-aside .toc { position: sticky; top: 96px; }
+aside .toc { position: sticky; top: calc(var(--hdr) + 40px); }
 aside .h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--tx3); margin-bottom: 10px; }
 .toc nav a { display: block; padding: 5px 0 5px 12px; border-left: 1px solid var(--line); font-size: 13px; color: var(--tx3); }
 .toc nav a.active { border-color: var(--ac); color: var(--hi); }
@@ -74,7 +76,7 @@ aside .h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; t
 @media (max-width: 860px) {
   .post { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   /* without the sidebar, hold the column to a comfortable line length */
-  .post > article { max-width: 640px; }
+  .post > article { grid-column: 1; max-width: 640px; margin-inline: auto; }
   .hw { grid-template-columns: 1fr; }
   aside { display: none; }
 }
@@ -117,7 +119,7 @@ aside .h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; t
   .copy { padding: 5px 10px; }
 }
 @media (max-width: 600px) {
-  .prose figure.fig { margin-left: -24px; margin-right: -24px; border-radius: 0; border-left: 0; border-right: 0; }
+  .prose figure.fig { margin-left: -16px; margin-right: -16px; border-radius: 0; border-left: 0; border-right: 0; }
   .prose .fig .caps p { font-size: 13.5px; }
 }
 /* result figures: a key under the drawing, and the tables folded beneath; on a phone the drawing scrolls sideways rather than shrinking its labels */

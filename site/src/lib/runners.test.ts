@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { breakEven, cachePayoff, checkWorkflow, erlangC, fleetSize, meanWait, runnersFor, SUGGEST } from './runners';
+import {
+  breakEven,
+  cachePayoff,
+  checkWorkflow,
+  erlangC,
+  fleetSize,
+  meanWait,
+  runnersFor,
+  SUGGEST,
+} from './runners';
 import { SAMPLE_WORKFLOW } from './runnersSample';
 
 describe('checkWorkflow', () => {
@@ -8,7 +17,15 @@ describe('checkWorkflow', () => {
 
   it('finds every job in the sample', () => {
     expect(r.error).toBeUndefined();
-    expect(r.jobs.map((j) => j.id)).toEqual(['lint', 'unit', 'contract', 'integration', 'dockerfile', 'image', 'desktop']);
+    expect(r.jobs.map((j) => j.id)).toEqual([
+      'lint',
+      'unit',
+      'contract',
+      'integration',
+      'dockerfile',
+      'image',
+      'desktop',
+    ]);
   });
 
   it('puts a job with no Docker use on the light class', () => {
@@ -46,7 +63,10 @@ describe('checkWorkflow', () => {
 
   it('reports parallel jobs on the same host port, and not ordered ones', () => {
     expect(r.collisions).toEqual([{ port: 5432, jobs: ['contract', 'integration'] }]);
-    const ordered = SAMPLE_WORKFLOW.replace('  integration:\n', '  integration:\n    needs: [contract]\n');
+    const ordered = SAMPLE_WORKFLOW.replace(
+      '  integration:\n',
+      '  integration:\n    needs: [contract]\n',
+    );
     expect(checkWorkflow(ordered).collisions).toEqual([]);
   });
 
@@ -56,7 +76,8 @@ describe('checkWorkflow', () => {
   });
 
   it('reads block-list runs-on and ignores comments', () => {
-    const w = 'jobs:\n  a:  # first\n    runs-on:\n      - self-hosted\n      - light\n    steps:\n      - run: echo "# not a comment"\n';
+    const w =
+      'jobs:\n  a:  # first\n    runs-on:\n      - self-hosted\n      - light\n    steps:\n      - run: echo "# not a comment"\n';
     const j = checkWorkflow(w).jobs[0];
     expect(j.id).toBe('a');
     expect(j.runsOn).toBe('[self-hosted, light]');
@@ -89,8 +110,15 @@ describe('queue model', () => {
 
 describe('fleetSize', () => {
   const base = {
-    jobsPerHour: 30, jobMinutes: 6, dockerShare: 0.1, cores: 12, ramGb: 32, reservedGb: 12,
-    light: { ramGb: 2, cpus: 1.5 }, dind: { ramGb: 6, cpus: 3 }, targetWaitSec: 30,
+    jobsPerHour: 30,
+    jobMinutes: 6,
+    dockerShare: 0.1,
+    cores: 12,
+    ramGb: 32,
+    reservedGb: 12,
+    light: { ramGb: 2, cpus: 1.5 },
+    dind: { ramGb: 6, cpus: 3 },
+    targetWaitSec: 30,
   };
 
   it('splits the load by Docker share', () => {
@@ -108,8 +136,17 @@ describe('fleetSize', () => {
 
 describe('breakEven', () => {
   const base = {
-    minutes: 6000, rate: 0.006, included: 3000, includedApplies: true, machineCost: 0, months: 36,
-    watts: 120, kwhPrice: 0.15, hoursPerMonth: 0, hourly: 0, selfCharge: 0,
+    minutes: 6000,
+    rate: 0.006,
+    included: 3000,
+    includedApplies: true,
+    machineCost: 0,
+    months: 36,
+    watts: 120,
+    kwhPrice: 0.15,
+    hoursPerMonth: 0,
+    hourly: 0,
+    selfCharge: 0,
   };
 
   it('bills only minutes past the included ones', () => {

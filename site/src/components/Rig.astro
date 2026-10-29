@@ -1,0 +1,129 @@
+---
+// The hardware every number on the site was measured on. Two shapes from one set of facts: the
+// card in the home page rail, and the strip that replaces it on a phone once the card scrolls
+// away. The strip holds the same rows behind a disclosure, so neither shape is the short version.
+import { readEnv } from '../lib/env';
+import { gb } from '../lib/format';
+
+interface Props {
+  variant?: 'card' | 'bar';
+}
+
+const { variant = 'card' } = Astro.props;
+
+const rig = readEnv('vram-accounting');
+const totalMb = rig?.gpu?.vram_total_mb;
+const taxMb = rig?.desktop_tax_mb;
+const measured = typeof totalMb === 'number' && typeof taxMb === 'number';
+const taxPct = measured ? (taxMb / totalMb) * 100 : 0;
+
+const ROWS: [string, string][] = [
+  ['gpu', 'GeForce RTX 5060, 8 GB GDDR7'],
+  ['arch', 'Blackwell sm_120, 30 SMs'],
+  ['driver', '616.56, CUDA 13.4'],
+  ['cpu', 'Ryzen 5 8400F, 6c/12t'],
+  ['host', 'Windows 11, WSL2, k3s'],
+];
+
+const cap = measured
+  ? `${gb(totalMb, 1)} · ${gb(taxMb, 1)} taken by the desktop before anything loads`
+  : '8 GB nominal · what the desktop takes is measured';
+---
+
+{variant === 'card' ? (
+  <div class="rig" data-rig-card>
+    <div class="t">The rig</div>
+    <dl>
+      {ROWS.map(([k, v]) => (
+        <>
+          <dt>{k}</dt>
+          <dd>{v}</dd>
+        </>
+      ))}
+    </dl>
+    <div class="sms" aria-hidden="true">
+      {Array.from({ length: 30 }, () => (
+        <i class="sm" />
+      ))}
+    </div>
+    <div class="vbar">
+      {measured && <i style={`width:${taxPct}%;background:#3a3a42`} title="desktop" />}
+      <i style={`width:${100 - taxPct}%;background:var(--ac)`} title="free" />
+    </div>
+    <div class="cap">{cap}</div>
+  </div>
+) : (
+  <div class="rigbar" hidden data-rig-bar>
+    <div class="rigbar-in">
+      <button type="button" aria-expanded="false" aria-controls="rigbar-panel" data-rig-toggle>
+        <span class="t">The rig</span>
+        <span class="vbar">
+          {measured && <i style={`width:${taxPct}%;background:#3a3a42`} />}
+          <i style={`width:${100 - taxPct}%;background:var(--ac)`} />
+        </span>
+        <span class="chev" aria-hidden="true" />
+      </button>
+      <div class="rigbar-panel" id="rigbar-panel" hidden>
+        <dl>
+          {ROWS.map(([k, v]) => (
+            <>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </>
+          ))}
+        </dl>
+        <div class="cap">{cap}</div>
+      </div>
+    </div>
+  </div>
+)}
+
+<script>
+  // The card is in the flow and never moves, so nothing jumps: the strip is a separate fixed
+  // element that appears once the card has scrolled out of sight, and only on a phone.
+  const card = document.querySelector<HTMLElement>('[data-rig-card]');
+  const bar = document.querySelector<HTMLElement>('[data-rig-bar]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-rig-toggle]');
+  const panel = document.getElementById('rigbar-panel');
+
+  if (card && bar && toggle && panel) {
+    const narrow = window.matchMedia('(max-width: 860px)');
+    let away = false;
+
+    const collapse = () => {
+      toggle.setAttribute('aria-expanded', 'false');
+      panel.hidden = true;
+    };
+
+    // Only one of the two is in the accessibility tree at a time, so the rows are not read twice.
+    const sync = () => {
+      const show = narrow.matches && away;
+      bar.hidden = !show;
+      card.setAttribute('aria-hidden', String(show));
+      if (!show) collapse();
+    };
+
+    new IntersectionObserver(
+      ([e]) => {
+        away = !e.isIntersecting;
+        sync();
+      },
+      { threshold: 0 },
+    ).observe(card);
+
+    narrow.addEventListener('change', sync);
+
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      panel.hidden = !open;
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        collapse();
+        toggle.focus();
+      }
+    });
+  }
+</script>

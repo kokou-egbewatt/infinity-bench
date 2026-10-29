@@ -11,12 +11,18 @@
 
 import type { IssueStates, RepoKey } from '../lib/issues';
 
-export const TOPICS = ['orchestration', 'serving', 'streaming', 'observability', 'agents', 'platform'] as const;
+export const TOPICS = [
+  'orchestration',
+  'serving',
+  'streaming',
+  'observability',
+  'agents',
+  'platform',
+] as const;
 type Topic = (typeof TOPICS)[number];
 
 export type Source =
-  | { repo: RepoKey; issue: number }
-  | { repo: RepoKey; doc: string; label: string };
+  { repo: RepoKey; issue: number } | { repo: RepoKey; doc: string; label: string };
 
 interface PlannedPost {
   title: string;
@@ -99,7 +105,7 @@ export const SERIES: Series[] = [
         id: 'timeslice-mps',
         title: 'Time-slicing vs MPS on one card',
         summary:
-          'Three small services share the GPU two ways. I compare latency and SM use, and what happens to the other two when one of them runs out of memory. MIG doesn\'t exist on this card, so it\'s out of scope here.',
+          "Three small services share the GPU two ways. I compare latency and SM use, and what happens to the other two when one of them runs out of memory. MIG doesn't exist on this card, so it's out of scope here.",
         sources: [],
       },
       {
@@ -107,7 +113,7 @@ export const SERIES: Series[] = [
         id: 'ebpf-cuda-launch',
         title: 'eBPF on the CUDA launch path under WSL2',
         summary:
-          'Tracing where the time goes between a kernel launch in Python and work starting on the GPU, and how much of it WSL2\'s GPU passthrough adds.',
+          "Tracing where the time goes between a kernel launch in Python and work starting on the GPU, and how much of it WSL2's GPU passthrough adds.",
         sources: [],
       },
     ],
@@ -122,7 +128,9 @@ export const SERIES: Series[] = [
     posts: [
       {
         title: 'Why the gateway never calls the control plane',
-        sources: [{ repo: 'nm', doc: 'docs/adr/0002-control-plane-data-plane-split.md', label: 'ADR-0002' }],
+        sources: [
+          { repo: 'nm', doc: 'docs/adr/0002-control-plane-data-plane-split.md', label: 'ADR-0002' },
+        ],
       },
       { title: 'mTLS between gateway and runtime, locally', sources: nm(94, 8) },
       { title: 'Gateway overhead with a stub backend', sources: nm(13) },
@@ -164,7 +172,8 @@ export const SERIES: Series[] = [
   {
     id: 'event-fabric',
     title: 'Event fabric',
-    description: 'Phase 3. Picking a broker, shedding load on purpose during a 5× spike, and replaying what failed.',
+    description:
+      'Phase 3. Picking a broker, shedding load on purpose during a 5× spike, and replaying what failed.',
     topic: 'platform',
     home: { repo: 'nm', label: 'NeuroMesh phase 3', milestone: 3 },
     posts: [
@@ -236,7 +245,8 @@ export const SERIES: Series[] = [
   {
     id: 'agents',
     title: 'Agents',
-    description: 'Phase 6. Durable execution for agents, starting with whether to use Temporal at all.',
+    description:
+      'Phase 6. Durable execution for agents, starting with whether to use Temporal at all.',
     topic: 'agents',
     home: { repo: 'nm', label: 'NeuroMesh phase 6', milestone: 6 },
     posts: [
@@ -267,7 +277,8 @@ export const SERIES: Series[] = [
   {
     id: 'operations',
     title: 'Running it for real',
-    description: 'Phase 7. Terraform and Argo CD environments, canaries, SLOs that page someone, and a game day.',
+    description:
+      'Phase 7. Terraform and Argo CD environments, canaries, SLOs that page someone, and a game day.',
     topic: 'platform',
     home: { repo: 'nm', label: 'NeuroMesh phase 7', milestone: 7 },
     posts: [
@@ -286,7 +297,8 @@ export const SERIES: Series[] = [
   },
 ];
 
-export const flatten = (series: ResolvedSeries[]) => series.flatMap((s) => s.posts.map((p) => ({ ...p, series: s })));
+export const flatten = (series: ResolvedSeries[]) =>
+  series.flatMap((s) => s.posts.map((p) => ({ ...p, series: s })));
 
 export const byPriority = <T extends PlannedPost>(posts: T[]) =>
   posts.filter((p) => p.priority).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
