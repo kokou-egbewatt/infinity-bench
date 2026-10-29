@@ -22,6 +22,13 @@ of a wrapper almost twice their width.
 
 ### Changed
 
+- **The rig card follows the home page down.** The page is one grid now, an intro and the posts
+  list in a column beside a rail the card sticks to, so the list no longer runs the full width
+  underneath where the card used to be. On a phone the card still sits under the intro and is read
+  in full; once it scrolls away a 36px strip takes over under the header, carrying the VRAM bar,
+  and opens the same rows on a tap. The card itself never moves, so nothing jumps, and only one of
+  the two is in the accessibility tree at a time.
+
 - **The post's reading column is centred.** `.post` is `1fr minmax(0, 640px) 1fr` with the
   contents in the third track, so the text is centred at every width instead of sitting 176px left
   of it. The wrapper is 1200px, which is what gives the contents a usable 200px.

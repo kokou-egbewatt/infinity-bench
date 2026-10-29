@@ -31,9 +31,12 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 @media (max-width: 860px) { nav.main .navsocial { border-left: 0; padding-left: 0; margin-left: 0; } }
 
 /* home */
-.hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start; }
-.hero h1 { font-family: var(--serif); font-weight: 400; font-size: 38px; line-height: 1.15; letter-spacing: -.01em; color: var(--hi); margin: 0 0 18px; }
-.hero p { color: var(--tx2); font-size: 16px; max-width: 56ch; margin: 0 0 10px; }
+.home { padding: 64px 0 40px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 48px; align-items: start; }
+.intro { grid-column: 1; grid-row: 1; }
+.feed { grid-column: 1; grid-row: 2; min-width: 0; }
+.rail { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: calc(var(--hdr) + 24px); }
+.intro h1 { font-family: var(--serif); font-weight: 400; font-size: 38px; line-height: 1.15; letter-spacing: -.01em; color: var(--hi); margin: 0 0 18px; }
+.intro p { color: var(--tx2); font-size: 16px; max-width: 56ch; margin: 0 0 10px; }
 .rig { border: 1px solid var(--line); border-radius: 8px; padding: 16px; background: var(--bg2); }
 .rig .t { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--tx3); margin-bottom: 10px; }
 .rig dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-family: var(--mono); font-size: 11.5px; }
@@ -46,6 +49,9 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 .vbar { margin: 12px 0 4px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; display: flex; }
 .vbar i { display: block; height: 100%; }
 .rig .cap { font-family: var(--mono); font-size: 10.5px; color: var(--tx3); }
+/* phones: the card scrolls away, then this takes over under the header */
+.rigbar { display: none; }
+.rigbar .t { margin: 0; }
 .sec { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; margin: 48px 0 6px; }
 .sec h2 { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--tx3); margin: 0; font-weight: 500; }
 .filters { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--mono); font-size: 11.5px; color: var(--tx3); }
@@ -121,6 +127,23 @@ footer a:hover { color: var(--tx); }
   .status .wrap { height: auto; padding-block: 6px; }
   nav.main { flex-wrap: wrap; gap: 2px 18px; }
 
+  .home { grid-template-columns: minmax(0, 1fr); padding-top: 40px; }
+  .intro, .feed, .rail { grid-column: 1; }
+  .rail { grid-row: 2; position: static; margin: 24px 0 4px; }
+  .feed { grid-row: 3; }
+
+  .rigbar { display: block; position: fixed; top: var(--hdr); left: 0; right: 0; z-index: 9; background: var(--bg2); border-bottom: 1px solid var(--line); }
+  .rigbar-in { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .rigbar button { display: flex; align-items: center; gap: 12px; width: 100%; height: 36px; padding: 0; background: none; border: 0; cursor: pointer; }
+  .rigbar .vbar { flex: 1; margin: 0; height: 6px; }
+  .rigbar .chev { width: 7px; height: 7px; border-right: 1.4px solid var(--tx3); border-bottom: 1.4px solid var(--tx3); transform: translateY(-2px) rotate(45deg); transition: transform .2s ease; flex: none; }
+  .rigbar button[aria-expanded='true'] .chev { transform: translateY(1px) rotate(-135deg); }
+  .rigbar-panel { padding: 2px 0 12px; }
+  .rigbar-panel dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-family: var(--mono); font-size: 11.5px; }
+  .rigbar-panel dt { color: var(--tx3); }
+  .rigbar-panel dd { margin: 0; color: var(--tx); }
+  .rigbar-panel .cap { margin: 8px 0 0; }
+
   /* without the script the nav stays inline and wraps, as it did before */
   header.top.js .burger { display: grid; place-content: center; gap: 3.5px; width: 38px; height: 34px; padding: 0; background: var(--bg2); border: 1px solid var(--line2); border-radius: 6px; cursor: pointer; }
   header.top.js .burger span { display: block; width: 15px; height: 1.5px; border-radius: 1px; background: var(--tx); transition: transform .2s ease, opacity .15s ease; }
@@ -144,6 +167,7 @@ footer a:hover { color: var(--tx); }
 @media (max-width: 600px) {
   .wrap { padding: 0 16px; }
   header.top.js .menu { padding-left: 16px; padding-right: 16px; }
+  .rigbar-in { padding: 0 16px; }
   .status .wrap > span:first-child { display: none; }
 }
 
