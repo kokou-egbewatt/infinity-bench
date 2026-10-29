@@ -34,6 +34,8 @@ of a wrapper almost twice their width.
   beside it. They come first in the markup, so a phone reads what exists before what is planned
   while a wide screen still reads left column then right. `.plan` also picks up the
   `margin-inline: auto` it never had, so the page is no longer pinned to the left of the wrapper.
+  Opening the `10 more planned` fold reveals titles rather than ten more full entries: a summary
+  runs four or five lines at 400px, and the accordion beside it does not grow when the fold does.
 
 - **The About page puts the core stack beside the prose.** 640px of text and a 400px column, so
   the prose keeps the measure the rest of the site uses and the page stops running twice as long

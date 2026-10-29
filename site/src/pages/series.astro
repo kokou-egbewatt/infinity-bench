@@ -424,8 +424,15 @@ const countLine = (posts: PlanEntry[]) => {
   .next li:nth-child(n + 3) {
     display: none;
   }
+  /* What the fold reveals is a list of titles, not ten more full entries. At 400px a summary
+     runs four or five lines, so keeping them made the column roughly three times the height of
+     the accordion beside it, which does not grow when this opens. */
   .plan-side:has(.later[open]) .next li:nth-child(n + 3) {
     display: list-item;
+    margin-bottom: 14px;
+  }
+  .plan-side:has(.later[open]) .next li:nth-child(n + 3) .s {
+    display: none;
   }
 
   /* by series: one folded line each */
