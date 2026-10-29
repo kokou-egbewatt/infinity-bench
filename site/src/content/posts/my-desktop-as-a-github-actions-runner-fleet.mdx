@@ -1,7 +1,7 @@
 ---
 title: My desktop as a GitHub Actions runner fleet
 dek: CI stopped for every private repository in the organisation when billing blocked its GitHub-hosted runners, so I moved it onto self-hosted runners on the desktop I already had.
-date: 2026-10-15
+date: 2026-10-28
 topic: platform
 plan: desktop-runner-fleet
 repo: infinity-bench
@@ -12,14 +12,6 @@ cost: "$0 · one machine, GPU idle"
 harness: "ad4dee4"
 data: gha-runners
 draft: false
-changes:
-  - date: 2026-10-28
-    text: >-
-      Re-measured on the fixed harness. All six pickup latency targets were run again and
-      reproduced the published figures, so those tables are unchanged. The memory test is new,
-      run on fleet 0.5.6 with six light runners and three dind pairs. The cold-versus-warm
-      numbers still come from the October run on fleet 0.5.4, because 0.5.6 moved the tool cache
-      into the image and a cold run there no longer re-downloads the pinned toolchains.
 ---
 
 Every job across ten private repositories stopped when billing blocked the organisation's GitHub-hosted runners. Self-hosted runners use no Actions minutes, so the desktop I already had became a small fleet for all of it.
