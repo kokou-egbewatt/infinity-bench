@@ -8,6 +8,29 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.10.0] - The cluster matrix (2026-10-30)
+
+**Seven local Kubernetes options, measured against one GPU probe on WSL2.** The probe, the scripts,
+every step's raw output and the write-up of each step, ready for the post
+([#22](https://github.com/kokou-egbewatt/infinity-bench/issues/22)).
+
+### Added
+
+- **`bench/cluster-matrix/`:** the probe, which exits with the level it reached (50 is a verified
+  GEMM), and the script for each step.
+- **`data/cluster-matrix/`:** `matrix.csv`, `costs.csv`, `ladder.csv`, `errors.csv` and
+  `floor.csv`, with each step's raw output and verbatim errors under `2026-10-29/`.
+- **`docs/notebook/cluster-matrix.ipynb`:** steps 00 to 10 in one notebook, every command
+  with its output, and the rubric fixed before the first result.
+- **`docs/dev-machine.md` and `docs/gpu-debug.md`:** the machine, the cluster, and debugging the GPU
+  layer by layer, including the four things a container needs on WSL2.
+- **The `cluster-matrix` post in the series plan**, first under Next up.
+
+### Changed
+
+- **`k3s-wsl2-gpu` is second under Next up**, retitled "k3s in WSL2 as a server, by one command":
+  the cluster is now built by NeuroMesh's `tools/cluster`, and the post is about that.
+
 ## [0.9.1] - Posts fit the screen (2026-10-29)
 
 **The post page scrolled sideways on a phone.** The article was 640px wide inside a 358px column,
