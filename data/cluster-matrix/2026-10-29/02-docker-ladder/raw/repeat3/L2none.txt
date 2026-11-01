@@ -1,0 +1,11 @@
+## rung L2none  2026-10-29T16:31:25Z
+$ docker run -d --privileged --gpus all docker:28-dind; inner: docker run --rm -e NVIDIA_VISIBLE_DEVICES=void IMG
+dxg=0
+libcuda_file=0
+libcuda_in_ldconfig=0
+LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+NVIDIA_VISIBLE_DEVICES=void
+gpu_mounts=0
+exit=127
+/usr/local/bin/gpu_probe: error while loading shared libraries: libnvidia-ml.so.1: cannot open shared object file: No such file or directory
+## docker exit=0  seconds=10

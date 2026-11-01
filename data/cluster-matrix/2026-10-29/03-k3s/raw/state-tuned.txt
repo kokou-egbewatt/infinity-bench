@@ -1,0 +1,45 @@
+## version
+k3s version v1.36.5+k3s1 (3dd98cc5)
+go version go1.26.8
+## node
+NAME      STATUS   ROLES           AGE     VERSION        INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION                              CONTAINER-RUNTIME
+gpu-lab   Ready    control-plane   6m55s   v1.36.5+k3s1   172.18.59.76   <none>        Ubuntu 24.04.1 LTS   6.6.114.1-microsoft-standard-WSL2 (amd64)   containerd://2.3.4-k3s1.36
+## allocatable nvidia.com/gpu: '1'
+## runtimeclasses
+crun                  crun
+lunatic               lunatic
+nvidia                nvidia
+nvidia-experimental   nvidia-experimental
+slight                slight
+spin                  spin
+wasmedge              wasmedge
+wasmer                wasmer
+wasmtime              wasmtime
+wws                   wws
+## containerd runtimes
+35:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc]
+38:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options]
+41:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runhcs-wcow-process]
+44:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.'nvidia']
+47:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.'nvidia'.options]
+48:  BinaryName = "/usr/bin/nvidia-container-runtime"
+## pods
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS        AGE     IP           NODE      NOMINATED NODE   READINESS GATES
+default       probe-stock-default                       0/1     Completed   0               2m21s   <none>       gpu-lab   <none>           <none>
+default       probe-stock-nvidia                        0/1     Completed   0               2m18s   <none>       gpu-lab   <none>           <none>
+default       probe-tuned-gpu-norc                      0/1     Completed   0               4s      10.42.0.24   gpu-lab   <none>           <none>
+default       probe-tuned-gpu-rc                        0/1     Completed   0               5s      10.42.0.23   gpu-lab   <none>           <none>
+kube-system   coredns-7cfb7bc9c7-6w5l8                  1/1     Running     2 (2m ago)      6m50s   10.42.0.20   gpu-lab   <none>           <none>
+kube-system   helm-install-traefik-crd-r5tcj            0/1     Completed   0               6m50s   <none>       gpu-lab   <none>           <none>
+kube-system   helm-install-traefik-pmmgh                0/1     Completed   2 (6m43s ago)   6m50s   <none>       gpu-lab   <none>           <none>
+kube-system   local-path-provisioner-77b9867795-hp2lv   1/1     Running     2 (2m ago)      6m50s   10.42.0.16   gpu-lab   <none>           <none>
+kube-system   metrics-server-6dc596dfb8-tb22j           1/1     Running     2 (119s ago)    6m50s   10.42.0.21   gpu-lab   <none>           <none>
+kube-system   nvidia-device-plugin-daemonset-9vt84      1/1     Running     0               20s     10.42.0.22   gpu-lab   <none>           <none>
+kube-system   svclb-traefik-045f6656-577tq              2/2     Running     2 (2m ago)      5m31s   10.42.0.18   gpu-lab   <none>           <none>
+kube-system   traefik-7c8544f77-rxdz6                   1/1     Running     1 (2m ago)      5m31s   10.42.0.17   gpu-lab   <none>           <none>
+## memory (MiB, WSL guest)
+Mem:           32097        1834       24443          28        6218       30262
+## disk
+10434M
+1662	/var/lib/rancher
+76	/usr/local/bin/k3s

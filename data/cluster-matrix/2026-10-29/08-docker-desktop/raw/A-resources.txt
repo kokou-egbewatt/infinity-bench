@@ -1,0 +1,7 @@
+A up: vram_mib=2260 wsl_mem_mib=1881
+A off: vram_mib=2315 wsl_mem_mib=1677
+cm-wsl-bundle:621.01 745MB
+docker/desktop-cloud-provider-kind:v0.6.0 613MB
+docker/desktop-containerd-registry-mirror:v0.0.4 52.9MB
+envoyproxy/envoy:v1.36.7 253MB
+kindest/node:v1.35.5 1.28GB

@@ -1,0 +1,10 @@
+A. no session held
+pid1 before: Thu Oct 29 13:09:53 2026
+pid1 after 90 s idle: Thu Oct 29 13:11:31 2026
+B. session held by: wsl -d Ubuntu -- sleep 400 &
+pid1 before: Thu Oct 29 13:11:31 2026
+pid1 after 90 s idle: Thu Oct 29 13:11:28 2026
+k3s pods restarts: kube-system/coredns-7cfb7bc9c7-6w5l8=5 kube-system/helm-install-traefik-crd-r5tcj=0 kube-system/helm-install-traefik-pmmgh=2 kube-system/local-path-provisioner-77b9867795-hp2lv=5 kube-system/metrics-server-6dc596dfb8-tb22j=5 kube-system/nvidia-device-plugin-daemonset-9vt84=3 kube-system/svclb-traefik-045f6656-577tq=8 kube-system/traefik-7c8544f77-rxdz6=4 
+B2. session held by: wsl -d Ubuntu -- sleep 200 &
+start: systemd 912743196 restarts: coredns-7cfb7bc9c7-6w5l8=5 helm-install-traefik-crd-r5tcj=0 helm-install-traefik-pmmgh=2 local-path-provisioner-77b9867795-hp2lv=6 metrics-server-6dc596dfb8-tb22j=5 nvidia-device-plugin-daemonset-9vt84=3 svclb-traefik-045f6656-577tq=8 traefik-7c8544f77-rxdz6=4 
+end:   systemd 912743196 restarts: coredns-7cfb7bc9c7-6w5l8=6 helm-install-traefik-crd-r5tcj=0 helm-install-traefik-pmmgh=2 local-path-provisioner-77b9867795-hp2lv=6 metrics-server-6dc596dfb8-tb22j=6 nvidia-device-plugin-daemonset-9vt84=4 svclb-traefik-045f6656-577tq=10 traefik-7c8544f77-rxdz6=5 

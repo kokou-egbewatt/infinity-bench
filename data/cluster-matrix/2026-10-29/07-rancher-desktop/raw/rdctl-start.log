@@ -1,0 +1,4 @@
+time="2026-10-29T16:42:40-04:00" level=info msg="About to launch C:\\Users\\<user>\\AppData\\Local\\Programs\\Rancher Desktop\\Rancher Desktop.exe --application.startInBackground=true --containerEngine.name containerd --kubernetes.enabled=true --no-modal-dialogs ...\n"
+
+(node:42936) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `Rancher Desktop --trace-deprecation ...` to show where the warning was created)

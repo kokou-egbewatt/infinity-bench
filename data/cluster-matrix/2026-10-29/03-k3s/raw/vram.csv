@@ -1,0 +1,4 @@
+run_id,label,median_mib
+20261029T170102Z,pre-install,2291
+20261029T170242Z,stock-idle-60s,2292
+20261029T170904Z,tuned-plugin-idle,2286

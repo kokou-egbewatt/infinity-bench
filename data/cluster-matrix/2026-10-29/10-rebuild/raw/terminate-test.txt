@@ -1,0 +1,7 @@
+terminate at 21:33:42
+The operation completed successfully. 
+kubectl sees Ready again after 180s at 21:37:21
+LastRunTime        : 29/10/2026 17:29:35
+LastTaskResult     : 0
+NumberOfMissedRuns : 0
+Unable to connect to the server: dial tcp [::1]:6443: connectex: No connection could be made because the target machine actively refused it.

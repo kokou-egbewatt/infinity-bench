@@ -1,0 +1,12 @@
+* [cm] minikube v1.39.0 on Microsoft Windows 11 Home 25H2
+  - KUBECONFIG=C:\PROJECTS\infinity-bench\temp\cluster-matrix\06-minikube\raw\kubeconfig-C
+* Using the docker driver based on user configuration
+* Using Docker Desktop driver with root privileges
+* Starting "cm" primary control-plane node in "cm" cluster
+* Pulling base image v0.0.51 ...
+* Configuring bridge CNI (Container Networking Interface) ...
+* Verifying Kubernetes components...
+  - Using image nvcr.io/nvidia/k8s-device-plugin:v0.20.0
+  - Using image gcr.io/k8s-minikube/storage-provisioner:v5
+* Enabled addons: nvidia-device-plugin, storage-provisioner, default-storageclass
+* Done! kubectl is now configured to use "cm" cluster and "default" namespace by default

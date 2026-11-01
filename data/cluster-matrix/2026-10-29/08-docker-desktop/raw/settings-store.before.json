@@ -1,0 +1,18 @@
+{
+  "AutoStart": false,
+  "DisplayedOnboarding": true,
+  "DockerEngine": "{\"default-runtime\": \"nvidia\"}",
+  "EnableDockerAI": true,
+  "ExtensionsEnabled": true,
+  "InferenceCanUseGPUVariant": true,
+  "KubernetesEnabled": false,
+  "KubernetesNodesCount": 1,
+  "KubernetesNodesVersion": "1.35.5",
+  "LastContainerdSnapshotterEnable": 1779314574,
+  "LicenseTermsVersion": 2,
+  "SettingsVersion": 45,
+  "UpdateInstallTime": 0,
+  "UpdatePreviousVersion": "",
+  "UseBackgroundIndexing": true,
+  "UseContainerdSnapshotter": true
+}

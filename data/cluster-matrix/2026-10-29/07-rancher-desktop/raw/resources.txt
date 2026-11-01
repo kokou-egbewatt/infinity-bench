@@ -1,0 +1,4 @@
+rd up (k8s 1.36.5 + plugin): vram_mib=2222 wsl_mem_mib=1637
+4.7G	C:\Users\<user>\AppData\Local/rancher-desktop
+2.2G	C:\Users\<user>\AppData\Local/Programs/Rancher Desktop
+distro-data vhdx MiB: 3404

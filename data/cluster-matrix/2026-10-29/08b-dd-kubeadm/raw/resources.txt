@@ -1,0 +1,4 @@
+kubeadm up: vram_mib=2226 wsl_mem_mib=1788
+docker/desktop-kubernetes:kubernetes-v1.36.1-cni-v1.9.1-critools-v1.35.0-cri-dockerd-v0.4.4-1-debian 594MB tagged=2026-10-29 20:24:16
+docker/desktop-storage-provisioner:v4.0 82.1MB tagged=2026-10-29 20:24:41
+docker/desktop-vpnkit-controller:v4.0 52.6MB tagged=2026-10-29 20:24:43

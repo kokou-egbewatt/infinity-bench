@@ -1,0 +1,10 @@
+## pod probe-a-hostpath  runtimeClass=-  gpu=-  mounts=hostpath
+phase=Pending
+exitCode=
+reason=ContainerCreating
+## logs
+Error from server (BadRequest): container "probe" in pod "probe-a-hostpath" is waiting to start: ContainerCreating
+## events
+Normal    Scheduled     Successfully assigned default/probe-a-hostpath to cm-control-plane
+Warning   FailedMount   MountVolume.SetUp failed for volume "wsldrivers" : hostPath type check failed, /usr/lib/wsl/drivers is not a directory, unable to determine its type: path "/usr/lib/wsl/drivers" does not exist
+Warning   FailedMount   MountVolume.SetUp failed for volume "wsllib" : hostPath type check failed, /usr/lib/wsl/lib is not a directory, unable to determine its type: path "/usr/lib/wsl/lib" does not exist

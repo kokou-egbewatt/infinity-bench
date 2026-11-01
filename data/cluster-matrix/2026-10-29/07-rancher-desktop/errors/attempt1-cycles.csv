@@ -1,0 +1,2 @@
+cycle,start_to_ready_s,import_s,plugin_s,pod_s,to_level50_s,level,k8s,vram_before,vram_up,mem_before,mem_up
+1,0.2,1.1,0.7,2.7,4.6,50,v1.36.5+k3s1,2187,2187,1564,1613

@@ -1,0 +1,8 @@
+  },
+  "imex": {}
+}
+I1029 18:13:14.579072       1 main.go:369] Retrieving plugins.
+I1029 18:13:14.657197       1 server.go:197] Starting GRPC server for 'nvidia.com/gpu'
+I1029 18:13:14.658144       1 server.go:141] Starting to serve 'nvidia.com/gpu' on /var/lib/kubelet/device-plugins/nvidia-gpu.sock
+I1029 18:13:14.660712       1 server.go:148] Registered device plugin for 'nvidia.com/gpu' with Kubelet
+I1029 18:13:14.663865       1 health.go:64] Ignoring the following XIDs for health checks: map[13:true 31:true 43:true 45:true 68:true 109:true]

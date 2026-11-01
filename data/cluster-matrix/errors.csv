@@ -1,0 +1,12 @@
+error,seen_in,means
+"error while loading shared libraries: libnvidia-ml.so.1: cannot open shared object file (exit 127)","02 L1none L2none L2m-gpus L2md-gpus; 04, 05, 08 stock; 03 GPU request without the RuntimeClass","nothing delivered /usr/lib/wsl/lib to the container"
+"nvml_init: Unable to load the NVML library (level 10)","02 L1m, L2m-mounts","/usr/lib/wsl/lib without /usr/lib/wsl/drivers, the driver store its libraries load from"
+"nvml_init: Not Supported (level 10); plugin: Failed to initialize NVML: Not Supported","06 with --gpus=all","a runtime injected the driver-store files but not /usr/lib/wsl/lib"
+"could not select device driver """" with capabilities: [[gpu]]","02 L2","a Docker daemon with no NVIDIA runtime (dind) was asked for --gpus"
+"no runtime for ""nvidia"" is configured","04","a RuntimeClass whose handler the node's containerd does not have"
+"RuntimeHandler ""nvidia"" not supported","08b","cri-dockerd does not pass RuntimeClass handlers through"
+"RuntimeClass ""nvidia"" not found","07, 08b","no RuntimeClass exists"
+"Insufficient nvidia.com/gpu","03 to 08b","no device plugin registered the GPU, or the one GPU is taken"
+"hostPath type check failed: /usr/lib/wsl/lib is not a directory","04, 05, 06, 08","the node container was not given the WSL folders"
+"Incompatible strategy detected auto ... invalid device discovery strategy","03","the device plugin pod cannot see the GPU: its DaemonSet lacks runtimeClassName: nvidia"
+"Detected platform: wsl ... Registered device plugin for 'nvidia.com/gpu'","03 to 08b","healthy device plugin"

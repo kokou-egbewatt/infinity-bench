@@ -1,0 +1,14 @@
+probe_t1-rc-gpu_applied,1793308952.445826300
+probe_t1-rc-gpu_done,1793308954.880674500
+probe_t2-rc-only_applied,1793308956.140716300
+probe_t2-rc-only_done,1793308982.736705400
+probe_t3-gpu-only_applied,1793309380.152300500
+probe_t3-gpu-only_done,1793309409.643422300
+probe_t3-gpu-only_applied,1793309551.436623500
+probe_t3-gpu-only_done,1793309578.166570300
+probe_t4-neither_applied,1793309579.349030400
+probe_t4-neither_done,1793309580.402721300
+probe_t5-second_applied,1793309582.667375600
+probe_t5-second_done,1793309609.391873500
+probe_t6-after-terminate_applied,1793309895.300258500
+probe_t6-after-terminate_done,1793309897.714984200

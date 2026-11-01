@@ -78,6 +78,14 @@ export const SERIES: Series[] = [
     posts: [
       {
         priority: 1,
+        id: 'cluster-matrix',
+        title: 'Which local Kubernetes can run GPU work on WSL2',
+        summary:
+          'I picked k3s for this machine in a hurry and never wrote down why. So I ran plain Docker, k3s, k3d, kind, minikube, Rancher Desktop and Docker Desktop against the same probe, and some of what I was sure about turned out to be wrong.',
+        sources: ib(22),
+      },
+      {
+        priority: 3,
         id: 'vram-accounting',
         title: 'VRAM accounting on Windows: how much of the 8 GB is actually free',
         summary:
@@ -85,7 +93,7 @@ export const SERIES: Series[] = [
         sources: ib(10, 13),
       },
       {
-        priority: 3,
+        priority: 5,
         id: 'dcgm-geforce',
         title: 'dcgm-exporter on a GeForce card: which fields report',
         summary:
@@ -93,15 +101,15 @@ export const SERIES: Series[] = [
         sources: nm(22),
       },
       {
-        priority: 4,
+        priority: 2,
         id: 'k3s-wsl2-gpu',
-        title: 'k3s in WSL2 with a GPU, up and torn down by one command',
+        title: 'k3s in WSL2 as a server, by one command',
         summary:
-          'The local cluster the rest of the series runs on: GPU Operator, device plugin and a GPU pod, timed from nothing to the first scheduled pod, and torn down again when it sits idle.',
+          'k3s won the comparison and dies a minute after the last terminal closes. A keepalive, a device plugin that registers the card and an admission policy turn it into a cluster I can leave running, paused and resumed by one command.',
         sources: [...nm(21), ...ib(2)],
       },
       {
-        priority: 5,
+        priority: 7,
         id: 'timeslice-mps',
         title: 'Time-slicing vs MPS on one card',
         summary:
@@ -109,7 +117,7 @@ export const SERIES: Series[] = [
         sources: [],
       },
       {
-        priority: 7,
+        priority: 9,
         id: 'ebpf-cuda-launch',
         title: 'eBPF on the CUDA launch path under WSL2',
         summary:
@@ -135,7 +143,7 @@ export const SERIES: Series[] = [
       { title: 'mTLS between gateway and runtime, locally', sources: nm(94, 8) },
       { title: 'Gateway overhead with a stub backend', sources: nm(13) },
       {
-        priority: 2,
+        priority: 4,
         id: 'vllm-8gb',
         title: 'vLLM on 8 GB: KV cache dtype, chunked prefill, and where it falls over',
         summary:
@@ -145,7 +153,7 @@ export const SERIES: Series[] = [
       { title: 'Session affinity vs. KV-cache locality', sources: nm(18) },
       { title: 'Retrying failed inference calls at the gateway', sources: nm(5) },
       {
-        priority: 10,
+        priority: 12,
         id: 'serving-70b-rented',
         title: 'Triton vs vLLM vs TensorRT-LLM at 70B',
         summary:
@@ -192,7 +200,7 @@ export const SERIES: Series[] = [
     posts: [
       { title: 'Modelling GPU inventory', sources: nm(48, 49) },
       {
-        priority: 6,
+        priority: 8,
         id: 'dra-one-device',
         title: 'DRA on k3s with one device',
         summary:
@@ -201,7 +209,7 @@ export const SERIES: Series[] = [
       },
       { title: 'KV-cache-aware routing', sources: nm(50) },
       {
-        priority: 8,
+        priority: 10,
         id: 'kuberay-gang',
         title: 'KubeRay gang scheduling with one GPU and three jobs',
         summary:
@@ -209,7 +217,7 @@ export const SERIES: Series[] = [
         sources: [],
       },
       {
-        priority: 9,
+        priority: 11,
         id: 'kueue-fair-share',
         title: 'Kueue fair share with one GPU',
         summary:
@@ -217,7 +225,7 @@ export const SERIES: Series[] = [
         sources: [],
       },
       {
-        priority: 11,
+        priority: 13,
         id: 'goodput-keda',
         title: 'Goodput SLOs, and scaling on KV-cache utilization with KEDA',
         summary:
@@ -265,7 +273,7 @@ export const SERIES: Series[] = [
     home: { repo: 'ib', label: 'infinity-bench' },
     posts: [
       {
-        priority: 2,
+        priority: 4,
         id: 'desktop-runner-fleet',
         title: 'My desktop as a GitHub Actions runner fleet',
         summary:
@@ -283,7 +291,7 @@ export const SERIES: Series[] = [
     home: { repo: 'nm', label: 'NeuroMesh phase 7', milestone: 7 },
     posts: [
       {
-        priority: 12,
+        priority: 14,
         id: 'blueprint',
         title: 'The blueprint: Terraform, Argo CD and Backstage',
         summary:

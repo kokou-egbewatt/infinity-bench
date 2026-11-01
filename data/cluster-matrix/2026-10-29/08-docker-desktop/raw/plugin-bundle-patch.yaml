@@ -1,0 +1,20 @@
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: bundle
+        image: docker.io/library/cm-wsl-bundle:621.01
+        imagePullPolicy: IfNotPresent
+        command: [sh, -c, "cp -a /bundle/wsl/. /wsl/"]
+        volumeMounts: [{name: wsl, mountPath: /wsl}]
+      containers:
+      - name: nvidia-device-plugin-ctr
+        env:
+        - {name: LD_LIBRARY_PATH, value: /usr/lib/wsl/lib}
+        securityContext: {privileged: true, allowPrivilegeEscalation: null, capabilities: null}
+        volumeMounts:
+        - {name: wsl, mountPath: /usr/lib/wsl, readOnly: true}
+        - {name: dxg, mountPath: /dev/dxg}
+      volumes:
+      - {name: wsl, emptyDir: {}}
+      - {name: dxg, hostPath: {path: /dev/dxg, type: CharDevice}}

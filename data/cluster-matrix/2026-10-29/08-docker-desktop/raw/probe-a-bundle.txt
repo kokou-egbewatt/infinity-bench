@@ -1,0 +1,17 @@
+Defaulted container "probe" out of: probe, bundle (init)
+dxg=1
+libcuda_file=1
+drivers_dir=1
+libcuda_in_ldconfig=0
+LD_LIBRARY_PATH=/usr/lib/wsl/lib
+NVIDIA_VISIBLE_DEVICES=all
+gpu_mounts=1
+  mount /dev/dxg
+{
+  "nvml_name": "NVIDIA GeForce RTX 5060",
+  "nvml_compute_procs": 0,
+  "level": 50,
+  "failed_stage": "",
+  "error": ""
+}
+exit=50

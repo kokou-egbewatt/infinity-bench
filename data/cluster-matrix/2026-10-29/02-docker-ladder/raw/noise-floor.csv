@@ -1,0 +1,2 @@
+run_id,label,samples,interval_s,median_mib,iqr_mib,min_mib,max_mib,spread_mib,conditions
+20261029T162709Z,live,30,2,2284,2,2282,2292,10,"49.70,2535MHz,23.57W,0%,0x0000000000000400"

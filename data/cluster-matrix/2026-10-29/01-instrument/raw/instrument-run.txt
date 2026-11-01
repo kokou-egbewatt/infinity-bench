@@ -1,0 +1,7 @@
+trial 1 alloc     0 MiB: exit 50 level 50  pre 2278  during 2391  post 2278
+trial 1 alloc  2048 MiB: exit 50 level 50  pre 2278  during 4441  post 2280
+trial 2 alloc     0 MiB: exit 50 level 50  pre 2280  during 2394  post 2281
+trial 2 alloc  2048 MiB: exit 50 level 50  pre 2280  during 4442  post 2281
+trial 3 alloc     0 MiB: exit 50 level 50  pre 2281  during 2394  post 2281
+trial 3 alloc  2048 MiB: exit 50 level 50  pre 2281  during 4442  post 2281
+conditions after: 49.60,2527MHz,23.50W,0%,0x0000000000000400

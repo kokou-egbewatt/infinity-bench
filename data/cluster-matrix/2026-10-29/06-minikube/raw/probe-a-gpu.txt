@@ -1,0 +1,7 @@
+## pod probe-a-gpu  runtimeClass=-  gpu=1  mounts=none
+phase=Pending
+exitCode=
+reason=0/1 nodes are available: 1 Insufficient nvidia.com/gpu. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+## logs
+## events
+Warning   FailedScheduling   0/1 nodes are available: 1 Insufficient nvidia.com/gpu. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.

@@ -1,0 +1,8 @@
+candidate,cold_to_ready_s,cold_to_level50_s,level50_rationed_in_timing,timed_cycles,wsl_ram_added_mib,disk_added_mb,vram_cuda_context,teardown_s,left_behind_after_its_own_teardown,notes
+k3s,7.9-9.4,16.7-19.2,no (plugin adds about 4 s; measured in tuning),3,364-382,695-739 (/var/lib/rancher),none,3.0-4.4,/etc/rancher/node/password,dies with the WSL distro when no wsl.exe session is attached
+k3d,28.6-28.9,54.3-63.6,yes,3,641-667,478 images + plugin image in the node,none,2.1-2.2,nothing (kubectl writes ~/.kube/cache),
+kind,45.8-55.9,71.2-80.1,yes,3,599-628,1340 node image + plugin image,none,1.2-1.3,the kind Docker network,
+minikube,85.7-95.4,107.2-116.4,yes,3,617-633,508 kicbase + Kubernetes preload,none,12.9-13.0,kicbase images; ~/.minikube is recreated by any minikube command,
+rancher-desktop,42.8,65.9,yes (on Kubernetes 1.25.16),1,about 590,6900 (2200 app + 4700 data),none,factory reset then 3.1 s uninstall,nothing if factory reset runs first; step 00 found 1.2 GB and two distros left by an uninstall alone,ignores --kubernetes.version on a fresh start
+docker-desktop-kind,82 (restart to node Ready),80.9 (warm: images could not be removed),yes,1 warm,not clean (Docker Desktop restarts change its own footprint),about 2200 images,none,manual,containers keep running hidden after Kubernetes is disabled; their volumes; the kind network,
+docker-desktop-kubeadm,69,not timed as a cycle,n/a,0,about 700 (approximate),about 730 images,none,manual,exited k8s_ containers hidden after disable,

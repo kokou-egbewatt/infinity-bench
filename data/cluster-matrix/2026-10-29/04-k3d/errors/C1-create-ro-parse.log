@@ -1,0 +1,2 @@
+[33mWARN[0m[0000] failed to stat file/directory '/usr/lib/wsl/drivers:/usr/lib/wsl/drivers' volume mount '/usr/lib/wsl/drivers:/usr/lib/wsl/drivers:ro': please make sure it exists 
+[31mFATA[0m[0000] Failed Cluster Configuration Validation:  failed to validate volume mount '/usr/lib/wsl/drivers:/usr/lib/wsl/drivers:ro': volume mount destination doesn't appear to be an absolute path: 'ro' in '/usr/lib/wsl/drivers:/usr/lib/wsl/drivers:ro' 

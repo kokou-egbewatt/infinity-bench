@@ -1,0 +1,146 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 971B 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/nvidia/cuda:12.8.0-base-ubuntu24.04
+#2 DONE 1.1s
+
+#3 [internal] load metadata for docker.io/nvidia/cuda:12.8.0-devel-ubuntu24.04
+#3 DONE 1.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/2] FROM docker.io/nvidia/cuda:12.8.0-base-ubuntu24.04@sha256:e778509d37d66475120929671500377524f7278478ba08131b07ef3ffcc0dce0
+#5 resolve docker.io/nvidia/cuda:12.8.0-base-ubuntu24.04@sha256:e778509d37d66475120929671500377524f7278478ba08131b07ef3ffcc0dce0 0.0s done
+#5 DONE 0.2s
+
+#6 [internal] load build context
+#6 transferring context: 6.04kB done
+#6 DONE 0.1s
+
+#7 [build 1/3] FROM docker.io/nvidia/cuda:12.8.0-devel-ubuntu24.04@sha256:9a8fffc32a955361aa66d754e7a0cda2513052eaf5aaf8f3ba69b80578d1c6a9
+#7 resolve docker.io/nvidia/cuda:12.8.0-devel-ubuntu24.04@sha256:9a8fffc32a955361aa66d754e7a0cda2513052eaf5aaf8f3ba69b80578d1c6a9 0.0s done
+#7 sha256:ae59cb84f3cbdc62c12b585db26034bbc16eb0efc26777c0cc5fa60b46e8193a 0B / 89.34kB 0.2s
+#7 sha256:ae59cb84f3cbdc62c12b585db26034bbc16eb0efc26777c0cc5fa60b46e8193a 89.34kB / 89.34kB 0.4s done
+#7 sha256:ba1786052c2e36dce3f1c9c662cceafa94041008ef60697a5b7dd3ed6b10de1a 1.69kB / 1.69kB 0.1s done
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 0B / 3.01GB 0.2s
+#7 sha256:b98cda71b10f27a4faa1a4d8f804504c7fe2fd3806b8925b28fadc6b23ac098f 1.52kB / 1.52kB 0.1s done
+#7 sha256:66a4307f086b825dd99feda1becc5ba00aeed46aefe80c62423faa16e826223e 59.43kB / 59.43kB 0.1s done
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 0B / 2.07GB 0.2s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 56.62MB / 3.01GB 5.3s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 62.91MB / 2.07GB 5.3s
+#7 ...
+
+#5 [stage-1 1/2] FROM docker.io/nvidia/cuda:12.8.0-base-ubuntu24.04@sha256:e778509d37d66475120929671500377524f7278478ba08131b07ef3ffcc0dce0
+#5 sha256:4b650590013c9e92d469a7b5514dbe45cd755b8d75f0d6ae09e2a3e089b0c82c 6.89kB / 6.89kB 0.1s done
+#5 sha256:0f8429c62360f4f7bcd905e2bbb8c8b9d98fdb3b8f097d4481502512a6349b03 187B / 187B 0.1s done
+#5 sha256:5f5407c3a2033fa6de01a43becfac02144c58fe600ae0e44040d929731cc947c 64.21MB / 64.21MB 5.4s done
+#5 sha256:7c19210cd82d5f44e49ab4ca48c65d3738df50ac211ba223d0740fc6a97a5d5a 4.54MB / 4.54MB 0.5s done
+#5 sha256:de44b265507ae44b212defcb50694d666f136b35c1090d9709068bc861bb2d64 29.75MB / 29.75MB 4.8s done
+#5 extracting sha256:de44b265507ae44b212defcb50694d666f136b35c1090d9709068bc861bb2d64 1.5s done
+#5 extracting sha256:7c19210cd82d5f44e49ab4ca48c65d3738df50ac211ba223d0740fc6a97a5d5a 0.3s done
+#5 extracting sha256:5f5407c3a2033fa6de01a43becfac02144c58fe600ae0e44040d929731cc947c 1.1s done
+#5 DONE 8.0s
+
+#7 [build 1/3] FROM docker.io/nvidia/cuda:12.8.0-devel-ubuntu24.04@sha256:9a8fffc32a955361aa66d754e7a0cda2513052eaf5aaf8f3ba69b80578d1c6a9
+#7 ...
+
+#5 [stage-1 1/2] FROM docker.io/nvidia/cuda:12.8.0-base-ubuntu24.04@sha256:e778509d37d66475120929671500377524f7278478ba08131b07ef3ffcc0dce0
+#5 extracting sha256:0f8429c62360f4f7bcd905e2bbb8c8b9d98fdb3b8f097d4481502512a6349b03 0.0s done
+#5 extracting sha256:4b650590013c9e92d469a7b5514dbe45cd755b8d75f0d6ae09e2a3e089b0c82c 0.0s done
+#5 DONE 8.0s
+
+#7 [build 1/3] FROM docker.io/nvidia/cuda:12.8.0-devel-ubuntu24.04@sha256:9a8fffc32a955361aa66d754e7a0cda2513052eaf5aaf8f3ba69b80578d1c6a9
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 169.87MB / 2.07GB 9.8s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 177.21MB / 3.01GB 10.4s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 274.73MB / 2.07GB 13.8s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 304.09MB / 3.01GB 15.5s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 380.63MB / 2.07GB 17.9s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 435.16MB / 3.01GB 20.6s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 484.44MB / 2.07GB 21.8s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 575.67MB / 3.01GB 25.7s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 590.35MB / 2.07GB 25.7s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 696.25MB / 2.07GB 29.7s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 709.89MB / 3.01GB 30.8s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 803.21MB / 2.07GB 33.8s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 838.86MB / 3.01GB 35.9s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 909.12MB / 2.07GB 37.8s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 973.08MB / 3.01GB 41.0s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.01GB / 2.07GB 41.9s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 1.10GB / 3.01GB 46.1s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.12GB / 2.07GB 45.9s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.22GB / 2.07GB 49.8s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 1.23GB / 3.01GB 51.2s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.33GB / 2.07GB 54.0s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 1.37GB / 3.01GB 56.3s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.43GB / 2.07GB 58.1s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 1.49GB / 3.01GB 61.4s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.54GB / 2.07GB 62.3s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 1.63GB / 3.01GB 66.5s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.64GB / 2.07GB 66.3s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.74GB / 2.07GB 70.4s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 1.76GB / 3.01GB 71.6s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.85GB / 2.07GB 74.4s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 1.89GB / 3.01GB 76.7s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 1.95GB / 2.07GB 78.3s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.02GB / 3.01GB 81.8s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 2.06GB / 2.07GB 82.2s
+#7 sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 2.07GB / 2.07GB 82.8s done
+#7 extracting sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.16GB / 3.01GB 86.8s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.30GB / 3.01GB 91.9s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.43GB / 3.01GB 97.0s
+#7 extracting sha256:14fc1a5fdf5b90a68b7925b9e4c1af3c24f9cfc0e5a92c1690771986c5b3233a 16.7s done
+#7 extracting sha256:66a4307f086b825dd99feda1becc5ba00aeed46aefe80c62423faa16e826223e 0.1s done
+#7 extracting sha256:ba1786052c2e36dce3f1c9c662cceafa94041008ef60697a5b7dd3ed6b10de1a 0.0s done
+#7 extracting sha256:b98cda71b10f27a4faa1a4d8f804504c7fe2fd3806b8925b28fadc6b23ac098f 0.0s done
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.54GB / 3.01GB 102.1s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.62GB / 3.01GB 107.2s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.70GB / 3.01GB 112.3s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.79GB / 3.01GB 117.4s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.87GB / 3.01GB 122.5s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 2.94GB / 3.01GB 127.6s
+#7 sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 3.01GB / 3.01GB 132.0s done
+#7 extracting sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a
+#7 extracting sha256:0e7f068147adc3f5c38d7a886adaeee2ce5d0e77a094a593d032a9d18b9e091a 23.1s done
+#7 DONE 155.9s
+
+#7 [build 1/3] FROM docker.io/nvidia/cuda:12.8.0-devel-ubuntu24.04@sha256:9a8fffc32a955361aa66d754e7a0cda2513052eaf5aaf8f3ba69b80578d1c6a9
+#7 extracting sha256:ae59cb84f3cbdc62c12b585db26034bbc16eb0efc26777c0cc5fa60b46e8193a 0.0s done
+#7 DONE 155.9s
+
+#8 [build 2/3] COPY gpu_probe.cu /tmp/
+#8 DONE 1.5s
+
+#9 [build 3/3] RUN nvcc -O2 -o /tmp/gpu_probe /tmp/gpu_probe.cu       -gencode arch=compute_120,code=sm_120       -gencode arch=compute_120,code=compute_120       -lnvidia-ml
+#9 0.542 /tmp/gpu_probe.cu(85): error: identifier "nvmlDeviceGetComputeRunningProcesses_v2" is undefined
+#9 0.542       nvmlDeviceGetComputeRunningProcesses_v2(nvdev, &nproc, 
+#9 0.542       ^
+#9 0.542 
+#9 0.546 1 error detected in the compilation of "/tmp/gpu_probe.cu".
+#9 ERROR: process "/bin/sh -c nvcc -O2 -o /tmp/gpu_probe /tmp/gpu_probe.cu       -gencode arch=compute_120,code=sm_120       -gencode arch=compute_120,code=compute_120       -lnvidia-ml" did not complete successfully: exit code: 2
+------
+ > [build 3/3] RUN nvcc -O2 -o /tmp/gpu_probe /tmp/gpu_probe.cu       -gencode arch=compute_120,code=sm_120       -gencode arch=compute_120,code=compute_120       -lnvidia-ml:
+0.542 /tmp/gpu_probe.cu(85): error: identifier "nvmlDeviceGetComputeRunningProcesses_v2" is undefined
+0.542       nvmlDeviceGetComputeRunningProcesses_v2(nvdev, &nproc, 
+0.542       ^
+0.542 
+0.546 1 error detected in the compilation of "/tmp/gpu_probe.cu".
+------
+Dockerfile:8
+--------------------
+   7 |     # sm_120 is the RTX 5060; the PTX entry lets the same binary run on newer cards.
+   8 | >>> RUN nvcc -O2 -o /tmp/gpu_probe /tmp/gpu_probe.cu \
+   9 | >>>       -gencode arch=compute_120,code=sm_120 \
+  10 | >>>       -gencode arch=compute_120,code=compute_120 \
+  11 | >>>       -lnvidia-ml
+  12 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c nvcc -O2 -o /tmp/gpu_probe /tmp/gpu_probe.cu       -gencode arch=compute_120,code=sm_120       -gencode arch=compute_120,code=compute_120       -lnvidia-ml" did not complete successfully: exit code: 2
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/3nci1xd0wes8u06ayo2h9yjhm
+exit=1

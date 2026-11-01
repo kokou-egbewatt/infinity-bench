@@ -1,0 +1,9 @@
+## pod probe-b-rc  runtimeClass=nvidia  gpu=-  mounts=none
+phase=Pending
+exitCode=
+reason=ContainerCreating
+## logs
+Error from server (BadRequest): container "probe" in pod "probe-b-rc" is waiting to start: ContainerCreating
+## events
+Normal    Scheduled                Successfully assigned default/probe-b-rc to docker-desktop
+Warning   FailedCreatePodSandBox   Failed to create pod sandbox: rpc error: code = Unknown desc = RuntimeHandler "nvidia" not supported

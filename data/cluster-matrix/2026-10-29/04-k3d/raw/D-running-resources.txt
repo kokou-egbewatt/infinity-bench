@@ -1,0 +1,9 @@
+vram=
+Mem:           32097        1737       27309          27        3436       30359
+ghcr.io/k3d-io/k3d-tools:5.9.0 35MB
+ghcr.io/k3d-io/k3d-proxy:5.9.0 106MB
+rancher/k3s:v1.35.5-k3s1 337MB
+k3d-cm-serverlb 65.5kB (virtual 77.2MB)
+k3d-cm-server-0 479kB (virtual 253MB)
+vram=
+Mem:           32097        1023       29707          26        1715       31074

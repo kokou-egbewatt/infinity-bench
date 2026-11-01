@@ -1,0 +1,3 @@
+7e063ae49e3716246b8e2b00c7ae4053fc0d46f2d02d0eaad39297a7a15d55dd /kind-cloud-provider running docker.io/docker/desktop-cloud-provider-kind:v
+a1cce1bb1da64ce337d60b0564be8eb6c664880a19b6ed6a81351a8884b8f198 /kind-registry-mirror running docker.io/docker/desktop-containerd-registry-
+ce43b719c26db4d44615fae8cbadf3a0700e0fd95536ce60e4506f9c8685974e /desktop-control-plane running kindest/node:v1.35.5

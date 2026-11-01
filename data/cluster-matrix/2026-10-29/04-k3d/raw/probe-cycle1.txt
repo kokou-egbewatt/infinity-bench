@@ -1,0 +1,35 @@
+## pod probe-cycle1  runtimeClass=-  gpu=1  mounts=hostpath
+phase=Running
+exitCode=0
+reason=Completed
+## logs
+dxg=1
+libcuda_file=1
+drivers_dir=1
+libcuda_in_ldconfig=0
+LD_LIBRARY_PATH=/usr/lib/wsl/lib
+NVIDIA_VISIBLE_DEVICES=all
+gpu_mounts=3
+  mount /dev/dxg
+  mount /usr/lib/wsl/drivers
+  mount /usr/lib/wsl/lib
+{
+  "nvml_device_count": 1,
+  "nvml_name": "NVIDIA GeForce RTX 5060",
+  "nvml_total_mib": 8151,
+  "nvml_compute_procs": 0,
+  "cuda_name": "NVIDIA GeForce RTX 5060",
+  "compute_capability": "12.0",
+  "allocated_mib": 2048,
+  "gemm_value": 512.0,
+  "hold_s": 0,
+  "level": 50,
+  "failed_stage": "",
+  "error": ""
+}
+exit=50
+## events
+Normal   Scheduled   Successfully assigned default/probe-cycle1 to k3d-cm-server-0
+Normal   Pulled      Container image "docker.io/library/cluster-matrix-probe:01" already present on machine and can be accessed by the pod
+Normal   Created     Container created
+Normal   Started     Container started

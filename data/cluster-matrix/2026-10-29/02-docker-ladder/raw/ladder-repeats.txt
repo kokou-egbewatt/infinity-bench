@@ -1,0 +1,22 @@
+### repeat 2
+L1none      level=none dxg=0 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=0 
+L1          level=50   dxg=1 libcuda_file=0 libcuda_in_ldconfig=1 gpu_mounts=9 
+L1m         level=10   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2none      level=none dxg=0 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=0 
+L2          level=none 
+L2m-gpus    level=none dxg=1 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2m-mounts  level=10   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L1md        level=50   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2md-mounts level=50   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2md-gpus   level=none dxg=1 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=6 
+### repeat 3
+L1none      level=none dxg=0 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=0 
+L1          level=50   dxg=1 libcuda_file=0 libcuda_in_ldconfig=1 gpu_mounts=9 
+L1m         level=10   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2none      level=none dxg=0 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=0 
+L2          level=none 
+L2m-gpus    level=none dxg=1 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2m-mounts  level=10   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L1md        level=50   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2md-mounts level=50   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2md-gpus   level=none dxg=1 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=6 

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-a-hostpath}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: probe
+    image: docker.io/library/cluster-matrix-probe:01
+    imagePullPolicy: IfNotPresent
+    command: [sh, /probe/inner.sh]
+    env:
+    - {name: NVIDIA_VISIBLE_DEVICES, value: all}
+    - {name: NVIDIA_DRIVER_CAPABILITIES, value: 'compute,utility'}
+    - {name: LD_LIBRARY_PATH, value: /usr/lib/wsl/lib}
+    securityContext: {privileged: true}
+    volumeMounts:
+    - {name: inner, mountPath: /probe}
+    - {name: dxg, mountPath: /dev/dxg}
+    - {name: wsllib, mountPath: /usr/lib/wsl/lib, readOnly: true}
+    - {name: wsldrivers, mountPath: /usr/lib/wsl/drivers, readOnly: true}
+  volumes:
+  - {name: inner, configMap: {name: probe-inner}}
+  - {name: dxg, hostPath: {path: /dev/dxg, type: CharDevice}}
+  - {name: wsllib, hostPath: {path: /usr/lib/wsl/lib, type: Directory}}
+  - {name: wsldrivers, hostPath: {path: /usr/lib/wsl/drivers, type: Directory}}

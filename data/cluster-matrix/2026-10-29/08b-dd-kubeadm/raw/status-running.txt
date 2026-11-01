@@ -1,0 +1,9 @@
+Field               Value
+ID:                 52e211ed
+State:              running
+Mode:               kubeadm
+Node Count:         1
+Version:            v1.36.1
+Started At:         2026-10-29 16:23:42.206 -0400 EDT
+Progress Message:   Kubernetes is up and running
+Error:              None

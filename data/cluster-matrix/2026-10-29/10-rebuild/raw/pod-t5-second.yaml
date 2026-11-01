@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-t5-second}
+spec:
+  restartPolicy: Never
+  runtimeClassName: nvidia
+  containers:
+  - name: probe
+    image: docker.io/library/cluster-matrix-probe:01
+    imagePullPolicy: Never
+    command: [sh, /probe/inner.sh]
+    env:
+    - {name: NVIDIA_VISIBLE_DEVICES, value: all}
+    - {name: NVIDIA_DRIVER_CAPABILITIES, value: 'compute,utility'}
+    resources:
+      limits: {nvidia.com/gpu: 1}
+    volumeMounts:
+    - {name: inner, mountPath: /probe}
+  volumes:
+  - {name: inner, configMap: {name: probe-inner}}

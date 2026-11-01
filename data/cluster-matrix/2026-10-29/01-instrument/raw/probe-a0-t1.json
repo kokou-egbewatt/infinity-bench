@@ -1,0 +1,14 @@
+{
+  "nvml_device_count": 1,
+  "nvml_name": "NVIDIA GeForce RTX 5060",
+  "nvml_total_mib": 8151,
+  "nvml_compute_procs": 0,
+  "cuda_name": "NVIDIA GeForce RTX 5060",
+  "compute_capability": "12.0",
+  "allocated_mib": 0,
+  "gemm_value": 512.0,
+  "hold_s": 30,
+  "level": 50,
+  "failed_stage": "",
+  "error": ""
+}

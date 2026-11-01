@@ -1,0 +1,24 @@
+2026-10-29T17:15:20Z
+2026-10-29T17:13:39Z   metrics-server-6dc596dfb8-tb22j           Created                   Container created
+2026-10-29T17:13:39Z   coredns-7cfb7bc9c7-6w5l8                  Unhealthy                 Readiness probe failed: Get "http://10.42.0.49:8181/ready": dial tcp 10.42.0.49
+2026-10-29T17:13:39Z   metrics-server-6dc596dfb8-tb22j           Started                   Container started
+2026-10-29T17:13:39Z   metrics-server-6dc596dfb8-tb22j           Unhealthy                 Readiness probe failed: Get "https://10.42.0.48:10250/readyz": dial tcp 10.42.0
+2026-10-29T17:13:40Z   traefik-7c8544f77-rxdz6                   Started                   Container started
+2026-10-29T17:13:40Z   traefik-7c8544f77-rxdz6                   Created                   Container created
+2026-10-29T17:13:40Z   traefik-7c8544f77-rxdz6                   Pulled                    Container image "rancher/mirrored-library-traefik:3.7.13" already present on ma
+2026-10-29T17:13:40Z   traefik-7c8544f77-rxdz6                   SandboxChanged            Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:13:50Z   nvidia-device-plugin-daemonset-9vt84      SandboxChanged            Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:13:50Z   nvidia-device-plugin-daemonset-9vt84      Pulled                    Container image "nvcr.io/nvidia/k8s-device-plugin:v0.18.2" already present on m
+2026-10-29T17:13:50Z   nvidia-device-plugin-daemonset-9vt84      Created                   Container created
+2026-10-29T17:13:51Z   traefik                                   UpdatedLoadBalancer       Updated LoadBalancer with new IPs: [172.18.59.76] -> [172.18.59.76]
+2026-10-29T17:13:51Z   nvidia-device-plugin-daemonset-9vt84      Started                   Container started
+2026-10-29T17:13:53Z   metrics-server-6dc596dfb8-tb22j           Unhealthy                 Readiness probe failed: HTTP probe failed with statuscode: 500
+## systemd start (monotonic us): 912743196  uptime: 1026.52
+Oct 29 13:13:38 <hostname> k3s[211]: time="2026-10-29T13:13:38-04:00" level=info msg="Starting /v1, Kind=ConfigMap controller"
+Oct 29 13:13:38 <hostname> k3s[211]: time="2026-10-29T13:13:38-04:00" level=info msg="Starting /v1, Kind=ServiceAccount controller"
+Oct 29 13:13:38 <hostname> k3s[211]: time="2026-10-29T13:13:38-04:00" level=info msg="Starting helm.cattle.io/v1, Kind=HelmChartConfig controller"
+Oct 29 13:13:38 <hostname> k3s[211]: time="2026-10-29T13:13:38-04:00" level=info msg="Starting helm.cattle.io/v1, Kind=HelmChart controller"
+Oct 29 13:13:38 <hostname> k3s[211]: time="2026-10-29T13:13:38-04:00" level=info msg="Starting network policy controller version v2.6.3-k3s1, built on 2026-09-30T16:04:14Z, go1.26.8"
+Oct 29 13:13:38 <hostname> k3s[211]: I1029 13:13:38.906314     211 network_policy_controller.go:164] Starting network policy controller
+Oct 29 13:13:38 <hostname> k3s[211]: I1029 13:13:38.943917     211 network_policy_controller.go:179] Starting network policy controller full sync goroutine
+Oct 29 13:13:39 <hostname> k3s[211]: time="2026-10-29T13:13:39-04:00" level=info msg="Started tunnel to 172.18.59.76:6443"

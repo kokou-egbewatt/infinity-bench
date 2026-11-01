@@ -1,0 +1,33 @@
+## version
+k3s version v1.36.5+k3s1 (3dd98cc5)
+go version go1.26.8
+## node
+NAME      STATUS   ROLES           AGE   VERSION        INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION                              CONTAINER-RUNTIME
+gpu-lab   Ready    control-plane   5s    v1.36.5+k3s1   172.18.59.76   <none>        Ubuntu 24.04.1 LTS   6.6.114.1-microsoft-standard-WSL2 (amd64)   containerd://2.3.4-k3s1.36
+## allocatable nvidia.com/gpu: ''
+## runtimeclasses
+crun                  crun
+lunatic               lunatic
+nvidia                nvidia
+nvidia-experimental   nvidia-experimental
+slight                slight
+spin                  spin
+wasmedge              wasmedge
+wasmer                wasmer
+wasmtime              wasmtime
+wws                   wws
+## containerd runtimes
+35:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc]
+38:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options]
+41:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runhcs-wcow-process]
+44:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.'nvidia']
+47:[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.'nvidia'.options]
+48:  BinaryName = "/usr/bin/nvidia-container-runtime"
+## pods
+No resources found
+## memory (MiB, WSL guest)
+Mem:           32097        1290       28829          26        2332       30807
+## disk
+9409M
+644	/var/lib/rancher
+76	/usr/local/bin/k3s

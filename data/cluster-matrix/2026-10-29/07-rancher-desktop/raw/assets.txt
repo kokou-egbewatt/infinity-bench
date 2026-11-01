@@ -1,0 +1,7 @@
+https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.24.0/rancher-desktop-linux-v1.24.0.zip.sha512sum
+https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.24.0/Rancher.Desktop-1.24.0-mac.aarch64.zip.sha512sum
+https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.24.0/Rancher.Desktop-1.24.0-mac.x86_64.zip.sha512sum
+https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.24.0/Rancher.Desktop-1.24.0.aarch64.dmg.sha512sum
+https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.24.0/Rancher.Desktop-1.24.0.x86_64.dmg.sha512sum
+https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.24.0/Rancher.Desktop.Setup.1.24.0.msi
+https://github.com/rancher-sandbox/rancher-desktop/releases/download/v1.24.0/Rancher.Desktop.Setup.1.24.0.msi.sha512sum

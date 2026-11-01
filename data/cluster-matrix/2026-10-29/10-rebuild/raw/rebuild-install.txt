@@ -1,0 +1,4 @@
+install to Ready: 9.0 s
+k3s version v1.36.5+k3s1 (3dd98cc5)
+-rw-r--r-- 1 root root 2945 Oct 29 17:21 /etc/rancher/k3s/k3s.yaml
+Error from server (NotFound): runtimeclasses.node.k8s.io "nvidia" not found

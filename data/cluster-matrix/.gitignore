@@ -1,0 +1,6 @@
+# The root .gitignore drops *.log; here the logs are the raw output and verbatim errors.
+!*.log
+# Written by the steps but kept private: client keys, installer logs, other projects' containers.
+kubeconfig*
+msi-*.log
+fleet-restart-policy*
