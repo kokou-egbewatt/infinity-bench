@@ -8,6 +8,26 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.11.0] - The GPU cluster lab (2026-10-31)
+
+**Four tools from the cluster comparison, on a lab page of their own.** The page builds once the
+cluster-matrix post exists, as the runner fleet lab does, so the next PR is what puts it on the
+site.
+
+### Added
+
+- **`/labs/gpu-cluster`:** an error decoder (paste an error, a pod's events or the probe's output;
+  get the layer that failed, what it means and the fix), a layer triage walk from the Windows
+  driver up to the device plugin, a filter for which of the seven local Kubernetes fits what you
+  need, and a check of whether a VRAM difference is above the noise floor.
+- **`site/src/lib/gpu.ts`**, tested in `gpu.test.ts`. The decoder has one rule per row of
+  `data/cluster-matrix/errors.csv`, and the tests fail if the two drift apart.
+
+### Changed
+
+- **The lab page's tool list is `LabShell.astro`**, shared by both labs instead of living in the
+  runner fleet lab.
+
 ## [0.10.0] - The cluster matrix (2026-10-30)
 
 **Seven local Kubernetes options, measured against one GPU probe on WSL2.** The probe, the scripts,
