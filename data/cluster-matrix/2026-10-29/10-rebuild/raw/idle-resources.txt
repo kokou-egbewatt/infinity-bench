@@ -1,0 +1,1 @@
+idle gpu-lab: vram_mib=2190 wsl_mem_mib=1293

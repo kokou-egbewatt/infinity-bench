@@ -1,0 +1,10 @@
+unpacking docker.io/library/cluster-matrix-probe:01 (sha256:2ef8cd3ee9a4a67dcf812f1793a2f99bfbe8b8cc1ee8291e73dac2d718574f26)...
+Loaded image: cluster-matrix-probe:01
+crw-rw-rw-    1 root     0          10, 125 Oct 29 16:42 /dev/dxg
+drivers
+lib
+lib files: 21
+grep: /var/lib/rancher/k3s/agent/etc/containerd/config.toml: No such file or directory
+no nvidia-container-runtime
+NAME="Rancher Desktop WSL Distro"
+ID="rancher-desktop-wsl-distro"

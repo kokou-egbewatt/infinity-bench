@@ -1,0 +1,59 @@
+## k3s service
+NRestarts=0
+ExecMainStartTimestamp=Thu 2026-10-29 13:08:39 EDT
+ActiveEnterTimestamp=Thu 2026-10-29 13:08:44 EDT
+## last terminations
+coredns-7cfb7bc9c7-6w5l8 Completed 0 2026-10-29T17:08:23Z
+helm-install-traefik-pmmgh Error 1 2026-10-29T17:01:24Z
+local-path-provisioner-77b9867795-hp2lv Completed 0 2026-10-29T17:08:23Z
+metrics-server-6dc596dfb8-tb22j Error 1 2026-10-29T17:08:23Z
+nvidia-device-plugin-daemonset-9vt84 Completed 0 2026-10-29T17:08:23Z
+svclb-traefik-045f6656-577tq Error 1 2026-10-29T17:08:23Z
+traefik-7c8544f77-rxdz6 Completed 0 2026-10-29T17:08:23Z
+## sandbox changes
+2026-10-29T17:02:35Z   kube-system   helm-install-traefik-pmmgh                SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:02:37Z   kube-system   metrics-server-6dc596dfb8-tb22j           Unhealthy                        Readiness probe failed: HTTP probe failed with statuscode: 500
+2026-10-29T17:06:32Z   kube-system   traefik-7c8544f77-rxdz6                   SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:06:32Z   kube-system   svclb-traefik-045f6656-577tq              SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:06:32Z   kube-system   local-path-provisioner-77b9867795-hp2lv   SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:06:33Z   kube-system   coredns-7cfb7bc9c7-6w5l8                  SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:06:33Z   kube-system   coredns-7cfb7bc9c7-6w5l8                  Unhealthy                        Readiness probe failed: Get "http://10.42.0.20:8181/ready": dial tcp 10.42.0.20:8181: connect: connection refused
+2026-10-29T17:06:33Z   kube-system   metrics-server-6dc596dfb8-tb22j           SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:06:33Z   kube-system   metrics-server-6dc596dfb8-tb22j           Unhealthy                        Readiness probe failed: Get "https://10.42.0.21:10250/readyz": dial tcp 10.42.0.21:10250: connect: connection refused
+2026-10-29T17:06:47Z   kube-system   metrics-server-6dc596dfb8-tb22j           Unhealthy                        Readiness probe failed: HTTP probe failed with statuscode: 500
+2026-10-29T17:07:13Z   kube-system   nvidia-device-plugin-daemonset-q4whw      BackOff                          Back-off restarting failed container nvidia-device-plugin-ctr in pod nvidia-device-plugin-daemonset-q4whw_kube-system(c498fa18-a407-4e25-a548-0c2ef5466b0b)
+2026-10-29T17:08:45Z   kube-system   svclb-traefik-045f6656-577tq              SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:08:45Z   kube-system   nvidia-device-plugin-daemonset-9vt84      SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:08:46Z   kube-system   coredns-7cfb7bc9c7-6w5l8                  Unhealthy                        Readiness probe failed: Get "http://10.42.0.28:8181/ready": dial tcp 10.42.0.28:8181: connect: connection refused
+2026-10-29T17:08:46Z   kube-system   metrics-server-6dc596dfb8-tb22j           SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:08:46Z   kube-system   metrics-server-6dc596dfb8-tb22j           Unhealthy                        Readiness probe failed: Get "https://10.42.0.29:10250/readyz": dial tcp 10.42.0.29:10250: connect: connection refused
+2026-10-29T17:08:46Z   kube-system   coredns-7cfb7bc9c7-6w5l8                  SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:08:51Z   kube-system   traefik-7c8544f77-rxdz6                   SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:08:57Z   kube-system   local-path-provisioner-77b9867795-hp2lv   SandboxChanged                   Pod sandbox changed, it will be killed and re-created.
+2026-10-29T17:09:00Z   kube-system   metrics-server-6dc596dfb8-tb22j           Unhealthy                        Readiness probe failed: HTTP probe failed with statuscode: 500
+## k3s journal around it
+Oct 29 13:08:46 <hostname> k3s[210]: time="2026-10-29T13:08:46-04:00" level=error msg="Sending HTTP/1.1 502 response to 127.0.0.1:53826: dial tcp 10.42.0.21:10250: connect: no route to host"
+Oct 29 13:08:46 <hostname> k3s[210]: time="2026-10-29T13:08:46-04:00" level=error msg="Sending HTTP/1.1 502 response to 127.0.0.1:53828: dial tcp 10.42.0.21:10250: connect: no route to host"
+Oct 29 13:08:46 <hostname> k3s[210]: time="2026-10-29T13:08:46-04:00" level=error msg="Sending HTTP/1.1 502 response to 127.0.0.1:53834: dial tcp 10.42.0.21:10250: connect: no route to host"
+Oct 29 13:08:46 <hostname> k3s[210]: time="2026-10-29T13:08:46-04:00" level=error msg="Sending HTTP/1.1 502 response to 127.0.0.1:53846: dial tcp 10.42.0.21:10250: connect: no route to host"
+Oct 29 13:08:46 <hostname> k3s[210]: time="2026-10-29T13:08:46-04:00" level=error msg="Sending HTTP/1.1 502 response to 127.0.0.1:53818: dial tcp 10.42.0.21:10250: connect: no route to host"
+Oct 29 13:08:46 <hostname> k3s[210]: E1029 13:08:46.797305     210 controller.go:113] "Unhandled Error" err=<
+Oct 29 13:08:46 <hostname> k3s[210]:         loading OpenAPI spec for "v1beta1.metrics.k8s.io" failed with: failed to download v1beta1.metrics.k8s.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: error trying to reach service: prox
+Oct 29 13:08:46 <hostname> k3s[210]:  > logger="UnhandledError"
+Oct 29 13:08:46 <hostname> k3s[210]: E1029 13:08:46.797387     210 controller.go:157] "Unhandled Error" err=<
+Oct 29 13:08:46 <hostname> k3s[210]:         Error updating APIService "v1beta1.metrics.k8s.io" with err: failed to download v1beta1.metrics.k8s.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+Oct 29 13:08:46 <hostname> k3s[210]:  > logger="UnhandledError"
+Oct 29 13:08:46 <hostname> k3s[210]: E1029 13:08:46.797301     210 remote_available_controller.go:471] "Unhandled Error" err="v1beta1.metrics.k8s.io failed with: failing or missing response from https://10.42.0.21:10250/apis/metrics.k8s.io/v1beta1: Get \"h
+Oct 29 13:08:46 <hostname> k3s[210]: E1029 13:08:46.797431     210 handler_proxy.go:144] error resolving kube-system/metrics-server: no endpoints available for service "metrics-server"
+Oct 29 13:08:46 <hostname> k3s[210]: E1029 13:08:46.798604     210 handler_proxy.go:144] error resolving kube-system/metrics-server: no endpoints available for service "metrics-server"
+Oct 29 13:08:46 <hostname> k3s[210]: E1029 13:08:46.802290     210 controller.go:157] "Unhandled Error" err=<
+Oct 29 13:08:46 <hostname> k3s[210]:         Error updating APIService "v1beta1.metrics.k8s.io" with err: failed to download v1beta1.metrics.k8s.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+Oct 29 13:08:46 <hostname> k3s[210]:  > logger="UnhandledError"
+Oct 29 13:08:46 <hostname> k3s[210]: E1029 13:08:46.802331     210 handler_proxy.go:144] error resolving kube-system/metrics-server: no endpoints available for service "metrics-server"
+Oct 29 13:08:47 <hostname> k3s[210]: time="2026-10-29T13:08:47-04:00" level=info msg="error in remotedialer server [400]: websocket: close 1006 (abnormal closure): unexpected EOF"
+Oct 29 13:08:47 <hostname> k3s[210]: E1029 13:08:47.297838     210 handler_proxy.go:144] error resolving kube-system/metrics-server: no endpoints available for service "metrics-server"
+Oct 29 13:08:47 <hostname> k3s[210]: E1029 13:08:47.799351     210 controller.go:123] "Unhandled Error" err="loading OpenAPI spec for \"v1beta1.metrics.k8s.io\" failed with: Error, could not get list of group versions for APIService" logger="UnhandledError
+Oct 29 13:08:47 <hostname> k3s[210]: E1029 13:08:47.799372     210 controller.go:113] "Unhandled Error" err=<
+Oct 29 13:08:47 <hostname> k3s[210]:         loading OpenAPI spec for "v1beta1.metrics.k8s.io" failed with: failed to download v1beta1.metrics.k8s.io: failed to retrieve openAPI spec, http error: ResponseCode: 503, Body: service unavailable
+Oct 29 13:08:47 <hostname> k3s[210]:  > logger="UnhandledError"
+Oct 29 13:08:55 <hostname> k3s[210]: E1029 13:08:55.298767     210 handler_proxy.go:144] error resolving kube-system/metrics-server: no endpoints available for service "metrics-server"

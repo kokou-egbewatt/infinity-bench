@@ -1,0 +1,8 @@
+Field               Value
+ID:                 03b24b57
+State:              disabled
+Mode:               kind
+Node Count:         1
+Version:            1.35.5
+Progress Message:   Kubernetes is stopped
+Error:              None

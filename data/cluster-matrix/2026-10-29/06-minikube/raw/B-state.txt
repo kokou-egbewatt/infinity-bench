@@ -1,0 +1,31 @@
+## addons
+│         ADDON NAME          │ PROFILE │   STATUS   │               MAINTAINER               │
+│ nvidia-device-plugin        │ cm      │ disabled   │ 3rd party (NVIDIA)                     │
+│ nvidia-driver-installer     │ cm      │ disabled   │ 3rd party (NVIDIA)                     │
+│ nvidia-gpu-device-plugin    │ cm      │ disabled   │ 3rd party (NVIDIA)                     │
+## gpu pods
+NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE   IP             NODE   NOMINATED NODE   READINESS GATES
+kube-system   nvidia-device-plugin-daemonset-j5dhk   1/1     Running   0          5s    10.244.0.2     cm     <none>           <none>
+## allocatable: ''
+## runtimeclasses: No resources found 
+## node
+crw-rw-rw- 1 root root 10, 125 Oct 29 18:41 /dev/dxg
+ls: cannot access '/usr/lib/wsl/lib': No such file or directory
+/usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b
+{"io.containerd.runc.v2":{"path":"runc",,\"seccomp\":{\"enabled\":true,\"actions\":[\"SCMP_ACT_ALLOW\",\"SCMP_ACT_ERRNO\",\"SCMP_ACT_KILL\",\"SCMP_ACT_KILL_PROCESS\",\"SCMP_ACT_KILL_THREAD\",\"SCMP_ACT_LOG\",\"SCMP_ACT_NOTIFY\",\"SCMP_ACT_TRACE\",\"SCMP_ACT_TRAP\"],\"operators\":[\"SCMP_CMP_EQ\",\"S
+DeviceRequests=[{"Driver":"","Count":-1,"DeviceIDs":null,"Capabilities":[["gpu"]],"Options":{}}]
+## plugin logs
+  "imex": {}
+}
+I1029 18:47:50.356651       1 main.go:391] Retrieving plugins.
+I1029 18:47:50.372612       1 plugin-manager.go:101] Detected platform: nvml
+I1029 18:47:50.372647       1 plugin-manager.go:50] Using device discovery strategy: nvml
+E1029 18:47:50.373701       1 factory.go:99] Failed to initialize NVML: Not Supported.
+E1029 18:47:50.373731       1 factory.go:100] If this is a GPU node, did you set the docker default runtime to `nvidia`?
+E1029 18:47:50.373736       1 factory.go:101] You can check the prerequisites at: https://github.com/NVIDIA/k8s-device-plugin#prerequisites
+E1029 18:47:50.373742       1 factory.go:102] You can learn how to set the runtime at: https://github.com/NVIDIA/k8s-device-plugin#quick-start
+E1029 18:47:50.373746       1 factory.go:103] If this is not a GPU node, you should set up a toleration or nodeSelector to only deploy this plugin on GPU nodes
+W1029 18:47:50.373750       1 factory.go:107] nvml init failed: Not Supported
+I1029 18:47:50.373760       1 main.go:416] No devices found. Waiting indefinitely.
+NAME                             DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE   CONTAINERS                 IMAGES                                                                                                             SELECTOR
+nvidia-device-plugin-daemonset   1         1         1       1            1           <none>                   12s   nvidia-device-plugin-ctr   nvcr.io/nvidia/k8s-device-plugin:v0.20.0@sha256:a61ba9fd8efb82f3a79f877f7580e02c1e8e7593f62473644bc9c79e315c3312   name=nvidia-device-plugin-ds

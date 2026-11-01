@@ -1,0 +1,4 @@
+cycle,create_s,ready_s,import_s,plugin_s,probe_s,to_level50_s,level,delete_s,vram_before,vram_up,vram_after,mem_before,mem_up,mem_after
+1,28.4,0.2,7.7,13.3,4.9,54.5,50,2.2,2283,2280,2280,1027,1668,1035
+2,28.4,0.3,8.8,12.3,4.6,54.3,50,2.1,2278,2278,2278,1035,1693,1052
+3,28.6,0.3,8.8,22.3,3.7,63.6,50,2.1,2278,2279,2278,1056,1723,1059

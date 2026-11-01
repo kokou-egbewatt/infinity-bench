@@ -1,0 +1,8 @@
+## pod probe-t2-rc-only  runtimeClass=nvidia  gpu=-  mounts=none
+phase=Unable to connect to the server: dial tcp [::1]:6443: connectex: No connection could be made because the target machine actively refused it.
+exitCode=
+reason=Unable to connect to the server: dial tcp [::1]:6443: connectex: No connection could be made because the target machine actively refused it.
+## logs
+Unable to connect to the server: dial tcp [::1]:6443: connectex: No connection could be made because the target machine actively refused it.
+## events
+Unable to connect to the server: dial tcp [::1]:6443: connectex: No connection could be made because the target machine actively refused it.

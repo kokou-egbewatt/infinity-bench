@@ -1,0 +1,3 @@
+L1md        level=50   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2md-mounts level=50   dxg=1 libcuda_file=1 libcuda_in_ldconfig=0 gpu_mounts=1 
+L2md-gpus   level=none dxg=1 libcuda_file=0 libcuda_in_ldconfig=0 gpu_mounts=6 

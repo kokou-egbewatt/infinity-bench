@@ -1,0 +1,7 @@
+## pod probe-a-rc  runtimeClass=nvidia  gpu=-  mounts=none
+phase=Error from server (NotFound): pods "probe-a-rc" not found
+exitCode=
+reason=Error from server (NotFound): pods "probe-a-rc" not found
+## logs
+error: error from server (NotFound): pods "probe-a-rc" not found in namespace "default"
+## events

@@ -1,0 +1,8 @@
+runtimeclass: nvidia -> nvidia
+28:      runtimeClassName: nvidia
+allocatable=1 after 9.6 s
+validatingadmissionpolicy.admissionregistration.k8s.io/gpu-request-and-runtimeclass-together   2     <unset>   9s
+validatingadmissionpolicybinding.admissionregistration.k8s.io/gpu-request-and-runtimeclass-together   gpu-request-and-runtimeclass-together   <unset>   9s
+gpu-admission-policy        /var/lib/rancher/k3s/server/manifests/gpu-admission-policy.yaml                       4d974e669b54e2ed5c7ebc2e4d944adf09416d8439f09fe8f2b883fd3f6a9cc7
+nvidia-device-plugin        /var/lib/rancher/k3s/server/manifests/nvidia-device-plugin.yaml                       a8314b38737ee4a827675aeb846a774a110fdb9f6f1a2a02a4cc7a2df26e512d
+Importing	elapsed: 3.1 s	total:   0.0 B	(0.0 B/s)	

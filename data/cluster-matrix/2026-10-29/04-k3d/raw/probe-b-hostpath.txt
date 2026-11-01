@@ -1,0 +1,9 @@
+## pod probe-b-hostpath  runtimeClass=-  gpu=-  mounts=hostpath
+phase=Pending
+exitCode=
+reason=ContainerCreating
+## logs
+Error from server (BadRequest): container "probe" in pod "probe-b-hostpath" is waiting to start: ContainerCreating
+## events
+Normal    Scheduled     Successfully assigned default/probe-b-hostpath to k3d-cm-server-0
+Warning   FailedMount   MountVolume.SetUp failed for volume "wsllib" : hostPath type check failed: /usr/lib/wsl/lib is not a directory

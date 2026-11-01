@@ -1,0 +1,31 @@
+## pod probe-b-default  runtimeClass=-  gpu=-  mounts=none
+phase=Running
+exitCode=0
+reason=Completed
+## logs
+dxg=1
+libcuda_file=0
+drivers_dir=1
+libcuda_in_ldconfig=1
+LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+NVIDIA_VISIBLE_DEVICES=void
+gpu_mounts=8
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libcuda.so.1.1
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libcuda_loader.so
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvdxgdmal.so.1
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvidia-ml.so.1
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvidia-ml_loader.so
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvidia-ptxjitcompiler.so.1
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/nvcubins.bin
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/nvidia-smi
+{
+  "level": 10,
+  "failed_stage": "nvml_init",
+  "error": "Not Supported"
+}
+exit=10
+## events
+Normal   Scheduled   Successfully assigned default/probe-b-default to cm
+Normal   Pulled      Container image "docker.io/library/cluster-matrix-probe:01" already present on machine and can be accessed by the pod
+Normal   Created     Container created
+Normal   Started     Container started

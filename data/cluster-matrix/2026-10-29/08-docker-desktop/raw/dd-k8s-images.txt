@@ -1,0 +1,15 @@
+Mode                Repo                Name                                    Tag
+kind                docker              desktop-containerd-registry-mirror      v0.0.4
+kind                docker              desktop-cloud-provider-kind             v0.6.0
+kind                envoyproxy          envoy                                   v1.36.7
+kind                kindest             node                                    
+kubeadm             docker              desktop-kubernetes                      kubernetes-v1.36.1-cni-v1.9.1-critools-v1.35.0-cri-dockerd-v0.4.4-1-debian
+kubeadm             docker              desktop-storage-provisioner             v4.0
+kubeadm             docker              desktop-vpnkit-controller               v4.0
+kubeadm             docker              desktop-kubernetes-etcd                 3.6.8-0
+kubeadm             docker              desktop-kubernetes-coredns              v1.14.2
+kubeadm             docker              desktop-kubernetes-pause                3.10.2
+kubeadm             docker              desktop-kubernetes-apiserver            v1.36.1
+kubeadm             docker              desktop-kubernetes-controller-manager   v1.36.1
+kubeadm             docker              desktop-kubernetes-scheduler            v1.36.1
+kubeadm             docker              desktop-kubernetes-proxy                v1.36.1

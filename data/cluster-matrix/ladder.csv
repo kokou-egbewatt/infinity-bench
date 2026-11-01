@@ -1,0 +1,11 @@
+rung,outer,inner,level,dxg,libcuda_file,libcuda_in_ldconfig,gpu_mounts,error,runs_agreeing
+L1none,docker run (NVIDIA_VISIBLE_DEVICES=void),,none,0,0,0,0,"libnvidia-ml.so.1: cannot open shared object file (exit 127)",3
+L1,docker run --gpus all,,50,1,0,1,9,,3
+L1m,docker run --device /dev/dxg + /usr/lib/wsl/lib + LD_LIBRARY_PATH,,10,1,1,0,1,"nvml_init: Unable to load the NVML library",3
+L1md,L1m + /usr/lib/wsl/drivers,,50,1,1,0,1,,3
+L2none,docker:28-dind --privileged --gpus all,docker run,none,0,0,0,0,"libnvidia-ml.so.1: cannot open shared object file (exit 127)",3
+L2,docker:28-dind --privileged --gpus all,docker run --gpus all,none,,,,,"could not select device driver """" with capabilities: [[gpu]]",3
+L2m-gpus,docker:28-dind --privileged --gpus all,L1m's flags,none,1,0,0,1,"libnvidia-ml.so.1: cannot open shared object file (exit 127)",3
+L2m-mounts,docker:28-dind --privileged + /dev/dxg + /usr/lib/wsl/lib,L1m's flags,10,1,1,0,1,"nvml_init: Unable to load the NVML library",3
+L2md-gpus,docker:28-dind --privileged --gpus all,L1md's flags,none,1,0,0,6,"libnvidia-ml.so.1: cannot open shared object file (exit 127)",3
+L2md-mounts,docker:28-dind --privileged + /dev/dxg + lib + drivers,L1md's flags,50,1,1,0,1,,3

@@ -1,0 +1,25 @@
+## ldd
+	linux-vdso.so.1 (0x00007ffd23961000)
+	libnvidia-ml.so.1 => /usr/lib/wsl/lib/libnvidia-ml.so.1 (0x000077c44858d000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000077c448200000)
+	/lib64/ld-linux-x86-64.so.2 (0x000077c448684000)
+	libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x000077c448588000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000077c44849f000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x000077c44849a000)
+	librt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x000077c448493000)
+## run: gpu_probe 2048 0
+{
+  "nvml_device_count": 1,
+  "nvml_name": "NVIDIA GeForce RTX 5060",
+  "nvml_total_mib": 8151,
+  "nvml_compute_procs": 0,
+  "cuda_name": "NVIDIA GeForce RTX 5060",
+  "compute_capability": "12.0",
+  "allocated_mib": 2048,
+  "gemm_value": 512.0,
+  "hold_s": 0,
+  "level": 50,
+  "failed_stage": "",
+  "error": ""
+}
+exit=50

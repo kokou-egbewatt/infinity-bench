@@ -1,0 +1,16 @@
+## rung L1m  2026-10-29T16:31:24Z
+$ docker run --rm --device /dev/dxg -v /usr/lib/wsl/lib:/usr/lib/wsl/lib:ro -e LD_LIBRARY_PATH=/usr/lib/wsl/lib -e NVIDIA_VISIBLE_DEVICES=void --entrypoint sh IMG -c INNER
+dxg=1
+libcuda_file=1
+libcuda_in_ldconfig=0
+LD_LIBRARY_PATH=/usr/lib/wsl/lib
+NVIDIA_VISIBLE_DEVICES=void
+gpu_mounts=1
+  mount /usr/lib/wsl/lib
+{
+  "level": 10,
+  "failed_stage": "nvml_init",
+  "error": "Unable to load the NVML library"
+}
+exit=10
+## docker exit=0  seconds=1

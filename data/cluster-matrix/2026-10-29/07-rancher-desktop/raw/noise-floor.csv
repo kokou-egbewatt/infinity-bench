@@ -1,0 +1,2 @@
+run_id,label,samples,interval_s,median_mib,iqr_mib,min_mib,max_mib,spread_mib,conditions
+20261029T204137Z,pre-install,30,2,2336,1,2336,2338,2,"51.40,2527MHz,23.92W,0%,0x0000000000000400"

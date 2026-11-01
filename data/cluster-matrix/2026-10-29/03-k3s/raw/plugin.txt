@@ -1,0 +1,75 @@
+## manifest: 9e915ef012d6a036ce4c739cf98451db3c8f272e02ee1e4fd560f1ffcc85b507  /mnt/c/PROJECTS/infinity-bench/temp/cluster-matrix/03-k3s/raw/nvidia-device-plugin-v0.18.2.yml
+## A. as published
+daemonset.apps/nvidia-device-plugin-daemonset created
+Waiting for daemon set spec update to be observed...
+Waiting for daemon set "nvidia-device-plugin-daemonset" rollout to finish: 0 out of 1 new pods have been updated...
+Waiting for daemon set "nvidia-device-plugin-daemonset" rollout to finish: 0 of 1 updated pods are available...
+daemon set "nvidia-device-plugin-daemonset" successfully rolled out
+allocatable='' after 60 s
+## plugin logs (published)
+      "passDeviceSpecs": false,
+      "deviceListStrategy": [
+        "envvar"
+      ],
+      "deviceIDStrategy": "uuid",
+      "cdiAnnotationPrefix": "cdi.k8s.io/",
+      "nvidiaCTKPath": "/usr/bin/nvidia-ctk",
+      "containerDriverRoot": "/driver-root"
+    }
+  },
+  "resources": {
+    "gpus": [
+      {
+        "pattern": "*",
+        "name": "nvidia.com/gpu"
+      }
+    ]
+  },
+  "sharing": {
+    "timeSlicing": {}
+  },
+  "imex": {}
+}
+I1029 17:07:12.683318       1 main.go:369] Retrieving plugins.
+E1029 17:07:12.683619       1 factory.go:113] Incompatible strategy detected auto
+E1029 17:07:12.683644       1 factory.go:114] If this is a GPU node, did you configure the NVIDIA Container Toolkit?
+E1029 17:07:12.683650       1 factory.go:115] You can check the prerequisites at: https://github.com/NVIDIA/k8s-device-plugin#prerequisites
+E1029 17:07:12.683654       1 factory.go:116] You can learn how to set the runtime at: https://github.com/NVIDIA/k8s-device-plugin#quick-start
+E1029 17:07:12.683658       1 factory.go:117] If this is not a GPU node, you should set up a toleration or nodeSelector to only deploy this plugin on GPU nodes
+E1029 17:07:12.684204       1 main.go:185] error starting plugins: error getting plugins: unable to create plugins: failed to construct resource managers: invalid device discovery strategy
+## B. runtimeClassName: nvidia
+daemonset.apps/nvidia-device-plugin-daemonset patched
+Waiting for daemon set "nvidia-device-plugin-daemonset" rollout to finish: 0 of 1 updated pods are available...
+daemon set "nvidia-device-plugin-daemonset" successfully rolled out
+allocatable=1
+## plugin logs (runtimeClass)
+    "deviceDiscoveryStrategy": "auto",
+    "plugin": {
+      "passDeviceSpecs": false,
+      "deviceListStrategy": [
+        "envvar"
+      ],
+      "deviceIDStrategy": "uuid",
+      "cdiAnnotationPrefix": "cdi.k8s.io/",
+      "nvidiaCTKPath": "/usr/bin/nvidia-ctk",
+      "containerDriverRoot": "/driver-root"
+    }
+  },
+  "resources": {
+    "gpus": [
+      {
+        "pattern": "*",
+        "name": "nvidia.com/gpu"
+      }
+    ]
+  },
+  "sharing": {
+    "timeSlicing": {}
+  },
+  "imex": {}
+}
+I1029 17:07:48.364149       1 main.go:369] Retrieving plugins.
+I1029 17:07:48.449038       1 server.go:197] Starting GRPC server for 'nvidia.com/gpu'
+I1029 17:07:48.449838       1 server.go:141] Starting to serve 'nvidia.com/gpu' on /var/lib/kubelet/device-plugins/nvidia-gpu.sock
+I1029 17:07:48.452234       1 server.go:148] Registered device plugin for 'nvidia.com/gpu' with Kubelet
+I1029 17:07:48.456123       1 health.go:64] Ignoring the following XIDs for health checks: map[13:true 31:true 43:true 45:true 68:true 109:true]

@@ -1,0 +1,12 @@
+## boots
+IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY
+ -3 6f855fc7c19b47248796e340c5e49363 Tue 2026-10-27 16:20:58 EDT Tue 2026-10-27 17:03:46 EDT
+ -2 d4f2ce2114bd44f3947c2bdc01b28009 Thu 2026-10-29 11:29:18 EDT Thu 2026-10-29 11:39:23 EDT
+ -1 786acff352964b8b898055dbe79a53e5 Thu 2026-10-29 12:07:05 EDT Thu 2026-10-29 12:33:21 EDT
+  0 88e6654d00c247088e0b754be5a04e01 Thu 2026-10-29 12:58:57 EDT Thu 2026-10-29 13:09:28 EDT
+## pid 1 started
+Thu Oct 29 13:08:34 2026
+## wsl.conf
+[boot]
+command = mount --make-rshared /
+systemd=true

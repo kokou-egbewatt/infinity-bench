@@ -1,0 +1,24 @@
+[36mINFO[0m[0000] Prep: Network                                
+[36mINFO[0m[0000] Created network 'k3d-cm'                     
+[36mINFO[0m[0000] Created image volume k3d-cm-images           
+[36mINFO[0m[0000] Starting new tools node...                   
+[36mINFO[0m[0000] Pulling image 'ghcr.io/k3d-io/k3d-tools:5.9.0' 
+[36mINFO[0m[0001] Creating node 'k3d-cm-server-0'              
+[36mINFO[0m[0002] Pulling image 'docker.io/rancher/k3s:v1.35.5-k3s1' 
+[36mINFO[0m[0002] Starting node 'k3d-cm-tools'                 
+[36mINFO[0m[0009] Creating LoadBalancer 'k3d-cm-serverlb'      
+[36mINFO[0m[0009] Pulling image 'ghcr.io/k3d-io/k3d-proxy:5.9.0' 
+[36mINFO[0m[0012] Using the k3d-tools node to gather environment information 
+[36mINFO[0m[0012] Starting new tools node...                   
+[36mINFO[0m[0012] Starting node 'k3d-cm-tools'                 
+[36mINFO[0m[0014] Starting cluster 'cm'                        
+[36mINFO[0m[0014] Starting servers...                          
+[36mINFO[0m[0014] Starting node 'k3d-cm-server-0'              
+[36mINFO[0m[0019] All agents already running.                  
+[36mINFO[0m[0019] Starting helpers...                          
+[36mINFO[0m[0019] Starting node 'k3d-cm-serverlb'              
+[36mINFO[0m[0026] Injecting records for hostAliases (incl. host.k3d.internal) and for 3 network members into CoreDNS configmap... 
+[36mINFO[0m[0028] Cluster 'cm' created successfully!           
+[36mINFO[0m[0028] You can now use it like this:                
+$env:KUBECONFIG=(C:\PROJECTS\infinity-bench\temp\cluster-matrix\_bin\k3d.exe kubeconfig write cm)
+kubectl cluster-info

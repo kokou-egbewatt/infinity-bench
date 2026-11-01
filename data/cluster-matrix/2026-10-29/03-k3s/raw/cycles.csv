@@ -1,0 +1,5 @@
+cycle,install_s,ready_s,import_s,probe_s,to_level50_s,level,uninstall_s,mem_before_mib,mem_at_l50_mib,disk_before_mib,disk_at_l50_mib,rancher_mib
+1,8.8,0.6,3.4,231.8,244.6,none-harness-race,4.7,1181,1781,8698,10201,1448
+2,8.8,0.6,3.4,6.4,19.2,50,3.4,1184,1558,8677,9481,729
+3,8.3,0.6,3.5,6.1,18.5,50,3.0,1182,1546,8674,9488,739
+4,7.3,0.6,3.5,5.2,16.7,50,4.4,1186,1568,8670,9430,695

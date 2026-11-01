@@ -1,0 +1,19 @@
+Error: unknown flag: --remove-kubernetes-cache
+Usage:
+  rdctl reset [flags]
+
+Flags:
+      --cache     Delete cached Kubernetes images
+      --factory   Delete VM and show first-run dialog on next start
+  -h, --help      help for reset
+      --k8s       Delete deployed Kubernetes workloads
+      --vm        Delete VM and create a new one with current settings
+
+Global Flags:
+      --config-path string   config file (default C:\Users\<user>\AppData\Local\rancher-desktop\rd-engine.json)
+      --host string          default is 127.0.0.1; most useful for WSL
+      --password string      overrides the password setting in the config file
+      --port int             overrides the port setting in the config file
+      --user string          overrides the user setting in the config file
+      --verbose              Be verbose
+

@@ -1,0 +1,12 @@
+## pod probe-b-rc  runtimeClass=nvidia  gpu=-  mounts=none
+phase=Pending
+exitCode=
+reason=ContainerCreating
+## logs
+Error from server (BadRequest): container "probe" in pod "probe-b-rc" is waiting to start: ContainerCreating
+## events
+Normal    Scheduled                Successfully assigned default/probe-b-rc to k3d-cm-server-0
+Warning   FailedCreatePodSandBox   Failed to create pod sandbox: rpc error: code = Unknown desc = unable to get OCI runtime for sandbox "340a4392a123b4c0611fdaee27e27a289c36f9f0dcc8ce0bbbbd9c384b5704c0": no runtime for "nvidia" is configured
+Warning   FailedCreatePodSandBox   Failed to create pod sandbox: rpc error: code = Unknown desc = unable to get OCI runtime for sandbox "318bdf957b57eafc63c40209591207850eb5017df38cf6c2cf69efb1ce6911ba": no runtime for "nvidia" is configured
+Warning   FailedCreatePodSandBox   Failed to create pod sandbox: rpc error: code = Unknown desc = unable to get OCI runtime for sandbox "1995c136c88b59118a30b8367af0ebfbb28046b082dd704e63954cf1ce7b6997": no runtime for "nvidia" is configured
+Warning   FailedCreatePodSandBox   Failed to create pod sandbox: rpc error: code = Unknown desc = unable to get OCI runtime for sandbox "509d2b563bb1ec8b3e7cd51ce528c92f76ecd0bdb83d911a70df9e3d1b0c4750": no runtime for "nvidia" is configured

@@ -1,0 +1,5 @@
+Untagged: envoyproxy/envoy:v1.36.7
+Deleted: sha256:29d778ba078e0404d18fa45ffb834c062071b0f81dc0a6a41501ce8e23a0059f
+Error response from daemon: conflict: unable to delete kindest/node:v1.35.5 (must be forced) - container 4037e60884bb is using its referenced image ce977ae6d659
+Error response from daemon: conflict: unable to delete docker/desktop-cloud-provider-kind:v0.6.0 (must be forced) - container 8fbb859fba64 is using its referenced image 46d51b990e97
+Error response from daemon: conflict: unable to delete docker/desktop-containerd-registry-mirror:v0.0.4 (must be forced) - container a45a20107bbc is using its referenced image 1de142695bb0

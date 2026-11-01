@@ -1,0 +1,33 @@
+## rung L1  2026-10-29T16:28:16Z
+$ docker run --rm --gpus all --entrypoint sh IMG -c INNER
+dxg=1
+libcuda_file=0
+libcuda_in_ldconfig=1
+LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+NVIDIA_VISIBLE_DEVICES=all
+gpu_mounts=9
+  mount /dev/dxg
+  mount /usr/bin/nvidia-smi
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvdxgdmal.so.1
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvidia-ml.so.1
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvidia-ml_loader.so
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/libnvidia-ptxjitcompiler.so.1
+  mount /usr/lib/wsl/drivers/nv_dispi.inf_amd64_20f49c6eb5c9b39b/nvidia-smi
+  mount /usr/lib/x86_64-linux-gnu/libnvidia-gpucomp.so
+  mount /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+{
+  "nvml_device_count": 1,
+  "nvml_name": "NVIDIA GeForce RTX 5060",
+  "nvml_total_mib": 8151,
+  "nvml_compute_procs": 0,
+  "cuda_name": "NVIDIA GeForce RTX 5060",
+  "compute_capability": "12.0",
+  "allocated_mib": 2048,
+  "gemm_value": 512.0,
+  "hold_s": 0,
+  "level": 50,
+  "failed_stage": "",
+  "error": ""
+}
+exit=50
+## docker exit=0  seconds=1

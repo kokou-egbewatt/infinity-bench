@@ -1,0 +1,5 @@
+cluster up: gpu-lab   Ready   control-plane   16m   v1.36.5+k3s1
+terminate at 21:37:50
+The operation completed successfully. 
+kubectl sees Ready again after 9s at 21:38:02
+nvidia.com/gpu allocatable=1 (20s after terminate)

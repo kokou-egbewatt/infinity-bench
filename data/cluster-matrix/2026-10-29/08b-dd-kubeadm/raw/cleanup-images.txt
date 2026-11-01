@@ -1,0 +1,3 @@
+docker/desktop-kubernetes:kubernetes-v1.36.1-cni-v1.9.1-critools-v1.35.0-cri-dockerd-v0.4.4-1-debian
+docker/desktop-storage-provisioner:v4.0
+docker/desktop-vpnkit-controller:v4.0

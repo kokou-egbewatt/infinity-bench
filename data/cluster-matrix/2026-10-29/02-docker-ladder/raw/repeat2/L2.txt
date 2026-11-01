@@ -1,0 +1,6 @@
+## rung L2  2026-10-29T16:30:28Z
+$ docker run -d --privileged --gpus all docker:28-dind; inner: docker run --rm --gpus all IMG
+docker: Error response from daemon: could not select device driver "" with capabilities: [[gpu]]
+
+Run 'docker run --help' for more information
+## docker exit=0  seconds=9

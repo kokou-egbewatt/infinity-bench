@@ -1,0 +1,25 @@
+[33mWARN[0m[0000] failed to stat file/directory '/usr/lib/wsl/lib' volume mount '/usr/lib/wsl/lib:/usr/lib/wsl/lib': please make sure it exists 
+[33mWARN[0m[0000] failed to stat file/directory '/usr/lib/wsl/drivers' volume mount '/usr/lib/wsl/drivers:/usr/lib/wsl/drivers': please make sure it exists 
+[33mWARN[0m[0000] failed to stat file/directory '/usr/lib/wsl/lib' volume mount '/usr/lib/wsl/lib:/usr/lib/wsl/lib': please make sure it exists 
+[33mWARN[0m[0000] failed to stat file/directory '/usr/lib/wsl/drivers' volume mount '/usr/lib/wsl/drivers:/usr/lib/wsl/drivers': please make sure it exists 
+[36mINFO[0m[0000] Prep: Network                                
+[36mINFO[0m[0000] Created network 'k3d-cm'                     
+[36mINFO[0m[0000] Created image volume k3d-cm-images           
+[36mINFO[0m[0000] Starting new tools node...                   
+[36mINFO[0m[0000] Starting node 'k3d-cm-tools'                 
+[36mINFO[0m[0001] Creating node 'k3d-cm-server-0'              
+[36mINFO[0m[0001] Creating LoadBalancer 'k3d-cm-serverlb'      
+[36mINFO[0m[0001] Using the k3d-tools node to gather environment information 
+[36mINFO[0m[0001] Starting new tools node...                   
+[36mINFO[0m[0001] Starting node 'k3d-cm-tools'                 
+[36mINFO[0m[0003] Starting cluster 'cm'                        
+[36mINFO[0m[0003] Starting servers...                          
+[36mINFO[0m[0003] Starting node 'k3d-cm-server-0'              
+[36mINFO[0m[0008] All agents already running.                  
+[36mINFO[0m[0008] Starting helpers...                          
+[36mINFO[0m[0008] Starting node 'k3d-cm-serverlb'              
+[36mINFO[0m[0015] Injecting records for hostAliases (incl. host.k3d.internal) and for 3 network members into CoreDNS configmap... 
+[36mINFO[0m[0017] Cluster 'cm' created successfully!           
+[36mINFO[0m[0017] You can now use it like this:                
+$env:KUBECONFIG=(C:\PROJECTS\infinity-bench\temp\cluster-matrix\_bin\k3d.exe kubeconfig write cm)
+kubectl cluster-info

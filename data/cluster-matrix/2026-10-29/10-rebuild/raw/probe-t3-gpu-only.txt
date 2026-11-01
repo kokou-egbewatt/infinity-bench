@@ -1,0 +1,7 @@
+## pod probe-t3-gpu-only  runtimeClass=-  gpu=1  mounts=none
+phase=Error from server (NotFound): pods "probe-t3-gpu-only" not found
+exitCode=
+reason=Error from server (NotFound): pods "probe-t3-gpu-only" not found
+## logs
+error: error from server (NotFound): pods "probe-t3-gpu-only" not found in namespace "default"
+## events
