@@ -3,6 +3,7 @@
 // getPosts() includes drafts in dev only.
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import GpuClusterLab from '../../components/widgets/GpuClusterLab.astro';
 import RunnerFleetLab from '../../components/widgets/RunnerFleetLab.astro';
 import { WIDGETS } from '../../lib/widgets';
 import { getPosts } from '../../lib/posts';
@@ -10,6 +11,7 @@ import { url } from '../../lib/url';
 
 const COMPONENTS = {
   'runner-fleet': RunnerFleetLab,
+  'gpu-cluster': GpuClusterLab,
 } as const;
 
 export const getStaticPaths = (async () => {
@@ -20,7 +22,7 @@ export const getStaticPaths = (async () => {
     const post = byPlan.get(w.plan);
     if (!post) return [];
     // getStaticPaths runs before the page, so it cannot see COMPONENTS below; keep the two lists in step
-    const ids = ['runner-fleet'];
+    const ids = ['runner-fleet', 'gpu-cluster'];
     if (!ids.includes(w.id))
       throw new Error(
         `Labs: ${w.id} has page: true but no component in src/pages/labs/[lab].astro`,

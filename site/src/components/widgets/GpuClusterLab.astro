@@ -1,0 +1,38 @@
+---
+// The cluster-matrix post's lab: decode an error, walk the layers, pick a cluster, and check a
+// VRAM difference against the noise floor.
+import ErrorDecoder from './ErrorDecoder.astro';
+import LabShell from './LabShell.astro';
+import LayerTriage from './LayerTriage.astro';
+import NoiseFloor from './NoiseFloor.astro';
+import WhichCluster from './WhichCluster.astro';
+
+const SECTIONS = [
+  {
+    id: 'error-decoder',
+    title: 'Error decoder',
+    blurb: 'Paste an error, see which layer failed and the fix',
+    Lab: ErrorDecoder,
+  },
+  {
+    id: 'layer-triage',
+    title: 'Layer triage',
+    blurb: 'Walk the GPU stack up to the first layer that fails',
+    Lab: LayerTriage,
+  },
+  {
+    id: 'which-cluster',
+    title: 'Which cluster',
+    blurb: 'The local Kubernetes that fits what you need',
+    Lab: WhichCluster,
+  },
+  {
+    id: 'noise-floor',
+    title: 'Noise floor',
+    blurb: 'Is a VRAM difference bigger than the noise?',
+    Lab: NoiseFloor,
+  },
+];
+---
+
+<LabShell sections={SECTIONS} />
