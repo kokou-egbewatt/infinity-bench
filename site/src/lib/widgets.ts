@@ -42,6 +42,21 @@ export const WIDGETS = [
       { id: 'fleet-size', name: 'fleet sizing' },
     ] as LabSection[],
   },
+  {
+    id: 'gpu-cluster',
+    name: 'GPU cluster lab',
+    blurb:
+      'Four tools from the cluster comparison: decode a GPU error, find the layer where the GPU stops, pick the local Kubernetes that fits, and check whether a VRAM difference is above the noise.',
+    plan: 'cluster-matrix',
+    section: undefined as string | undefined,
+    page: true as boolean,
+    sections: [
+      { id: 'error-decoder', name: 'error decoder' },
+      { id: 'layer-triage', name: 'layer triage' },
+      { id: 'which-cluster', name: 'which cluster' },
+      { id: 'noise-floor', name: 'noise floor' },
+    ] as LabSection[],
+  },
 ] as const;
 
 export const WIDGET_IDS: ReadonlySet<string> = new Set(WIDGETS.map((w) => w.id));

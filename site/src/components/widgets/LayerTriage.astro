@@ -1,0 +1,218 @@
+---
+// The GPU stack on k3s from the bottom up, one command per layer. The first no is the layer to
+// fix. Logic and the layers in src/lib/gpu.ts, from docs/gpu-debug.md.
+import { LAYERS } from '../../lib/gpu';
+import '../../styles/widget.css';
+---
+
+<div class="widget tri" data-widget="layer-triage">
+  <p class="wt">Where does the GPU stop?</p>
+  <p class="lbl">
+    Run each command in order, starting at the Windows driver, and say whether it answered as
+    expected.
+  </p>
+  <ol class="layers">
+    {LAYERS.map((l, i) => (
+      <li class="layer" data-layer={l.id}>
+        <div class="lh">
+          <span class="n">{i + 1}</span>
+          <span class="name">{l.name}</span>
+          <span class="yn" role="radiogroup" aria-label={`${l.name} answered as expected?`}>
+            <label>
+              <input type="radio" name={`tri-${l.id}`} value="yes" /> yes
+            </label>
+            <label>
+              <input type="radio" name={`tri-${l.id}`} value="no" /> no
+            </label>
+          </span>
+        </div>
+        <code class="cmd">{l.check}</code>
+        <p class="ok">Expect {l.ok}.</p>
+      </li>
+    ))}
+  </ol>
+  <div class="acts">
+    <button type="button" data-act="reset">
+      start over
+    </button>
+  </div>
+  <div class="verdict" data-out="verdict" aria-live="polite"></div>
+  <p class="formula">
+    The layers from docs/gpu-debug.md. Layers 1 and 2 are the Windows driver; 3 to 6 are what you
+    install to build the cluster. NeuroMesh's task cluster:status runs this walk in one command.
+  </p>
+  <p class="src">
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/gpu.ts">
+      code
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/docs/gpu-debug.md">
+      gpu-debug.md
+    </a>
+  </p>
+  <noscript>
+    <p class="formula">This lab needs JavaScript; the commands above work without it.</p>
+  </noscript>
+</div>
+
+<script>
+  import { LAYERS, triage, type Answer } from '../../lib/gpu';
+  import { onVisible } from '../../lib/onVisible';
+
+  function init(root: HTMLElement) {
+    const out = root.querySelector<HTMLElement>('[data-out="verdict"]')!;
+    const answers = (): Answer[] =>
+      LAYERS.map(
+        (l) =>
+          (root.querySelector<HTMLInputElement>(`input[name="tri-${l.id}"]:checked`)
+            ?.value as Answer) ?? undefined,
+      );
+
+    const run = () => {
+      const a = answers();
+      const t = triage(a);
+      root.querySelectorAll<HTMLElement>('[data-layer]').forEach((li, i) => {
+        li.classList.toggle('bad', t.broken?.id === li.dataset.layer);
+        li.classList.toggle('good', a[i] === 'yes');
+      });
+      out.replaceChildren();
+      const p = (cls: string, text: string) => {
+        const e = document.createElement('p');
+        e.className = cls;
+        e.textContent = text;
+        out.append(e);
+      };
+      if (t.healthy)
+        p(
+          'ok',
+          'Every layer answers. A pod that sets runtimeClassName: nvidia and requests nvidia.com/gpu: 1 gets the card.',
+        );
+      else if (t.broken) {
+        p('bad', `Fix layer ${LAYERS.indexOf(t.broken) + 1}, ${t.broken.name}.`);
+        p('fix', t.broken.fix);
+        if (t.unchecked.length)
+          p(
+            'warn',
+            `You have not checked ${t.unchecked.map((l) => l.name).join(', ')} yet. A failure there would explain this one too, so start with ${t.unchecked[0].name}.`,
+          );
+      } else p('wait', 'Answer from layer 1 down. The first no is the layer to fix.');
+    };
+
+    root.addEventListener('change', run);
+    root.querySelector('[data-act="reset"]')!.addEventListener('click', () => {
+      root
+        .querySelectorAll<HTMLInputElement>('input[type="radio"]')
+        .forEach((r) => (r.checked = false));
+      run();
+    });
+    run();
+  }
+
+  onVisible('[data-widget="layer-triage"]', init);
+</script>
+
+<style>
+  .widget p.lbl {
+    font-size: 12.5px;
+    color: var(--tx2);
+    margin: 0 0 10px;
+  }
+  .layers {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+  }
+  .layer {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line2);
+    border-radius: 6px;
+    background: var(--bg);
+    padding: 8px 12px;
+    min-width: 0;
+  }
+  .layer.good {
+    border-left-color: var(--ac);
+  }
+  .layer.bad {
+    border-left-color: #f87171;
+  }
+  .lh {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .n {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+  }
+  .name {
+    font-size: 13.5px;
+    color: var(--hi);
+    flex: 1;
+  }
+  .yn {
+    display: flex;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--tx2);
+  }
+  .yn input {
+    accent-color: var(--ac);
+  }
+  .cmd {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--tx);
+    background: #08080a;
+    border-radius: 4px;
+    padding: 5px 8px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .widget .layer p.ok {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--tx3);
+  }
+  .acts {
+    margin: 10px 0 12px;
+  }
+  .acts button {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx2);
+    background: var(--bg);
+    border: 1px solid var(--line2);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .acts button:hover {
+    color: var(--hi);
+  }
+  .verdict :global(p) {
+    margin: 0 0 6px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--tx);
+  }
+  .verdict :global(p.ok) {
+    color: var(--ac);
+  }
+  .verdict :global(p.bad) {
+    color: #f87171;
+  }
+  .verdict :global(p.warn) {
+    color: var(--warn);
+  }
+  .verdict :global(p.wait) {
+    color: var(--tx2);
+  }
+</style>

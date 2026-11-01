@@ -1,0 +1,241 @@
+---
+// Paste an error, a pod's events or the probe's JSON; get the layer that failed and the fix.
+// Rules in src/lib/gpu.ts, one per row of data/cluster-matrix/errors.csv. Nothing leaves the page.
+import { readCsv } from '../../lib/postData';
+import '../../styles/widget.css';
+
+const rows = readCsv('cluster-matrix', 'errors.csv', 'ErrorDecoder', 'labs/gpu-cluster');
+// minikube's documented --gpus=all path, step 06: the probe and the device plugin, as they printed
+const SAMPLE = `{
+  "level": 10,
+  "failed_stage": "nvml_init",
+  "error": "Not Supported"
+}
+E1029 18:47:50.373701  1 factory.go:99] Failed to initialize NVML: Not Supported.
+I1029 18:47:50.373760  1 main.go:416] No devices found. Waiting indefinitely.`;
+const uid = 'dec';
+---
+
+<div
+  class="widget dec"
+  data-widget="error-decoder"
+  data-rows={JSON.stringify(rows)}
+  data-sample={SAMPLE}
+>
+  <p class="wt">What does this GPU error mean?</p>
+  <label class="lbl" for={`${uid}-in`}>
+    Paste an error, a pod's events, a device plugin log or the probe's output.
+  </label>
+  <textarea
+    id={`${uid}-in`}
+    data-in="text"
+    spellcheck="false"
+    autocomplete="off"
+    rows="8"
+  >{SAMPLE}</textarea>
+  <div class="acts">
+    <button type="button" data-act="sample">
+      reset to the example
+    </button>
+    <button type="button" data-act="clear">
+      clear
+    </button>
+  </div>
+  <p class="sum" data-out="summary" aria-live="polite"></p>
+  <ol class="hits" data-out="hits"></ol>
+  <p class="formula">
+    Every error the comparison hit, from data/cluster-matrix/errors.csv. Nothing you paste leaves
+    the page.
+  </p>
+  <p class="src">
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/gpu.ts">
+      code
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/gpu.test.ts">
+      tests
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/data/cluster-matrix/errors.csv">
+      errors.csv
+    </a>
+  </p>
+  <noscript>
+    <p class="formula">This lab needs JavaScript.</p>
+  </noscript>
+</div>
+
+<script>
+  import { decodeError, type Row } from '../../lib/gpu';
+  import { onVisible } from '../../lib/onVisible';
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function init(root: HTMLElement) {
+    const rows = JSON.parse(root.dataset.rows ?? '[]') as Row[];
+    const area = root.querySelector<HTMLTextAreaElement>('[data-in="text"]')!;
+    const summary = root.querySelector<HTMLElement>('[data-out="summary"]')!;
+    const list = root.querySelector<HTMLElement>('[data-out="hits"]')!;
+
+    const run = () => {
+      const d = decodeError(area.value, rows);
+      const parts: string[] = [];
+      if (d.probe) parts.push(`Probe level ${d.probe.level}: ${d.probe.meaning}.`);
+      if (d.matches.length)
+        parts.push(
+          `${d.matches.length === 1 ? 'One known error' : `${d.matches.length} known errors`}.`,
+        );
+      else if (area.value.trim())
+        parts.push(
+          d.probe?.level === 50
+            ? ''
+            : 'Nothing I hit in the comparison. Walk the layers to find where it stops.',
+        );
+      summary.textContent = parts.filter(Boolean).join(' ');
+      list.replaceChildren(
+        ...d.matches.map((m) => {
+          const li = el('li', 'hit');
+          const head = el('div', 'hh');
+          head.append(el('span', 'layer', m.rule.layer), el('code', 'err', m.rule.error));
+          li.append(head, el('p', 'means', `Means ${m.means}.`));
+          const fix = el('p', 'fix');
+          fix.append(el('span', 'k', 'fix'), document.createTextNode(m.rule.fix));
+          li.append(fix, el('p', 'seen', `Seen in step ${m.seenIn}.`));
+          return li;
+        }),
+      );
+    };
+
+    let t: number | undefined;
+    area.addEventListener('input', () => {
+      clearTimeout(t);
+      t = window.setTimeout(run, 200);
+    });
+    root.querySelector('[data-act="sample"]')!.addEventListener('click', () => {
+      area.value = root.dataset.sample ?? '';
+      run();
+    });
+    root.querySelector('[data-act="clear"]')!.addEventListener('click', () => {
+      area.value = '';
+      area.focus();
+      run();
+    });
+    run();
+  }
+
+  onVisible('[data-widget="error-decoder"]', init);
+</script>
+
+<style>
+  .lbl {
+    display: block;
+    font-size: 12.5px;
+    color: var(--tx2);
+    margin: 0 0 6px;
+  }
+  textarea {
+    display: block;
+    width: 100%;
+    resize: vertical;
+    min-height: 140px;
+    box-sizing: border-box;
+    background: #08080a;
+    color: var(--tx);
+    border: 1px solid var(--line2);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.55;
+    padding: 10px 12px;
+  }
+  textarea:focus-visible {
+    outline: 2px solid var(--ac);
+    outline-offset: 1px;
+  }
+  .acts {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 14px;
+  }
+  .acts button {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx2);
+    background: var(--bg);
+    border: 1px solid var(--line2);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .acts button:hover {
+    color: var(--hi);
+  }
+  .widget p.sum {
+    font-size: 13.5px;
+    color: var(--tx);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  .hits {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .hits :global(.hit) {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--warn);
+    border-radius: 6px;
+    background: var(--bg);
+    padding: 10px 12px;
+  }
+  .hits :global(.hh) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin-bottom: 6px;
+  }
+  .hits :global(.layer) {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--warn);
+  }
+  .hits :global(.err) {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--hi);
+    background: none;
+    padding: 0;
+    overflow-wrap: anywhere;
+  }
+  .widget .hits :global(p) {
+    margin: 0 0 4px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .widget .hits :global(p.means) {
+    color: var(--tx2);
+  }
+  .widget .hits :global(p.fix) {
+    color: var(--tx);
+  }
+  .widget .hits :global(p.seen) {
+    color: var(--tx3);
+    font-size: 12px;
+  }
+  .hits :global(.k) {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+    margin-right: 8px;
+  }
+</style>

@@ -1,0 +1,205 @@
+---
+// Tick what you need; the seven Kubernetes candidates that fit, fastest first, and why the rest
+// are out. Logic in src/lib/gpu.ts; rows from data/cluster-matrix/matrix.csv and costs.csv.
+import { readCsv } from '../../lib/postData';
+import '../../styles/widget.css';
+
+const WHO = 'WhichCluster';
+const AT = 'labs/gpu-cluster';
+const matrix = readCsv('cluster-matrix', 'matrix.csv', WHO, AT);
+const costs = readCsv('cluster-matrix', 'costs.csv', WHO, AT);
+const NEEDS = [
+  { key: 'rationed', label: 'Kubernetes has to ration the GPU (nvidia.com/gpu)' },
+  { key: 'unprivileged', label: 'GPU pods must not be privileged' },
+  { key: 'stock', label: 'It has to work with no tuning' },
+  { key: 'noDockerDesktop', label: 'No Docker Desktop' },
+];
+---
+
+<div
+  class="widget wc"
+  data-widget="which-cluster"
+  data-matrix={JSON.stringify(matrix)}
+  data-costs={JSON.stringify(costs)}
+>
+  <p class="wt">Which local Kubernetes fits?</p>
+  <div class="stack">
+    <fieldset>
+      <legend>What I need</legend>
+      {NEEDS.map((n) => (
+        <label class="chk">
+          <input type="checkbox" data-need={n.key} />
+          {n.label}
+        </label>
+      ))}
+      <label class="num">
+        <input
+          type="number"
+          data-in="ram"
+          min="0"
+          step="50"
+          placeholder="any"
+          inputmode="numeric"
+        />
+        Most WSL RAM it may add, MiB
+      </label>
+    </fieldset>
+    <div>
+      <p class="sum" data-out="summary" aria-live="polite"></p>
+      <ol class="fit" data-out="fit"></ol>
+      <ul class="out" data-out="out"></ul>
+    </div>
+  </div>
+  <p class="formula">
+    Measured on one machine, an RTX 5060 under WSL2, on 2026-10-29. Cold is from nothing installed
+    to a verified GEMM; RAM is what the cluster added to WSL at idle.
+  </p>
+  <p class="src">
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/site/src/lib/gpu.ts">
+      code
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/data/cluster-matrix/matrix.csv">
+      matrix.csv
+    </a>{' '}
+    ·{' '}
+    <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/data/cluster-matrix/costs.csv">
+      costs.csv
+    </a>
+  </p>
+  <noscript>
+    <p class="formula">This lab needs JavaScript.</p>
+  </noscript>
+</div>
+
+<script>
+  import { chooseCluster, coldLabel, ramLabel, type Needs, type Row } from '../../lib/gpu';
+  import { onVisible } from '../../lib/onVisible';
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function init(root: HTMLElement) {
+    const matrix = JSON.parse(root.dataset.matrix ?? '[]') as Row[];
+    const costs = JSON.parse(root.dataset.costs ?? '[]') as Row[];
+    const summary = root.querySelector<HTMLElement>('[data-out="summary"]')!;
+    const fitList = root.querySelector<HTMLElement>('[data-out="fit"]')!;
+    const outList = root.querySelector<HTMLElement>('[data-out="out"]')!;
+    const ram = root.querySelector<HTMLInputElement>('[data-in="ram"]')!;
+    const need = (k: string) => root.querySelector<HTMLInputElement>(`[data-need="${k}"]`)!.checked;
+
+    const run = () => {
+      const needs: Needs = {
+        rationed: need('rationed'),
+        unprivileged: need('unprivileged'),
+        stock: need('stock'),
+        noDockerDesktop: need('noDockerDesktop'),
+        ramMib: ram.value === '' ? undefined : Number(ram.value),
+      };
+      const r = chooseCluster(matrix, costs, needs);
+      summary.textContent = r.fit.length
+        ? `${r.fit.length} of ${r.fit.length + r.out.length} fit. Fastest first:`
+        : 'None of the seven fits all of that.';
+      fitList.replaceChildren(
+        ...r.fit.map((c) => {
+          const li = el('li', 'cand');
+          const head = el('div', 'ch');
+          head.append(el('span', 'id', c.id), el('span', 'cold', coldLabel(c.coldToLevel50)));
+          li.append(
+            head,
+            el(
+              'p',
+              'meta',
+              `${c.version}; node: ${c.nodeIs}; adds ${ramLabel(c.ramMib)} of WSL RAM.`,
+            ),
+          );
+          const how = el('p', 'how');
+          how.append(el('span', 'k', 'how'), document.createTextNode(c.route));
+          li.append(how);
+          if (c.catch) li.append(el('p', 'catch', `Catch: ${c.catch}.`));
+          return li;
+        }),
+      );
+      outList.replaceChildren(
+        ...r.out.map((o) => el('li', undefined, `${o.candidate.id}: ${o.why.join('; ')}.`)),
+      );
+    };
+
+    root.addEventListener('change', run);
+    ram.addEventListener('input', run);
+    run();
+  }
+
+  onVisible('[data-widget="which-cluster"]', init);
+</script>
+
+<style>
+  .widget p.sum {
+    font-size: 13.5px;
+    color: var(--tx);
+    margin: 0 0 10px;
+  }
+  .widget label.num {
+    margin-top: 10px;
+  }
+  .fit {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .fit :global(.cand) {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ac);
+    border-radius: 6px;
+    background: var(--bg);
+    padding: 10px 12px;
+  }
+  .fit :global(.ch) {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .fit :global(.id) {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--hi);
+  }
+  .fit :global(.cold) {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ac);
+    white-space: nowrap;
+  }
+  .widget .fit :global(p) {
+    margin: 0 0 4px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .widget .fit :global(p.meta) {
+    color: var(--tx2);
+  }
+  .widget .fit :global(p.catch) {
+    color: var(--warn);
+  }
+  .fit :global(.k) {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+    margin-right: 8px;
+  }
+  .out {
+    margin: 12px 0 0 18px;
+    padding: 0;
+    font-size: 12.5px;
+    color: var(--tx3);
+    line-height: 1.6;
+  }
+</style>
