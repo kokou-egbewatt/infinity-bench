@@ -81,7 +81,7 @@ export const SERIES: Series[] = [
         id: 'cluster-matrix',
         title: 'Which local Kubernetes can run GPU work on WSL2',
         summary:
-          'I picked k3s for this machine in a hurry and never wrote down why. So I ran plain Docker, k3s, k3d, kind, minikube, Rancher Desktop and Docker Desktop against the same probe, and some of what I was sure about turned out to be wrong.',
+          'Before running any GPU work as pods, I needed a cluster that can use the GPU. So I ran plain Docker, k3s, k3d, kind, minikube, Rancher Desktop and Docker Desktop against the same probe, and some of what I was sure about turned out to be wrong.',
         sources: ib(22),
       },
       {
