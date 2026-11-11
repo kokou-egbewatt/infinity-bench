@@ -11,6 +11,7 @@ import LabLink from '../../components/post/LabLink.astro';
 import VramAccount from '../../components/widgets/VramAccount.astro';
 import KvCalc from '../../components/widgets/KvCalc.astro';
 import RunnerFigure from '../../components/figures/runners/RunnerFigure.astro';
+import GpuFigure from '../../components/figures/gpu/GpuFigure.astro';
 import { getPosts } from '../../lib/posts';
 import { readEnv, commitUrl, repoUrl } from '../../lib/env';
 import { isoDate, readTime } from '../../lib/format';
@@ -56,7 +57,15 @@ const repoLink =
         <HardwareBlock hardware={d.hardware} cost={d.cost} env={env} />
         <div class="prose">
           <Content
-            components={{ ResultsTable, PullQuote, VramAccount, KvCalc, RunnerFigure, LabLink }}
+            components={{
+              ResultsTable,
+              PullQuote,
+              VramAccount,
+              KvCalc,
+              RunnerFigure,
+              GpuFigure,
+              LabLink,
+            }}
           />
           <Changelog post={post} />
         </div>
