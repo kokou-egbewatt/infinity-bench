@@ -8,6 +8,25 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.12.0] - Which local Kubernetes can run GPU work on WSL2 (2026-11-11)
+
+**The cluster-matrix post is published, and its lab with it.** Seven local Kubernetes options,
+one GPU probe, and what each one needs to reach a verified GEMM with the GPU rationed
+([#22](https://github.com/kokou-egbewatt/infinity-bench/issues/22)).
+
+### Added
+
+- **The post**, from the data in `data/cluster-matrix/`: the requirements and what counts as
+  working, the noise floor, the four things a container needs on WSL2, the Docker ladder, the
+  seven candidates stock and tuned, what each costs, every error and what it means, and why
+  k3s.
+- **`/labs/gpu-cluster` on the site.** It was waiting for this post.
+
+### Changed
+
+- **The notebook and the Series summary no longer say k3s was picked before the comparison.**
+  The comparison is what chose it.
+
 ## [0.11.0] - The GPU cluster lab (2026-10-31)
 
 **Four tools from the cluster comparison, on a lab page of their own.** The page builds once the

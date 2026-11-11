@@ -1,0 +1,272 @@
+---
+title: Which local Kubernetes can run GPU work on WSL2
+dek: There are many ways to run models locally. This post tests seven local Kubernetes options against one GPU probe to find the best one for running GPU inference workloads on my machine.
+date: 2026-11-11
+topic: orchestration
+plan: cluster-matrix
+repo: infinity-bench
+hardware:
+  kind: local
+cost: "$0 · one machine, one day"
+harness: "722756a"
+data: cluster-matrix
+draft: false
+---
+
+Every GPU harness and inference workload on this blog is going to run as a pod, so before writing any of them I needed a Kubernetes cluster on this machine that can actually use the GPU. It is a Windows desktop with an RTX 5060, and everything Linux runs in WSL2. There are plenty of local Kubernetes options and most of them say they support GPUs, so rather than pick one and hope, I tested them: plain Docker as a control, then k3s, k3d, kind, minikube, Rancher Desktop and Docker Desktop in both its modes. One at a time, against the same probe, with the machine cleaned back to a blank slate between each.
+
+## 1. Requirements
+
+The cluster had to:
+
+- run a pod that does real CUDA work on the GPU, not just one that can see it;
+- let the scheduler ration the card, so a pod asks for the GPU and the next one waits instead of sharing it by accident;
+- run GPU pods without `privileged: true` if at all possible;
+- start quickly from nothing and stay light, since it shares the machine with everything else I do.
+
+Out of scope: more than one node, more than one GPU, and sharing the card between pods with MPS or time-slicing. Those get their own post.
+
+**What counts as working.** I wrote the rules down before running anything. Every candidate ran the same probe image, built once and loaded by its image ID. The probe climbs five levels and reports the highest one it reached:
+
+| Level | Meaning |
+| --- | --- |
+| 10 | nothing |
+| 20 | NVML initialised, so the driver is reachable |
+| 30 | a CUDA context |
+| 40 | a 2 GiB allocation |
+| **50** | **a GEMM ran and every element of the result checked out** |
+
+Only 50 counts. `nvidia-smi` printing a device name is level 20, and a pod at `Running` proves nothing at all.
+
+<PullQuote>A pod at `Running` with `nvidia.com/gpu: 1` and no driver in it is not a GPU pod. It is a pod.</PullQuote>
+
+Separately, each Kubernetes candidate was scored on whether `nvidia.com/gpu` becomes allocatable, because a GPU that only works when a pod goes around the scheduler is a different thing from one Kubernetes can hand out.
+
+Stock and tuned are separate results, and tuning got 45 minutes per candidate. Each candidate was its own step, and it was removed at the end of it, with the machine checked against the blank slate before the next one started. The tables below number the steps the same way: 01 the instrument, 02 the Docker ladder, 03 k3s, 04 k3d, 05 kind, 06 minikube, 07 Rancher Desktop, 08 Docker Desktop in kind mode and 08b in kubeadm mode.
+
+export const STEPS = {
+  '01': 'instrument',
+  '02': 'Docker ladder',
+  '03': 'k3s',
+  '04': 'k3d',
+  '05': 'kind',
+  '06': 'minikube',
+  '07': 'Rancher Desktop',
+  '08': 'Docker Desktop',
+};
+
+## 2. Expectations
+
+From what I had read, and from an earlier attempt with minikube, I went in fairly sure of three things:
+
+- **The GPU doesn't survive container nesting on WSL2.** So anything that runs its Kubernetes nodes as containers, like kind, k3d and minikube, can't do GPU work here. That minikube attempt had `nvidia-smi` working inside the node container, and I put it down to luck.
+- **A container needs three things to reach the GPU.** It needs four.
+- **minikube fails because of a limit in NVML.** It fails because one directory is missing.
+
+All three turned out to be wrong, and I would have ruled out kind and k3d without ever running them.
+
+## 3. Measuring VRAM
+
+Every VRAM number on this blog will be a whole-card before and after, because nothing on WSL2 can tell you how much a single process uses. Windows lists the processes on the GPU and reports `[N/A]` for every one of them; WSL2 and pods don't list them at all. So before measuring anything else, I measured the noise.
+
+Thirty samples of `memory.used`, two seconds apart, at the start of every step:
+
+<ResultsTable
+  file="floor.csv"
+  caption="The noise floor at the start of each step, in MiB. Spread is max minus min: the smallest difference the step could see."
+  columns={{
+    step: { label: 'Step', format: (v) => `${v} ${STEPS[v] ?? ''}` },
+    label: 'When',
+    median_mib: 'Median',
+    iqr_mib: 'IQR',
+    spread_mib: 'Spread',
+  }}
+/>
+
+The floor moved between 1 and 39 MiB depending on what the desktop was doing. Against that, a known 2048 MiB allocation read as 2048 to 2050 MiB, and a CUDA context on its own cost 113 MiB. So the instrument works, and anything smaller than the floor is a "can't tell", not a number. That rule mattered later: none of the seven clusters held any VRAM at idle, and every reading stayed inside its floor.
+
+To check a difference of your own against a floor, use the lab's <LabLink id="gpu-cluster" section="noise-floor">noise floor</LabLink> tool.
+
+## 4. What a container needs
+
+WSL2 has no NVIDIA kernel driver. Everything goes through the Windows driver, reached through a paravirtual device, and a container gets the GPU only when four things arrive together:
+
+| What | What you see without it |
+| --- | --- |
+| `/dev/dxg` | NVML fails, or CUDA finds no device |
+| `/usr/lib/wsl/lib`, on the loader path | `libnvidia-ml.so.1: cannot open shared object file` (exit 127) |
+| `/usr/lib/wsl/drivers`, the Windows driver store the libraries in `lib` load their code from | `nvml_init: Unable to load the NVML library` |
+| something that puts them there: the NVIDIA runtime, or mounts by hand | any of the above |
+
+The third one is the one I didn't know about. With only the device and `lib`, the probe stops at level 10 with "Unable to load the NVML library", which reads like a broken driver and isn't.
+
+## 5. The Docker ladder
+
+Before any Kubernetes, I wanted to know whether the GPU survives a container inside a container, because kind, k3d and minikube are exactly that: the node is a container, and the pod is a container inside it. So I built a ladder in plain Docker, ten rungs from no GPU at all up to a Docker daemon inside a privileged container running another container. Each rung ran three times, and all ten gave the same answer every time.
+
+<ResultsTable
+  file="ladder.csv"
+  caption="The nesting ladder. Level is the probe's highest level; none means it didn't start."
+  columns={{
+    rung: 'Rung',
+    outer: 'Outer container',
+    inner: 'Inner container',
+    level: 'Level',
+    error: 'Error',
+  }}
+/>
+
+`--gpus all` works one level deep and no further. It mounts individual files rather than the directories, so the container it starts has nothing to pass down. A Docker daemon inside it has no NVIDIA runtime of its own, and asking it for `--gpus` fails with `could not select device driver "" with capabilities: [[gpu]]`.
+
+The device and the two directories, passed down by hand with the loader path set, work at every depth I tried, with no NVIDIA toolkit involved anywhere. So the GPU does survive nesting on WSL2. What doesn't nest is `--gpus`.
+
+That predicted every container-node cluster that followed: each one fails stock, and each one can be fixed with mounts.
+
+## 6. Candidates
+
+export const short = (v) => v.replace(/\s*\(.*$/, '').replace(/:.*$/, '');
+export const name = (v) => (v === 'docker-plain' ? 'plain Docker (control)' : v);
+
+<ResultsTable
+  file="matrix.csv"
+  caption="Probe level a pod reaches, stock and tuned. Stock is the install as documented; tuned is the least I had to change to reach level 50 with the GPU rationed."
+  columns={{
+    candidate: { label: 'Candidate', format: name },
+    stock_best_level: { label: 'Stock', format: short },
+    tuned_level: 'Tuned',
+    tuned_schedulable: 'Rationed',
+    gpu_pods_privileged: 'Privileged pods',
+    unrequested_pod_can_get_gpu: { label: 'Unasked pod gets GPU', format: short },
+  }}
+  highlight={(r) => r.candidate === 'k3s'}
+/>
+
+<details class="fold">
+<summary>the full table: how each one gets there</summary>
+
+<ResultsTable
+  file="matrix.csv"
+  caption="Stock and tuned, with the route for each."
+  columns={{
+    candidate: { label: 'Candidate', format: name },
+    tool_version: 'Version',
+    node_is: 'The node is',
+    stock_best_level: 'Stock level',
+    stock_how: 'Stock, how',
+    tuned_route: 'Tuned route',
+    unrequested_pod_can_get_gpu: 'A pod that never asks for the GPU',
+    repeat_agreement: 'Repeats',
+  }}
+/>
+
+</details>
+
+Every one of them reaches a verified GEMM in the end, and every one can have the scheduler ration the card. What differs is how they get there, and there are two routes.
+
+**The runtime route: k3s and minikube.** The NVIDIA runtime injects everything, and pods stay unprivileged. Stock k3s finds the toolkit in the distro, adds an `nvidia` runtime to its containerd and creates an `nvidia` RuntimeClass, all without a flag from me, so a pod that names the RuntimeClass reaches level 50 on a fresh install. minikube's documented path, `--gpus=all`, stopped at level 10 with `Not Supported`, the same failure I had hit before. It isn't a limit in NVML. `--gpus` gave the node `/dev/dxg` and some driver-store files but no `/usr/lib/wsl/lib`, and the toolkit inside the node can only pass on what it was given. One more flag, `--mount-string=/usr/lib/wsl:/usr/lib/wsl`, and minikube reaches level 50 with unprivileged pods.
+
+The catch on this route is that rationing is opt-in. On k3s, any pod that names the RuntimeClass gets the GPU whether or not it asked for `nvidia.com/gpu`. On minikube, where `nvidia` is the node's default runtime, any image that sets `NVIDIA_VISIBLE_DEVICES=all` gets it, and every `nvidia/cuda` image does.
+
+**The mount route: k3d, kind, Rancher Desktop, and Docker Desktop in kubeadm mode.** The device and the two directories go into the node, then into each pod as hostPath volumes, and the device plugin gets the same mounts so it can count the card. Nothing reaches the GPU without mounting the paths itself, so rationing holds. The catch is that every GPU pod is privileged, and a pod that asks for the GPU but forgets the mounts gets scheduled with nothing in it.
+
+**Docker Desktop in kind mode** is the odd one out. Its node is a hidden container I can't add mounts to, so the only way through was to copy the driver files into every pod from an image, which ties the image to driver 621.01. It works, but I wouldn't run it.
+
+On both routes the device plugin needed the same fix. As published, it sat at `Running` with no restarts and never registered a GPU, because the plugin pod itself couldn't see the card. Giving its DaemonSet `runtimeClassName: nvidia` (or the mounts) was all it took.
+
+To find the one that fits what you need, try the lab's <LabLink id="gpu-cluster" section="which-cluster">which cluster</LabLink> tool.
+
+## 7. Cost
+
+<ResultsTable
+  file="costs.csv"
+  caption="Cold is from nothing installed. RAM is what the cluster added to WSL at idle. Ranges are the fastest and slowest of the timed cycles."
+  columns={{
+    candidate: 'Candidate',
+    cold_to_ready_s: { label: 'To Ready (s)', format: short },
+    cold_to_level50_s: { label: 'To level 50 (s)', format: short },
+    timed_cycles: 'Cycles',
+    wsl_ram_added_mib: { label: 'RAM (MiB)', format: short },
+  }}
+  highlight={(r) => r.candidate === 'k3s'}
+/>
+
+<details class="fold">
+<summary>the full table: disk, teardown, and what each leaves behind</summary>
+
+<ResultsTable
+  file="costs.csv"
+  caption="Everything measured about each candidate's footprint, with the notes as written."
+  columns={{
+    candidate: 'Candidate',
+    cold_to_ready_s: 'Cold to Ready (s)',
+    cold_to_level50_s: 'Cold to level 50 (s)',
+    wsl_ram_added_mib: 'WSL RAM added (MiB)',
+    disk_added_mb: 'Disk (MB)',
+    teardown_s: 'Teardown',
+    left_behind_after_its_own_teardown: 'Left behind',
+    notes: 'Notes',
+  }}
+/>
+
+</details>
+
+k3s gets to a working GPU pod about three times faster than anything else, 17 to 19 seconds from nothing, and adds about 370 MiB of RAM. The container-node clusters each add 600 to 670 MiB, and minikube takes nearly two minutes. Rancher Desktop costs 6.9 GB of disk, most of it its own data. None of them holds any VRAM.
+
+k3s, k3d, kind and minikube each got three timed cycles, and they agreed. Rancher Desktop and Docker Desktop got one cycle each, and Docker Desktop's was warm because it wouldn't let me remove its images.
+
+## 8. Errors
+
+Here is every distinct error the comparison hit, word for word, in the hope you can skip the detours they cost me:
+
+<details class="fold">
+<summary>the table: ten errors, and the message that means it works</summary>
+
+<ResultsTable
+  file="errors.csv"
+  caption="Each message as it was printed, where I saw it, and what it means. Steps are numbered as in section 1; L1 and L2 are rungs of the Docker ladder."
+  columns={{
+    error: 'Error',
+    seen_in: 'Seen in step',
+    means: 'Means',
+  }}
+/>
+
+</details>
+
+Most of them point one layer away from the real problem. "Cannot open shared object file" isn't a missing library in your image; it's a directory that never reached the container. "Insufficient nvidia.com/gpu" is often the right answer: the one GPU is taken. Paste any of them into the lab's <LabLink id="gpu-cluster" section="error-decoder">error decoder</LabLink> for the layer and the fix, or walk the stack from the Windows driver up with <LabLink id="gpu-cluster" section="layer-triage">layer triage</LabLink>.
+
+## 9. Side effects
+
+None of these are GPU results, but each one cost me time:
+
+- **WSL stops a distro about a minute after its last `wsl.exe` session closes**, and a k3s cluster in it dies with it. Docker Desktop and Rancher Desktop keep their own distros alive.
+- **Docker Desktop's Resource Saver restarts its engine**, and `restart: always` then brings back containers you stopped by hand.
+- **Docker Desktop hides its Kubernetes containers** from `docker ps -a`, and in kind mode it leaves the node running after you disable Kubernetes. Its settings file has to be edited while it's stopped, or it writes its old value back.
+- **Rancher Desktop starts Kubernetes 1.25.16** unless you set a version on a running instance, and uninstalling it without a factory reset first leaves 1.2 GB and two distros behind.
+- **dind and Docker Desktop's hidden containers leak anonymous volumes** unless they're removed with `-v`.
+- **Any minikube command recreates `~/.minikube`**, even `minikube version`, and kubectl on Windows writes `~/.kube/cache` whatever `KUBECONFIG` says.
+- **k3d's Windows build can't parse `-v ...:ro`.**
+
+## 10. Verdict
+
+k3s. Against the requirements in section 1 it is the fastest from nothing, the lightest, and along with minikube the only option where GPU pods run unprivileged. minikube is the runner-up on the same route, but it is six times slower to start and its rationing hole is wider. The mount-route options all work, but every GPU pod on them has to be privileged, which fails the third requirement.
+
+k3s has two catches, and both matter here:
+
+1. **It dies with its distro.** WSL stops the Ubuntu distro a minute after the last terminal closes, and the cluster goes with it.
+2. **Rationing is opt-in.** A pod that names the RuntimeClass without requesting `nvidia.com/gpu` gets the card anyway, and the scheduler thinks it's free. The VRAM harness I'm building next ([#10](https://github.com/kokou-egbewatt/infinity-bench/issues/10)) decides whether it has the card to itself by reading `nvidia.com/gpu` allocations, so a pod that goes around them is invisible to it.
+
+Fixing both, and turning k3s into a cluster I can leave running and drive with one command, is the next post. The full record of this one, every command with what it printed, is in the [notebook](https://github.com/kokou-egbewatt/infinity-bench/blob/main/docs/notebook/cluster-matrix.ipynb), and the scripts and the probe are in [`bench/cluster-matrix/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/cluster-matrix).
+
+If your numbers disagree with mine, I want to hear it.
+
+## 11. Sources
+
+- [NVIDIA: CUDA on WSL user guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html)
+- [NVIDIA k8s-device-plugin](https://github.com/NVIDIA/k8s-device-plugin)
+- [k3s: NVIDIA container runtime support](https://docs.k3s.io/advanced#nvidia-container-runtime-support)
+- [Kubernetes: RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/)
+- [minikube: using NVIDIA GPUs](https://minikube.sigs.k8s.io/docs/tutorials/nvidia/)
+- [kind: extra mounts](https://kind.sigs.k8s.io/docs/user/configuration/#extra-mounts)
+- [Microsoft: WSL configuration and idle timeout](https://learn.microsoft.com/en-us/windows/wsl/wsl-config)
