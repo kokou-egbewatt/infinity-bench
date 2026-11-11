@@ -98,11 +98,15 @@ WSL2 has no NVIDIA kernel driver. Everything goes through the Windows driver, re
 | `/usr/lib/wsl/drivers`, the Windows driver store the libraries in `lib` load their code from | `nvml_init: Unable to load the NVML library` |
 | something that puts them there: the NVIDIA runtime, or mounts by hand | any of the above |
 
+<GpuFigure scene="four-things" />
+
 The third one is the one I didn't know about. With only the device and `lib`, the probe stops at level 10 with "Unable to load the NVML library", which reads like a broken driver and isn't.
 
 ## 5. The Docker ladder
 
 Before any Kubernetes, I wanted to know whether the GPU survives a container inside a container, because kind, k3d and minikube are exactly that: the node is a container, and the pod is a container inside it. So I built a ladder in plain Docker, ten rungs from no GPU at all up to a Docker daemon inside a privileged container running another container. Each rung ran three times, and all ten gave the same answer every time.
+
+<GpuFigure scene="docker-ladder" />
 
 <ResultsTable
   file="ladder.csv"
@@ -163,6 +167,8 @@ export const name = (v) => (v === 'docker-plain' ? 'plain Docker (control)' : v)
 
 Every one of them reaches a verified GEMM in the end, and every one can have the scheduler ration the card. What differs is how they get there, and there are two routes.
 
+<GpuFigure scene="two-routes" />
+
 **The runtime route: k3s and minikube.** The NVIDIA runtime injects everything, and pods stay unprivileged. Stock k3s finds the toolkit in the distro, adds an `nvidia` runtime to its containerd and creates an `nvidia` RuntimeClass, all without a flag from me, so a pod that names the RuntimeClass reaches level 50 on a fresh install. minikube's documented path, `--gpus=all`, stopped at level 10 with `Not Supported`, the same failure I had hit before. It isn't a limit in NVML. `--gpus` gave the node `/dev/dxg` and some driver-store files but no `/usr/lib/wsl/lib`, and the toolkit inside the node can only pass on what it was given. One more flag, `--mount-string=/usr/lib/wsl:/usr/lib/wsl`, and minikube reaches level 50 with unprivileged pods.
 
 The catch on this route is that rationing is opt-in. On k3s, any pod that names the RuntimeClass gets the GPU whether or not it asked for `nvidia.com/gpu`. On minikube, where `nvidia` is the node's default runtime, any image that sets `NVIDIA_VISIBLE_DEVICES=all` gets it, and every `nvidia/cuda` image does.
@@ -176,6 +182,8 @@ On both routes the device plugin needed the same fix. As published, it sat at `R
 To find the one that fits what you need, try the lab's <LabLink id="gpu-cluster" section="which-cluster">which cluster</LabLink> tool.
 
 ## 7. Cost
+
+<GpuFigure scene="cold-race" />
 
 <ResultsTable
   file="costs.csv"
