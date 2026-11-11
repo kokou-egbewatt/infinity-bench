@@ -8,6 +8,21 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.13.0] - Figures for the cluster-matrix post (2026-11-11)
+
+**Four animated figures in the cluster-matrix post**, the ones 0.12.0 left for later.
+
+### Added
+
+- **What a container needs:** the three paths reach a container one at a time, and the probe
+  climbs from exit 127 to level 10 to level 50.
+- **The Docker ladder:** `--gpus` gets one level deep and stops; the device and two folders, passed
+  down by hand, reach level 50 at both levels.
+- **Two routes to a rationed GPU:** the runtime route and the mount route, with the catch on each.
+- **Cold to level 50:** every candidate racing from nothing installed to a verified GEMM, at one
+  eighth speed, drawn from `data/cluster-matrix/costs.csv`.
+- **`site/scripts/figures/gpu/`**, which generates them with the runner post's engine.
+
 ## [0.12.0] - Which local Kubernetes can run GPU work on WSL2 (2026-11-11)
 
 **The cluster-matrix post is published, and its lab with it.** Seven local Kubernetes options,
