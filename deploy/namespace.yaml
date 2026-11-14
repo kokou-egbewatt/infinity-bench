@@ -1,0 +1,8 @@
+# Where harness pods run. privileged is only for the hostPath that writes into data/<post>/;
+# the pods themselves are not privileged.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infinity-bench
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
