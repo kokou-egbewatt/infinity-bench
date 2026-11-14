@@ -1,0 +1,15 @@
+# What the desktop holds on the GPU before a model loads. See README.md.
+sample_interval_s: 1
+settle_s: 10          # wait after closing or reopening an app before sampling
+samples: 30           # per reading; a reading is the median of these
+trials: 3             # close and reopen each app this many times
+drift_flag_mib: 50    # flag a trial whose reopened reading is this far from the one before closing
+spread_flag_mib: 40   # flag a row whose trials disagree by more than this (standard deviation)
+
+keep_open: VS Code     # never closed: the run is driven from it; in the last reading too
+
+# Closed and reopened one at a time, in this order, while everything else stays open.
+consumers:
+  - { id: chrome, label: "Chrome, hardware acceleration on" }
+  - { id: discord, label: "Discord" }
+  - { id: second_monitor, label: "Second monitor, 4K" }

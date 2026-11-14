@@ -89,6 +89,25 @@ pod with no driver and no binaries of its own. It runs `nvidia-smi -L` and has t
 It also checks that a pod with only the GPU request, and one with only the RuntimeClass, both get
 rejected.
 
+### Harness pods
+
+Harnesses run in the `infinity-bench` namespace ([`deploy/`](../deploy/)), from one image built
+from [`bench/Dockerfile`](../bench/Dockerfile). There's no registry: `bench/run.sh` builds the
+image tagged with the commit, and imports it straight into k3s's containerd with
+`docker save | wsl -u root -- k3s ctr images import -`, so the pod uses `imagePullPolicy: Never`.
+The pod writes into the repo's `data/<post>/` through a `hostPath` on `/mnt/c`, as uid 1000, so the
+files stay editable from Windows.
+
+Freeing the card for a run, and giving it back:
+
+```sh
+kubectl get pods -A -o wide | grep -v Completed     # anything holding nvidia.com/gpu shows in task cluster:status
+kubectl -n <ns> scale deploy/<name> --replicas=0    # before
+kubectl -n <ns> scale deploy/<name> --replicas=1    # after
+```
+
+`run.sh` refuses to start while any pod holds `nvidia.com/gpu`, and names it.
+
 ## Windows toolchain
 
 I run `make` from Git Bash, and the repo lives at `C:\PROJECTS\infinity-bench`.
@@ -154,7 +173,10 @@ since that's where it runs anyway and it costs nothing in accuracy. Because noth
 single process, it measures each app by closing and reopening it: read with the app open, close
 it, let things settle, read again, reopen, read again. It never uses the per-process columns. The
 harness pod's own NVML handle is in every reading and doesn't change between them, so it cancels
-out. `desktop_tax_mb` is recorded with it included, and the post says so.
+out. `desktop_tax_mb` is recorded with it included, and the post says so. Because the noise moves
+from session to session, it measures the floor first, in the same run, and a difference that
+doesn't clear it is reported as not measurable. The details are in
+[bench/vram-accounting](../bench/vram-accounting/README.md).
 
 How I got here, and what to do when the GPU goes missing from one of these layers, is in
 [gpu-debug.md](gpu-debug.md).
