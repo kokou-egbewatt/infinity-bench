@@ -1,0 +1,19 @@
+shutdown at 22:47:37
+Ready with nvidia.com/gpu=1 9s after wsl --shutdown (22:47:51)
+  ✅ WSL distro          Ubuntu running
+  ✅ WSL passthrough     /dev/dxg present
+  ✅ container toolkit   nvidia-container-toolkit 1.20.1-1
+  ✅ k3s                 v1.36.5+k3s1
+  ✅ k3s service         active, enabled at boot
+  ✅ containerd runtime  nvidia runtime configured
+  ✅ node                gpu-lab Ready, created 1h26m23s ago
+  ✅ RuntimeClass        nvidia -> nvidia
+  ❌ device plugin       "0/1" ready: check `kubectl -n kube-system logs ds/nvidia-device-plugin-daemonset`
+  ❌ nvidia.com/gpu      not allocatable: a plugin that is Running but logs `Incompatible strategy` lacks runtimeClassName
+  ✅ admission policy    GPU request and RuntimeClass must come together
+  ✅ GPU in use          no running pod holds nvidia.com/gpu
+  ✅ kubeconfig          context gpu-lab in the Windows kubeconfig
+cluster: unhealthy: the first ❌ is the layer to fix
+exit status 1
+task: Failed to run task "cluster:status": exit status 1
+plugin ready=1 allocatable=1 at 22:48:13

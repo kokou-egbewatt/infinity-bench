@@ -1,0 +1,12 @@
+task: [cluster:delete] go run ./tools/cluster delete 
+delete removes, and cannot undo:
+  k3s in Ubuntu (k3s-uninstall.sh), with every pod, volume and image
+  /etc/rancher and /var/lib/rancher in Ubuntu
+  the Scheduled Task "gpu-lab keepalive"
+  the gpu-lab context, cluster and user in C:\Users\<user>\.kube\config
+it keeps the distro and nvidia-container-toolkit.
+cluster: not deleted: run again with -yes
+exit status 1
+task: Failed to run task "cluster:delete": exit status 1
+exit=201
+gpu-lab   Ready   control-plane   89m   v1.36.5+k3s1

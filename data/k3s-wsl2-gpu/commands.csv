@@ -1,0 +1,7 @@
+command,run,wall_s,changed,raw
+start,first run after a config change,7.7,"config.yaml, device plugin manifests, k3s restarted",start-twice.txt
+start,second run,2.2,nothing,start-twice.txt
+pause,,4.0,"k3s stopped and disabled; node, volumes and images kept",pause-resume.txt
+resume,after pause,20.5,k3s started; Ready and nvidia.com/gpu allocatable,pause-resume.txt
+stop,,5.2,"k3s stopped, keepalive task disabled, Ubuntu terminated",stop-resume.txt
+resume,after stop,23.7,"keepalive enabled and started, k3s started; Ready and nvidia.com/gpu allocatable",stop-resume.txt

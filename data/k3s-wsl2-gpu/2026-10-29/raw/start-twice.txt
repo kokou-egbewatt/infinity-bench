@@ -1,0 +1,37 @@
+### run 1 22:30:31
+task: [cluster:start] go run ./tools/cluster start 
+keepalive
+k3s in Ubuntu
+  changed /etc/rancher/k3s/config.yaml
+  ok /var/lib/rancher/k3s/server/manifests/gpu-admission-policy.yaml
+  changed /var/lib/rancher/k3s/server/manifests/nvidia-device-plugin.yaml
+  changed /var/lib/rancher/k3s/server/manifests/nvidia-device-plugin-config.yaml
+  ok k3s v1.36.5+k3s1
+  changed k3s restarted for /etc/rancher/k3s/config.yaml
+  ready=True
+  allocatable=1
+kubeconfig
+  ok context gpu-lab in C:\Users\<user>\.kube\config
+
+real	0m7.661s
+user	0m0.015s
+sys	0m0.000s
+exit=0
+### run 2 22:30:39
+task: [cluster:start] go run ./tools/cluster start 
+keepalive
+k3s in Ubuntu
+  ok /etc/rancher/k3s/config.yaml
+  ok /var/lib/rancher/k3s/server/manifests/gpu-admission-policy.yaml
+  ok /var/lib/rancher/k3s/server/manifests/nvidia-device-plugin.yaml
+  ok /var/lib/rancher/k3s/server/manifests/nvidia-device-plugin-config.yaml
+  ok k3s v1.36.5+k3s1
+  ready=True
+  allocatable=1
+kubeconfig
+  ok context gpu-lab in C:\Users\<user>\.kube\config
+
+real	0m2.244s
+user	0m0.000s
+sys	0m0.015s
+exit=0
