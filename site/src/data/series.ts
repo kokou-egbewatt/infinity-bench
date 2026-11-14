@@ -103,7 +103,7 @@ export const SERIES: Series[] = [
       {
         priority: 2,
         id: 'k3s-wsl2-gpu',
-        title: 'k3s in WSL2 as a server, by one command',
+        title: 'k3s GPU Cluster',
         summary:
           'k3s won the comparison and dies a minute after the last terminal closes. A keepalive, a device plugin that registers the card and an admission policy turn it into a cluster I can leave running, paused and resumed by one command.',
         sources: [...nm(21), ...ib(2)],

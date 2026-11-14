@@ -1,0 +1,19 @@
+task: [cluster:status] go run ./tools/cluster status -probe
+  ✅ Windows driver      NVIDIA GeForce RTX 5060, 621.01
+  ✅ keepalive           task "gpu-lab keepalive" running
+  ✅ WSL distro          Ubuntu running
+  ✅ WSL passthrough     /dev/dxg present
+  ✅ container toolkit   nvidia-container-toolkit 1.20.1-1
+  ✅ k3s                 v1.36.5+k3s1
+  ✅ k3s service         active, enabled at boot
+  ✅ containerd runtime  nvidia runtime configured
+  ✅ node                gpu-lab Ready, created 1h10m28s ago
+  ✅ RuntimeClass        nvidia -> nvidia
+  ✅ device plugin       1 pod ready
+  ✅ nvidia.com/gpu      1 allocatable
+  ✅ admission policy    GPU request and RuntimeClass must come together
+  ✅ GPU in use          no running pod holds nvidia.com/gpu
+  ✅ kubeconfig          context gpu-lab in the Windows kubeconfig
+  ✅ probe pod           GPU 0: NVIDIA GeForce RTX 5060 (UUID: <gpu-uuid>)
+  ✅ policy              rejects RuntimeClass without a GPU request
+  ✅ policy              rejects GPU request without the RuntimeClass

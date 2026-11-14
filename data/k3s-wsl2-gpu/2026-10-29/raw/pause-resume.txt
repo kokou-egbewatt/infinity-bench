@@ -1,0 +1,27 @@
+before: node=2026-10-29T21:21:29Z pv=pvc-ef31b299-28ea-4c6d-b676-89470ba23309 marker=Thu Oct 29 22:49:26 UTC 2026
+### pause
+task: [cluster:pause] go run ./tools/cluster pause
+  changed k3s stopped and disabled; node, volumes and images kept
+
+real	0m3.999s
+k3s processes after pause: 1
+k3s enabled: disabled
+Unable to connect to the server: dial tcp [::1]:6443: connectex: No connection could be made because the target machine actively refused it.
+  ✅ keepalive           task "gpu-lab keepalive" running
+  ⚠️  k3s service         paused (disabled): run resume
+### resume
+task: [cluster:resume] go run ./tools/cluster resume 
+keepalive
+  ok keepalive task
+  ok keepalive running
+k3s in Ubuntu
+  changed k3s started
+  ready=True
+  allocatable=1
+
+real	0m20.504s
+after:  node=2026-10-29T21:21:29Z pv=pvc-ef31b299-28ea-4c6d-b676-89470ba23309 marker=Thu Oct 29 22:49:26 UTC 2026
+  changed k3s stopped and disabled; node, volumes and images kept
+k3s+containerd processes, cni interfaces after pause: 0 0
+  ready=True
+  allocatable=1

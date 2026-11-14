@@ -1,0 +1,27 @@
+### stop
+task: [cluster:stop] go run ./tools/cluster stop
+  changed k3s stopped and disabled; node, volumes and images kept
+  changed keepalive task stopped and disabled
+  changed Ubuntu terminated; WSL returns its memory once no other distro runs
+
+real	0m5.171s
+wsl -l -v:
+  NAME              STATE           VERSION
+* Ubuntu            Stopped         2
+  docker-desktop    Running         2
+  ⚠️  keepalive           task "gpu-lab keepalive" is Disabled: the distro stops when no terminal is open (stopped with `stop`?)
+  ⚠️  WSL distro          Ubuntu is Stopped: run resume
+### resume
+task: [cluster:resume] go run ./tools/cluster resume 
+keepalive
+  ok keepalive task
+  changed keepalive task enabled
+  changed keepalive task started
+k3s in Ubuntu
+  changed k3s started
+  ready=True
+  allocatable=1
+
+real	0m23.727s
+node created 2026-10-29T21:21:29Z
+marker after stop/resume: Thu Oct 29 22:49:26 UTC 2026

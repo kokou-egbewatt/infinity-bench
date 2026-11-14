@@ -1,0 +1,178 @@
+---
+title: k3s GPU Cluster
+dek: k3s won the comparison but dies a minute after the last terminal closes, and its GPU rationing is opt-in. This is how I turned it into a cluster I can leave running, and drive with one command.
+date: 2026-11-14
+topic: platform
+plan: k3s-wsl2-gpu
+repo: NeuroMesh
+hardware:
+  kind: local
+cost: "$0 · one machine"
+harness: "21c352d"
+data: k3s-wsl2-gpu
+---
+
+In [the comparison](/posts/which-local-kubernetes-can-run-gpu-work-on-wsl2/), k3s was the fastest and lightest way to run GPU pods on this machine, and the only one besides minikube where those pods run unprivileged. It also came with two catches: WSL stops its distro about a minute after the last terminal closes, taking the cluster with it, and any pod that names the `nvidia` RuntimeClass gets the GPU whether or not it asked for it.
+
+Both had to go before the cluster could carry anything I care about. The result is `gpu-lab`, run by `task cluster:*` from [NeuroMesh's `tools/cluster`](https://github.com/kokou-egbewatt/NeuroMesh/tree/main/tools/cluster), and shared by NeuroMesh and this blog.
+
+## 1. Goals
+
+The cluster had to:
+
+- stay up with no terminal open, and come back on its own after `wsl --shutdown` or a reboot;
+- advertise the GPU so the scheduler rations it, with no way for a pod to go around that;
+- be built, paused, resumed and removed by one command each, where running a command twice changes nothing;
+- serve both NeuroMesh and the harnesses on this blog.
+
+Out of scope: more than one node, a local image registry, and the Windows relay. Those are still open on [NeuroMesh#21](https://github.com/kokou-egbewatt/NeuroMesh/issues/21).
+
+## 2. Keepalive
+
+<PullQuote>`wsl.exe` exits 0 when its distro is terminated, so restart-on-failure never fires.</PullQuote>
+
+WSL stops a distro about a minute after its last `wsl.exe` session ends. A k3s server in that distro stops with it, and every pod gets recreated when something wakes it again. So something has to hold a session open.
+
+My first keepalive was a per-user Scheduled Task, started at logon, running a hidden `wsl.exe -d Ubuntu --exec /bin/sleep infinity` with restart-on-failure every minute. No admin and no window. It held the cluster up fine, until I tested `wsl --terminate`: `wsl.exe` exited cleanly, Task Scheduler recorded success, and nothing restarted. The cluster stayed down.
+
+The task has to loop by itself:
+
+```powershell
+while ($true) { & wsl.exe -d Ubuntu --exec /bin/sleep infinity; Start-Sleep -Seconds 5 }
+```
+
+<ResultsTable
+  file="recovery.csv"
+  caption="How long the cluster takes to come back, in seconds, from the timestamps in the raw output."
+  columns={{
+    event: 'What stopped it',
+    keepalive: 'Keepalive',
+    node_ready_s: 'Node Ready',
+    gpu_allocatable_s: 'GPU allocatable',
+  }}
+/>
+
+With the loop, the node is Ready 14 seconds after `wsl --shutdown` and the GPU is allocatable again at 36 seconds; the difference is the device plugin re-registering. Left alone for 15 minutes with no terminal of mine open, the node stayed Ready with nothing restarted.
+
+## 3. Device plugin
+
+The NVIDIA device plugin, as published, sat at `Running` on k3s with no restarts and never registered a GPU. Its log said why:
+
+```text
+Incompatible strategy detected auto
+invalid device discovery strategy
+```
+
+The plugin counts the card through NVML, so its own pod needs the driver, and on k3s the driver only reaches pods that use the `nvidia` RuntimeClass. One line on its DaemonSet fixes it:
+
+```yaml
+spec:
+  template:
+    spec:
+      runtimeClassName: nvidia
+```
+
+After that the log reads `Detected platform: wsl` and `Registered device plugin for 'nvidia.com/gpu'`, and the node shows `nvidia.com/gpu: 1`. Time-slicing stays at one replica: the cluster is shared with the VRAM measurements on this blog, and time-slicing shares compute, not memory, so every replica would see the whole card.
+
+## 4. Admission policy
+
+With the RuntimeClass and the device plugin both in place, there are still two ways to get it wrong:
+
+- a pod that names the RuntimeClass without requesting `nvidia.com/gpu` gets the GPU, and the scheduler thinks the card is free;
+- a pod that requests `nvidia.com/gpu` without the RuntimeClass holds the card with no driver in it.
+
+A ValidatingAdmissionPolicy rejects both, so the only pod that reaches the GPU is one the scheduler counted:
+
+```yaml
+validations:
+- expression: "!variables.nvidiaRuntime || variables.wantsGpu"
+  message: runtimeClassName nvidia without a nvidia.com/gpu limit would use the GPU without the scheduler knowing.
+- expression: "!variables.wantsGpu || variables.nvidiaRuntime"
+  message: nvidia.com/gpu requested without runtimeClassName nvidia would hold the GPU with no driver.
+```
+
+`kube-system` is exempt, because the device plugin itself runs with the RuntimeClass and requests nothing. With the policy in place, "is `nvidia.com/gpu` allocated" is a complete answer to "is anyone else on the card", which is exactly what the VRAM harness ([#10](https://github.com/kokou-egbewatt/infinity-bench/issues/10)) checks before it measures.
+
+## 5. One cluster
+
+I wanted NeuroMesh to have its own distro and its own cluster. It can't: every plain WSL2 distro on this machine shares one network namespace, so a second k3s finds ports 6443 and 10250 already taken by the first. So there is one cluster, `gpu-lab`, and both repositories use it. The rule that follows is that before any VRAM measurement, no pod holds the GPU and NeuroMesh's GPU workloads are scaled to zero.
+
+Two smaller fixes came out of sharing it:
+
+- **The kubeconfig stays readable.** k3s rewrites `/etc/rancher/k3s/k3s.yaml` as root-only on every start, so `kubectl` inside WSL broke after every restart until I set `write-kubeconfig-mode: "0644"`.
+- **Windows kubectl doesn't depend on the node's IP.** The `gpu-lab` context points at `localhost:6443`, which WSL forwards, so it survives the distro getting a new address.
+
+## 6. Commands
+
+Everything above is set up and checked by six commands:
+
+```sh
+task cluster:start     # set up or fix the cluster, wait for Ready and the GPU
+task cluster:status    # check every layer from the Windows driver up; -- -probe also runs a GPU pod
+task cluster:pause     # stop k3s and every pod; keep the node, volumes and images
+task cluster:resume
+task cluster:stop      # pause, then let the distro stop and give its memory back
+task cluster:delete -- -yes
+```
+
+<ResultsTable
+  file="commands.csv"
+  caption="Wall time for each command on this machine, and what it changed."
+  columns={{
+    command: 'Command',
+    run: 'Run',
+    wall_s: 'Seconds',
+    changed: 'What changed',
+  }}
+/>
+
+`start` prints `ok` or `changed` for every piece it manages, so a second run is a list of `ok` lines and takes about two seconds. `pause` and `stop` keep the node, its volumes and its images; I checked by writing a marker file to a volume before pausing and reading it back after resuming. `delete` without `-yes` only lists what it would remove (k3s with every pod, volume and image, `/etc/rancher` and `/var/lib/rancher`, the keepalive task, and the `gpu-lab` entries in the Windows kubeconfig) and that it keeps the distro and the toolkit.
+
+## 7. Status
+
+`task cluster:status` checks each layer in the order a GPU reaches a pod, and stops being green at the first one that is broken:
+
+```text
+✅ Windows driver      NVIDIA GeForce RTX 5060, 621.01
+✅ keepalive           task "gpu-lab keepalive" running
+✅ WSL distro          Ubuntu running
+✅ WSL passthrough     /dev/dxg present
+✅ container toolkit   nvidia-container-toolkit 1.20.1-1
+✅ k3s                 v1.36.5+k3s1
+✅ k3s service         active, enabled at boot
+✅ containerd runtime  nvidia runtime configured
+✅ node                gpu-lab Ready
+✅ RuntimeClass        nvidia -> nvidia
+✅ device plugin       1 pod ready
+✅ nvidia.com/gpu      1 allocatable
+✅ admission policy    GPU request and RuntimeClass must come together
+✅ GPU in use          no running pod holds nvidia.com/gpu
+✅ kubeconfig          context gpu-lab in the Windows kubeconfig
+```
+
+With `-probe` it also runs a plain `ubuntu:24.04` pod, with no driver and no binaries of its own, that has to list the card with `nvidia-smi -L`, and checks that the policy rejects both half-shaped pods. Run in the seconds after `wsl --shutdown`, before the device plugin is back, it says exactly what is still coming up:
+
+```text
+❌ device plugin       "0/1" ready: check `kubectl -n kube-system logs ds/nvidia-device-plugin-daemonset`
+❌ nvidia.com/gpu      not allocatable: a plugin that is Running but logs `Incompatible strategy` lacks runtimeClassName
+```
+
+The same walk, without a cluster to run it against, is the lab's <LabLink id="gpu-cluster" section="layer-triage">layer triage</LabLink>.
+
+## 8. What's left
+
+[NeuroMesh#21](https://github.com/kokou-egbewatt/NeuroMesh/issues/21) stays open for the parts this doesn't cover yet: a local registry mirror and the `task image:*` path ([NeuroMesh#14](https://github.com/kokou-egbewatt/NeuroMesh/issues/14)), the Windows relay, sizing `.wslconfig` from the machine instead of by hand, and the decision about CI.
+
+The numbers here are in [`data/k3s-wsl2-gpu/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/k3s-wsl2-gpu), and the code is in NeuroMesh at the commit in the environment block.
+
+If your numbers disagree with mine, I want to hear it.
+
+## 9. Sources
+
+- [Microsoft: WSL configuration and idle timeout](https://learn.microsoft.com/en-us/windows/wsl/wsl-config)
+- [k3s: NVIDIA container runtime support](https://docs.k3s.io/advanced#nvidia-container-runtime-support)
+- [k3s: configuration file](https://docs.k3s.io/installation/configuration#configuration-file)
+- [NVIDIA k8s-device-plugin](https://github.com/NVIDIA/k8s-device-plugin)
+- [Kubernetes: ValidatingAdmissionPolicy](https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/)
+- [Kubernetes: RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/)
+- [Microsoft: Register-ScheduledTask](https://learn.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask)

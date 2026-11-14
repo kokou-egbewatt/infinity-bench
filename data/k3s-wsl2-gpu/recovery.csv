@@ -1,0 +1,5 @@
+event,keepalive,node_ready_s,gpu_allocatable_s,timed_by,raw
+wsl --shutdown,looping task,14,36,timestamps (the script printed 9 s for Ready),2026-10-29/raw/shutdown-recovery.txt
+wsl --terminate,task that runs wsl.exe once,stayed down,stayed down,"the wait gave up at 180 s, and kubectl still could not connect after it",../cluster-matrix/2026-10-29/10-rebuild/raw/terminate-test.txt
+wsl --terminate,looping task,12,20,"timestamps for Ready (the script printed 9 s); allocatable as printed",../cluster-matrix/2026-10-29/10-rebuild/raw/terminate-test-loop.txt
+15 minutes with no terminal open,looping task,stayed Ready,stayed 1,"node unchanged, pod restarts 12 before and after",2026-10-29/raw/idle-15min.txt
