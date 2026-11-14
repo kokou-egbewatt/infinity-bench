@@ -101,3 +101,11 @@ def test_keep_open_names_what_stayed_open():
     last = rows[-1]
     assert last["label"] == "The desktop and VS Code"
     assert "VS Code left open" in last["note"]
+
+
+def test_bare_false_skips_the_last_reading():
+    d = FakeDesktop({"chrome": 600, "tiny": 2})
+    rows, *_ = harness.run(
+        {**CFG, "bare": False}, d.read, d.ask, sleep=lambda s: None, log=lambda m: None
+    )
+    assert [r["consumer_id"] for r in rows] == ["desktop", "chrome", "tiny"]

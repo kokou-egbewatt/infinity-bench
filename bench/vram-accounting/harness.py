@@ -142,22 +142,23 @@ def run(
             )
         rows.append(consumer_row(c["id"], c["label"], trials, floor, cfg))
 
-    keep = cfg.get("keep_open")
-    ask(f"Close every app but {keep}." if keep else "Close every app.")
-    sleep(settle)
-    bare = reading("dwm", "closed")
-    rows.append(
-        {
-            "consumer_id": "dwm",
-            "label": f"The desktop and {keep}" if keep else "The desktop alone",
-            "vram_mib": float(bare.median),
-            "stddev_mib": None,
-            "trials": 1,
-            "samples": n,
-            "note": f"everything else closed{f', {keep} left open' if keep else ''}; "
-            "includes the harness pod's NVML handle",
-        }
-    )
+    if cfg.get("bare", True):  # the reading with every app closed; a focused pass can skip it
+        keep = cfg.get("keep_open")
+        ask(f"Close every app but {keep}." if keep else "Close every app.")
+        sleep(settle)
+        bare = reading("dwm", "closed")
+        rows.append(
+            {
+                "consumer_id": "dwm",
+                "label": f"The desktop and {keep}" if keep else "The desktop alone",
+                "vram_mib": float(bare.median),
+                "stddev_mib": None,
+                "trials": 1,
+                "samples": n,
+                "note": f"everything else closed{f', {keep} left open' if keep else ''}; "
+                "includes the harness pod's NVML handle",
+            }
+        )
     ask("Done measuring. Reopen whatever you like.")
     return rows, raw, floor, float(base.median)
 
