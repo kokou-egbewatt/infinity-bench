@@ -213,7 +213,9 @@ def main(config: Path | None = None, go_dir: Path | None = None):
         _rmdir(go_dir)
 
     day = capture_env.now().date().isoformat()
-    io.write_results("results.csv", rows, FIELDS)
+    sub = cfg.get("subdir", "")  # a second run with another config goes beside the first
+    base = io.out_dir() / sub
+    io.write_results("results.csv", rows, FIELDS, base=base)
     io.write_results(
         f"{day}/raw/samples.csv",
         [
@@ -222,6 +224,7 @@ def main(config: Path | None = None, go_dir: Path | None = None):
             for i, v in enumerate(r.samples)
         ],
         ["consumer_id", "state", "i", "used_mib"],
+        base=base,
     )
     env["desktop_tax_mb"] = tax
     env["vram_accounting"] = {
@@ -229,8 +232,9 @@ def main(config: Path | None = None, go_dir: Path | None = None):
         "memory_info": "v2" if nvml.v2 else "v1",
         **{k: cfg[k] for k in ("samples", "sample_interval_s", "settle_s", "trials")},
     }
-    io.write_env(env)
-    typer.echo(f"\nWrote results.csv, {day}/raw/samples.csv and env.json. Tax {tax:.0f} MiB.")
+    io.write_env(env, base=base)
+    where = f"{sub}/" if sub else ""
+    typer.echo(f"\nWrote {where}results.csv, raw samples and env.json. Tax {tax:.0f} MiB.")
 
 
 if __name__ == "__main__":

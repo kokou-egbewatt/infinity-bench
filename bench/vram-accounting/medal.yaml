@@ -1,0 +1,14 @@
+# One pass with Medal, the clip recorder, which config.yaml left out. Writes to
+# data/vram-accounting/medal/ so it doesn't replace the main run.
+subdir: medal
+sample_interval_s: 1
+settle_s: 30
+samples: 30
+trials: 1
+drift_flag_mib: 50
+spread_flag_mib: 40
+
+keep_open: VS Code
+
+consumers:
+  - { id: medal, label: "Medal" }
