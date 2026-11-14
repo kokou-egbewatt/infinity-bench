@@ -24,10 +24,10 @@ So every app is measured by difference, from whole-card `memory.used` read throu
 
 1. With everything open, it takes 30 one-second samples. Their median is the desktop tax
    (`desktop_tax_mb` in `env.json`), and their range is the noise floor.
-2. For each app, three times: read, close it, wait 10 s, read, reopen it, wait 10 s, read. The
+2. For each app, three times: read, close it, wait 30 s, read, reopen it, wait 30 s, read. The
    app's figure is the median of open minus closed. The reading after reopening is the next
    trial's open reading.
-3. Last, with every app closed but VS Code (`keep_open`) and one monitor, a reading of what's left.
+3. Last, with every app closed but VS Code (`keep_open`), a reading of what's left.
 
 VS Code is never closed, because the run is driven from it, so it has no row of its own and it is in
 the last reading.
@@ -48,6 +48,5 @@ A reading is always the median of 30 samples.
   cancels out of the differences, but it is in the desktop tax and in the last reading.
 - An idle CUDA context isn't measured here, because gpu-lab has one GPU slot and the harness holds
   it. The cluster-matrix work measured it at 113 MiB.
-- The second monitor's figure depends on its resolution and refresh rate.
-- Chrome's GPU process can take 20 to 30 s to let go of its memory. If its trials disagree, raise
-  `settle_s` and say so.
+- Chrome's GPU process can take 20 to 30 s to let go of its memory, and longer to settle after it
+  reopens, which is why `settle_s` is 30. Wait for it to finish loading before you confirm.

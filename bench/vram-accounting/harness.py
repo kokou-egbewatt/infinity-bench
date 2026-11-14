@@ -143,14 +143,13 @@ def run(
         rows.append(consumer_row(c["id"], c["label"], trials, floor, cfg))
 
     keep = cfg.get("keep_open")
-    but = f"the desktop and {keep}" if keep else "the desktop itself"
-    ask(f"Close everything but {but}: every other app, and the second monitor.")
+    ask(f"Close every app but {keep}." if keep else "Close every app.")
     sleep(settle)
     bare = reading("dwm", "closed")
     rows.append(
         {
             "consumer_id": "dwm",
-            "label": f"The desktop{f' and {keep}' if keep else ''}, one monitor",
+            "label": f"The desktop and {keep}" if keep else "The desktop alone",
             "vram_mib": float(bare.median),
             "stddev_mib": None,
             "trials": 1,

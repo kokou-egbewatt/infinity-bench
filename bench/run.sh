@@ -96,6 +96,7 @@ left=$(envsubst "$vars" <deploy/harness-pod.yaml | grep -o '\${[A-Za-z0-9_]*}' |
 
 kubectl --context "$CONTEXT" apply -f deploy/namespace.yaml >/dev/null
 trap 'kubectl --context "$CONTEXT" -n "$NS" delete pod "$POD" --wait=false >/dev/null 2>&1 || true' EXIT
+trap 'exit 130' INT TERM HUP  # so EXIT runs, and the pod goes, when the run is stopped
 envsubst "$vars" <deploy/harness-pod.yaml | kubectl --context "$CONTEXT" apply -f - >/dev/null
 kubectl --context "$CONTEXT" -n "$NS" wait --for=condition=Ready "pod/$POD" --timeout=120s >/dev/null
 

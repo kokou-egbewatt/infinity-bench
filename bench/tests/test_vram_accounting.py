@@ -39,7 +39,7 @@ class FakeDesktop:
             self.open.discard(msg.split("]")[0][1:].split()[0])
         elif msg.startswith("[") and "Reopen " in msg:
             self.open.add(msg.split("]")[0][1:].split()[0])
-        elif msg.startswith("Close everything"):
+        elif msg.startswith("Close every app"):
             self.open.clear()
 
 
@@ -99,5 +99,5 @@ def test_keep_open_names_what_stayed_open():
     cfg = {**CFG, "keep_open": "VS Code"}
     rows, *_ = harness.run(cfg, d.read, d.ask, sleep=lambda s: None, log=lambda m: None)
     last = rows[-1]
-    assert last["label"] == "The desktop and VS Code, one monitor"
+    assert last["label"] == "The desktop and VS Code"
     assert "VS Code left open" in last["note"]
