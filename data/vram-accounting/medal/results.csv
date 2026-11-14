@@ -1,0 +1,4 @@
+consumer_id,label,vram_mib,stddev_mib,trials,samples,note
+desktop,Everything open,2461.0,,1,30,noise floor 28 MiB
+medal,Medal,191.0,,1,30,trial 1 did not come back within 50 MiB
+dwm,The desktop and VS Code,1392.0,,1,30,"everything else closed, VS Code left open; includes the harness pod's NVML handle"
