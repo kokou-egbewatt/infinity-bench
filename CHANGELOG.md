@@ -8,6 +8,19 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.14.0] - k3s GPU Cluster (2026-11-14)
+
+**The k3s-wsl2-gpu post.** How the comparison's winner became a cluster I can leave running: a
+keepalive that loops, a device plugin that registers the card, an admission policy that closes
+opt-in rationing, and NeuroMesh's `task cluster:*` to drive it.
+
+### Added
+
+- **The post**, with `repo: NeuroMesh` and its harness at NeuroMesh `21c352d`, per ADR-0003.
+- **`data/k3s-wsl2-gpu/`:** `commands.csv` (wall time and what changed for each command),
+  `recovery.csv` (how long the cluster takes to come back after WSL stops it), and the raw output
+  each row comes from.
+
 ## [0.13.0] - Figures for the cluster-matrix post (2026-11-11)
 
 **Four animated figures in the cluster-matrix post**, the ones 0.12.0 left for later.
