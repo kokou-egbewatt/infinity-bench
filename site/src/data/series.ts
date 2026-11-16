@@ -87,7 +87,7 @@ export const SERIES: Series[] = [
       {
         priority: 3,
         id: 'vram-accounting',
-        title: 'VRAM accounting on Windows: how much of the 8 GB is actually free',
+        title: 'How much of the 8 GB is actually free',
         summary:
           'Before any model loads, the desktop, the browser and WSL2 already hold part of the card. I measure each one, so every later post can say how much memory it really had.',
         sources: ib(10, 13),
