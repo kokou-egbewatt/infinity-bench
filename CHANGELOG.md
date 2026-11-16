@@ -8,6 +8,26 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.17.0] - Glossary (2026-11-16)
+
+**The terms the posts use, each defined once.** Posts link a term instead of explaining it again.
+
+### Added
+
+- **`/glossary`:** 26 terms A to Z, from VRAM and NVML through RuntimeClass and time-slicing to
+  KV cache, Q4_K_M and QLoRA. Each has a short definition, a source, related terms, and the posts
+  that use it. A search box filters them, and a link to `/glossary#<id>` highlights the entry.
+  It's in the footer.
+- **`<Term id="...">`** for posts: a dotted underline that shows the definition on hover, or as a
+  sheet along the bottom of the screen on a phone's first tap. An unknown id fails the build.
+- **`src/data/glossary.yaml`**, the entries, with tests for unique ids, `see` links that resolve
+  and no em dashes.
+
+### Changed
+
+- **The three GPU posts** link 23 terms on their first mention.
+- **`docs/writing-a-post.md`** documents `Term`.
+
 ## [0.16.2] - Link previews (2026-11-16)
 
 **Shared links get the current title and a picture.** A link to kokou.dev showed the skeleton's
