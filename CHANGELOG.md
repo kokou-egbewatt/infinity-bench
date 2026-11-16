@@ -8,6 +8,22 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.16.1] - Makefile and Dependabot (2026-11-16)
+
+**The rest of #11 and #12.**
+
+### Added
+
+- **Makefile targets:** `cluster-check` (the cluster half of `bench/run.sh`'s checks, without
+  building or running anything), `dev`, `site`, `preview` and `clean`. `check` now runs
+  `astro check` and the site tests too, and every target has a line in `make help`.
+- **`.github/dependabot.yml`:** weekly updates for the pinned GitHub Actions.
+
+### Changed
+
+- **`bench/run.sh cluster-check`** stops after the context, RuntimeClass, namespace and GPU checks,
+  and doesn't need a clean tree.
+
 ## [0.16.0] - Sorting across the site (2026-11-16)
 
 **Newest first everywhere, with a way to change it.** Posts, series and labs share one sort
