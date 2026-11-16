@@ -8,6 +8,26 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.15.0] - How much of the 8 GB is actually free (2026-11-16)
+
+**The vram-accounting post.** What Windows and the apps I leave open hold on the RTX 5060 before a
+model loads, measured one app at a time from a pod on gpu-lab.
+
+### Added
+
+- **The bench environment:** `bench/` with uv, a harness image imported into k3s, the
+  `infinity-bench` namespace, `bench/run.sh` and a Makefile.
+- **`bench/vram-accounting/`:** the harness (NVML medians, a measured noise floor, prompts by Enter
+  or `--go-dir`), configs for the main, Medal, Docker Desktop and Discord stream passes, and
+  `combine.py`.
+- **`data/vram-accounting/`:** three runs from 2026-11-14 and the Discord stream pass from
+  2026-11-16, with raw samples, and `desktop.csv`.
+- **The post**, and the "What is stealing my VRAM" widget pointed at its Headroom section.
+
+### Changed
+
+- **`docs/dev-machine.md`:** harness pods and the noise floor.
+
 ## [0.14.0] - k3s GPU Cluster (2026-11-14)
 
 **The k3s-wsl2-gpu post.** How the comparison's winner became a cluster I can leave running: a

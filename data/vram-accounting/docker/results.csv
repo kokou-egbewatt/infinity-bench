@@ -1,0 +1,3 @@
+consumer_id,label,vram_mib,stddev_mib,trials,samples,note
+desktop,Everything open,1683.0,,1,30,noise floor 26 MiB
+docker_desktop,Docker Desktop,71.0,18.3,3,30,trial 3 did not come back within 50 MiB

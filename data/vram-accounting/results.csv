@@ -1,0 +1,5 @@
+consumer_id,label,vram_mib,stddev_mib,trials,samples,note
+desktop,Everything open,2662.0,,1,30,noise floor 9 MiB
+chrome,"Chrome, hardware acceleration on",99.0,55.2,3,30,trials disagree by more than 40 MiB; trial 1 did not come back within 50 MiB
+discord,Discord,136.0,22.6,3,30,
+dwm,The desktop and VS Code,2310.0,,1,30,"everything else closed, VS Code left open; includes the harness pod's NVML handle"

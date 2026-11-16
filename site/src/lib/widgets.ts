@@ -13,7 +13,7 @@ export const WIDGETS = [
     blurb:
       'Toggle what is running on the desktop and see how much of the 8 GB a model can actually have.',
     plan: 'vram-accounting',
-    section: undefined as string | undefined,
+    section: '3-headroom' as string | undefined,
     page: false as boolean,
     sections: [] as LabSection[],
   },

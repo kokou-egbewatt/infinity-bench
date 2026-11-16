@@ -1,0 +1,13 @@
+# Watching a Discord stream against Discord left open without one. Writes to
+# data/vram-accounting/discord-stream/ so it doesn't replace the main run.
+subdir: discord-stream
+bare: false
+sample_interval_s: 1
+settle_s: 30
+samples: 30
+trials: 3
+drift_flag_mib: 50
+spread_flag_mib: 40
+
+consumers:
+  - { id: discord_stream, label: "the Discord stream" }

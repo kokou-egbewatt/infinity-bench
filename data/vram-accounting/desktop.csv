@@ -1,0 +1,7 @@
+consumer_id,label,vram_mb,source,note
+floor,"Windows, the display and VS Code",1392,medal/results.csv,every other app closed
+medal,Medal,191,medal/results.csv,one trial
+discord,Discord,136,results.csv,three trials
+chrome,"Chrome, hardware acceleration on",99,results.csv,"three trials; 193 MiB after running a while, about 100 freshly reopened"
+docker_desktop,Docker Desktop,71,docker/results.csv,three trials
+unattributed,Not attributed,773,results.csv,everything open (2662) minus the rows above; it varied over the afternoon

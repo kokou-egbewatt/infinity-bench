@@ -1,0 +1,13 @@
+# Docker Desktop on its own, three times. Writes to data/vram-accounting/docker/. Docker has to be
+# running when the run starts, to build the image; after that it's closed and reopened like an app.
+subdir: docker
+bare: false
+sample_interval_s: 1
+settle_s: 30
+samples: 30
+trials: 3
+drift_flag_mib: 50
+spread_flag_mib: 40
+
+consumers:
+  - { id: docker_desktop, label: "Docker Desktop" }

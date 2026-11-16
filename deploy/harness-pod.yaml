@@ -1,0 +1,56 @@
+# One harness run. bench/run.sh fills the ${VARS} with envsubst, applies it, runs the harness
+# with kubectl exec, and deletes the pod. The pod itself only sleeps.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ${POD}
+  namespace: infinity-bench
+  labels:
+    app.kubernetes.io/part-of: infinity-bench
+    infinity-bench/harness: ${HARNESS}
+spec:
+  runtimeClassName: nvidia
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 2   # sleep as PID 1 ignores SIGTERM; don't hold the GPU for 30 s
+  securityContext:
+    # 1000 owns /mnt/c in the distro, so what the pod writes stays editable from Windows.
+    runAsUser: 1000
+    runAsGroup: 1000
+  containers:
+    - name: harness
+      image: ${IMAGE}
+      imagePullPolicy: Never
+      stdin: true
+      tty: true
+      resources:
+        requests: { cpu: 100m, memory: 128Mi }
+        limits: { cpu: "1", memory: 512Mi, nvidia.com/gpu: 1 }
+      env:
+        - { name: UTC_OFFSET, value: "${UTC_OFFSET}" }
+        - { name: OUT_DIR, value: /out }
+        - { name: GIT_REPO, value: infinity-bench }
+        - { name: GIT_SHA, value: "${GIT_SHA}" }
+        - { name: GIT_DIRTY, value: "${GIT_DIRTY}" }
+        - { name: GIT_BRANCH, value: "${GIT_BRANCH}" }
+        - { name: HOST_OS, value: "${HOST_OS}" }
+        - { name: HOST_WSL, value: "${HOST_WSL}" }
+        - { name: HOST_DISTRO, value: "${HOST_DISTRO}" }
+        - { name: HOST_CPU, value: "${HOST_CPU}" }
+        - { name: HOST_RAM_GB, value: "${HOST_RAM_GB}" }
+        - { name: HOST_WSL_MEMORY_GB, value: "${HOST_WSL_MEMORY_GB}" }
+        - { name: CLUSTER_CONTEXT, value: "${CLUSTER_CONTEXT}" }
+        - { name: CLUSTER_NODE, value: "${CLUSTER_NODE}" }
+        - { name: CLUSTER_K3S, value: "${CLUSTER_K3S}" }
+        - { name: CLUSTER_TOOLKIT, value: "${CLUSTER_TOOLKIT}" }
+        - { name: CLUSTER_DEVICE_PLUGIN, value: "${CLUSTER_DEVICE_PLUGIN}" }
+        - { name: CLUSTER_TIME_SLICING, value: "${CLUSTER_TIME_SLICING}" }
+        - { name: CLUSTER_NAMESPACE, value: infinity-bench }
+        - { name: CLUSTER_IMAGE, value: "${IMAGE}" }
+        - { name: CLUSTER_OTHER_GPU_PODS, value: "${CLUSTER_OTHER_GPU_PODS}" }
+      volumeMounts:
+        - { name: out, mountPath: /out }
+  volumes:
+    - name: out
+      hostPath:
+        path: ${OUT_HOST}
+        type: DirectoryOrCreate

@@ -8,6 +8,7 @@ site/.wrangler/
 .venv/
 __pycache__/
 .ruff_cache/
+.pytest_cache/
 
 # models
 *.gguf
@@ -26,3 +27,6 @@ Thumbs.db
 # logs, local env variants
 *.log
 .env.*
+
+# signal files for a prompted harness run
+data/*/go/

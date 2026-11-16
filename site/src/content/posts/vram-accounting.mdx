@@ -1,0 +1,75 @@
+---
+title: How much of the 8 GB is actually free
+dek: Before any model loads, Windows and the apps I leave open already hold part of the RTX 5060. I measured each one, so every later post can say how much memory it really had.
+date: 2026-11-16
+topic: observability
+plan: vram-accounting
+hardware:
+  kind: local
+cost: "$0 · one afternoon"
+harness: "a8bf187"
+data: vram-accounting
+widgets: [vram]
+---
+
+Every model post on this site runs on the card my desktop is already using. The RTX 5060 has 8151 MiB, and Windows, the display and whatever I have open take their share before a model gets any. If I say a model fits, I need to know what it actually had.
+
+## 1. Method
+
+Nothing on WSL2 can say how much VRAM one process uses. Windows lists every process on the GPU and reports `[N/A]` for each one, and WSL2 and pods list none ([dev-machine.md](https://github.com/kokou-egbewatt/infinity-bench/blob/main/docs/dev-machine.md#can-i-see-vram-from-everywhere)). What every side agrees on is the whole card's `memory.used`.
+
+So I measured by difference. A pod on gpu-lab reads `memory.used` through NVML, 30 times a second apart, and keeps the median. It reads with an app open, I close the app, it waits 30 s and reads again, I reopen it, it reads again. Three times per app. The first reading, with everything open, also gives the noise floor: how far the card moves on its own. A difference that doesn't clear it isn't a measurement.
+
+VS Code stayed open the whole time, because I drove the runs from it.
+
+## 2. Results
+
+<ResultsTable
+  file="desktop.csv"
+  caption="What the desktop held on the GPU, in MiB, from three runs on 2026-11-14. The rows add up to the main run's reading with everything open."
+  columns={{
+    label: 'What',
+    vram_mb: 'MiB',
+    note: 'Note',
+  }}
+/>
+
+With everything open, the desktop held **2662 MiB, a third of the card**. With every app closed but VS Code, it still held **1392 MiB**. That floor is Windows' compositor and the display, and this machine can't move it anywhere else: the Ryzen 5 8400F has no integrated graphics, so the 5060 is the only thing that can drive the monitor.
+
+<PullQuote>Closing every app I had open won back 1270 MiB. More than half of that I can't pin on any one app.</PullQuote>
+
+The apps themselves were smaller than I expected. Medal, the clip recorder, was the largest at 191 MiB. Chrome depended on how long it had been running: 193 MiB the first time I closed it, about 100 MiB each time after a fresh reopen.
+
+The last row is the uncomfortable one. With the same apps open, the everything-open reading was 2662 MiB in the first run, 2461 MiB half an hour later and 1683 MiB after that. Two days later it was 3638 MiB, with Chrome, Discord, Docker Desktop, Medal, Notepad, Slack, Spotify, Steam, WhatsApp, the NVIDIA overlay and VS Code all open.
+
+My first guess was a Discord stream I'd been watching when the first run started, so I measured that on its own: three times, leave the stream with Discord still open, then rejoin. Leaving never freed anything. The card read higher with the stream closed in all three trials, and some readings moved by over 200 MiB on their own. Whatever holds that gigabyte, it isn't the stream, and closing apps one at a time can't say what it is.
+
+## 3. Headroom
+
+Tick off what's running and pick a model. The rows are the ones above, and the model sizes are the published ones.
+
+<VramAccount file="desktop.csv" fixed={['floor']} model="llama-3.1-8b-q4km" />
+
+With everything open, an 8B model at Q4_K_M fits with under 800 MiB left for its KV cache. With only the floor, it has about 2 GB. At the 3638 MiB I read two days later, it doesn't fit at all. So I check `memory.used` before a long-context run and close what I can, because it costs nothing.
+
+## 4. Mistakes
+
+- **Ten seconds wasn't long enough to settle.** Chrome was still loading when the reading after a reopen began, and the first run's noise floor came out at 94 MiB. I stopped, raised the wait to 30 s and reran. The floor was 9 MiB.
+- **I left Medal out of the plan,** and it turned out to be the largest app.
+- **I guessed Docker Desktop was worth about 730 MiB,** from the gap between two readings. Measured on its own, it's 71. The gap was the unattributed gigabyte.
+
+## 5. Unknowns
+
+- What the unattributed gigabyte is. It's not a Discord stream I'm watching. Discord might keep the video memory until the app itself closes, which closing Discord while a stream plays would test.
+- How much turning off hardware acceleration in Chrome, Discord and Medal wins back. I haven't measured it.
+- How much a cheap second graphics source would free, by taking the display off the 5060 entirely.
+
+The harness is in [`bench/vram-accounting/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/bench/vram-accounting) and every sample is in [`data/vram-accounting/`](https://github.com/kokou-egbewatt/infinity-bench/tree/main/data/vram-accounting). To see whether a difference on your machine clears the noise, try the lab's <LabLink id="gpu-cluster" section="noise-floor">noise floor</LabLink> check.
+
+If your numbers disagree with mine, I want to hear it.
+
+## 6. Sources
+
+- [NVML: nvmlDeviceGetMemoryInfo](https://docs.nvidia.com/deploy/nvml-api/group__nvmlDeviceQueries.html)
+- [nvidia-smi reference](https://docs.nvidia.com/deploy/nvidia-smi/index.html)
+- [CUDA on WSL user guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
