@@ -8,6 +8,22 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.16.2] - Link previews (2026-11-16)
+
+**Shared links get the current title and a picture.** A link to kokou.dev showed the skeleton's
+"one GPU, measured" and no image.
+
+### Added
+
+- **`public/og.png`**, a 1200×630 card in the site's style, as `og:image` and `twitter:image` on
+  every page. `scripts/og/card.html` is its source and `scripts/og/render.mjs` renders it with
+  headless Chrome.
+
+### Changed
+
+- **The site title and description** match the home page: "Kokou · Platform Engineering GPU
+  Infrastructure", in the tab, link previews and the RSS feed, from one place in `src/lib/site.ts`.
+
 ## [0.16.1] - Makefile and Dependabot (2026-11-16)
 
 **The rest of #11 and #12.**
