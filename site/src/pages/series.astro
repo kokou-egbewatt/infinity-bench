@@ -4,6 +4,7 @@ import { postStatus, type PlanEntry, type PostStatus, type Source } from '../dat
 import { resolveSeries } from '../lib/posts';
 import { getIssueStates, issueUrl, milestoneUrl, docUrl, REPOS } from '../lib/issues';
 import { url } from '../lib/url';
+import SortChips from '../components/SortChips.astro';
 
 const states = await getIssueStates();
 const { series: SERIES, nextUp: NEXT_UP } = await resolveSeries();
@@ -45,11 +46,34 @@ const DOT_TITLE: Record<PostStatus, string> = {
 };
 
 const isPublished = (p: PlanEntry) => postStatus(p, states) === 'published';
-const publishedBySeries = SERIES.map((s) => ({ s, posts: s.posts.filter(isPublished) })).filter(
-  (x) => x.posts.length,
+// Newest first everywhere: published posts by date, then planned ones in reading order.
+const pubDate = (p: PlanEntry) => (isPublished(p) && p.published) || '';
+const newestFirst = (posts: PlanEntry[]) =>
+  posts
+    .map((p, i) => ({ p, i }))
+    .sort((a, b) => pubDate(b.p).localeCompare(pubDate(a.p)) || a.i - b.i)
+    .map((x) => x.p);
+const latest = (posts: PlanEntry[]) => newestFirst(posts).map(pubDate)[0] ?? '';
+const bySeries = SERIES.map((s, i) => ({ s, i, date: latest(s.posts) }))
+  .sort((a, b) => b.date.localeCompare(a.date) || a.i - b.i)
+  .map(({ s, date }) => ({ ...s, posts: newestFirst(s.posts), date }));
+// Recently published: the two newest posts, grouped under their series.
+const RECENT_SHOWN = 2;
+const recent = bySeries
+  .flatMap((s) => s.posts.filter(isPublished).map((p) => ({ s, p })))
+  .sort((a, b) => pubDate(b.p).localeCompare(pubDate(a.p)))
+  .slice(0, RECENT_SHOWN);
+const publishedBySeries = recent.reduce<{ s: (typeof bySeries)[number]; posts: PlanEntry[] }[]>(
+  (groups, { s, p }) => {
+    const last = groups[groups.length - 1];
+    if (last?.s.id === s.id) last.posts.push(p);
+    else groups.push({ s, posts: [p] });
+    return groups;
+  },
+  [],
 );
 const nextUp = NEXT_UP.filter((p) => !isPublished(p));
-const NEXT_SHOWN = 2;
+const NEXT_SHOWN = 1;
 
 const countLine = (posts: PlanEntry[]) => {
   const n = posts.filter(isPublished).length;
@@ -143,70 +167,80 @@ const countLine = (posts: PlanEntry[]) => {
       </aside>
 
       <div class="plan-main">
-        <h2 class="label">By series</h2>
-        {SERIES.map((s) => (
-          <details id={s.id} open={s.posts.some(isPublished)}>
-            <summary>
-              <span class="chev" aria-hidden="true">
-                ▸
-              </span>
-              <span class="st">{s.title}</span>
-              <span class="sm">{countLine(s.posts)}</span>
-              <span class="dots" aria-hidden="true">
-                {s.posts.map((p) => {
-                  const st = postStatus(p, states);
-                  return <i class:list={['dot', st]} title={`${p.title}: ${DOT_TITLE[st]}`} />;
-                })}
-              </span>
-            </summary>
-            <div class="body">
-              <p class="d">
-                {s.description}
-                {s.home.repo !== 'both' && s.home.milestone && (
-                  <>
-                    {' '}
-                    <a href={milestoneUrl(s.home.repo, s.home.milestone)}>Milestone on GitHub</a>.
-                  </>
-                )}
-              </p>
-              <ul>
-                {s.posts.map((p) => {
-                  const n = note(p);
-                  const ls = links(p.sources);
-                  const pub = isPublished(p);
-                  return (
-                    <li>
-                      {pub ? (
-                        <a class="t" href={url(`/posts/${p.slug}`)}>
-                          {p.title}
-                        </a>
-                      ) : (
-                        <span class="t">{p.title}</span>
-                      )}
-                      <span class="m">
-                        {pub && p.published ? (
-                          <span>{fmtDate(p.published)}</span>
+        <div class="bar">
+          <h2 class="label">By series</h2>
+          <SortChips for=".serieslist" />
+        </div>
+        <div class="serieslist">
+          {bySeries.map((s) => (
+            <details
+              id={s.id}
+
+              data-date={s.date}
+              data-name={s.title}
+            >
+              <summary>
+                <span class="chev" aria-hidden="true">
+                  ▸
+                </span>
+                <span class="st">{s.title}</span>
+                <span class="sm">{countLine(s.posts)}</span>
+                <span class="dots" aria-hidden="true">
+                  {s.posts.map((p) => {
+                    const st = postStatus(p, states);
+                    return <i class:list={['dot', st]} title={`${p.title}: ${DOT_TITLE[st]}`} />;
+                  })}
+                </span>
+              </summary>
+              <div class="body">
+                <p class="d">
+                  {s.description}
+                  {s.home.repo !== 'both' && s.home.milestone && (
+                    <>
+                      {' '}
+                      <a href={milestoneUrl(s.home.repo, s.home.milestone)}>Milestone on GitHub</a>.
+                    </>
+                  )}
+                </p>
+                <ul>
+                  {s.posts.map((p) => {
+                    const n = note(p);
+                    const ls = links(p.sources);
+                    const pub = isPublished(p);
+                    return (
+                      <li>
+                        {pub ? (
+                          <a class="t" href={url(`/posts/${p.slug}`)}>
+                            {p.title}
+                          </a>
                         ) : (
-                          <>
-                            {ls.map((l, i) => (
-                              <>
-                                {i > 0 && ', '}
-                                <a href={l.href} class:list={{ done: l.done }}>
-                                  {l.text}
-                                </a>
-                              </>
-                            ))}
-                            {n && <span class:list={['n', n.cls]}>{n.text}</span>}
-                          </>
+                          <span class="t">{p.title}</span>
                         )}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </details>
-        ))}
+                        <span class="m">
+                          {pub && p.published ? (
+                            <span>{fmtDate(p.published)}</span>
+                          ) : (
+                            <>
+                              {ls.map((l, i) => (
+                                <>
+                                  {i > 0 && ', '}
+                                  <a href={l.href} class:list={{ done: l.done }}>
+                                    {l.text}
+                                  </a>
+                                </>
+                              ))}
+                              {n && <span class:list={['n', n.cls]}>{n.text}</span>}
+                            </>
+                          )}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </details>
+          ))}
+        </div>
       </div>
     </article>
   </div>
@@ -227,6 +261,13 @@ const countLine = (posts: PlanEntry[]) => {
 </script>
 
 <style>
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
   .plan {
     display: grid;
     grid-template-columns: minmax(0, 640px) minmax(0, 400px);
@@ -421,17 +462,17 @@ const countLine = (posts: PlanEntry[]) => {
   }
   /* Show the first NEXT_SHOWN items; the fold below the list reveals the rest.
      Keep the nth-child number in sync with NEXT_SHOWN. */
-  .next li:nth-child(n + 3) {
+  .next li:nth-child(n + 2) {
     display: none;
   }
   /* What the fold reveals is a list of titles, not ten more full entries. At 400px a summary
      runs four or five lines, so keeping them made the column roughly three times the height of
      the accordion beside it, which does not grow when this opens. */
-  .plan-side:has(.later[open]) .next li:nth-child(n + 3) {
+  .plan-side:has(.later[open]) .next li:nth-child(n + 2) {
     display: list-item;
     margin-bottom: 14px;
   }
-  .plan-side:has(.later[open]) .next li:nth-child(n + 3) .s {
+  .plan-side:has(.later[open]) .next li:nth-child(n + 2) .s {
     display: none;
   }
 

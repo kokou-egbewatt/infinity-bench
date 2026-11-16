@@ -6,6 +6,7 @@ import { getPosts } from '../lib/posts';
 import { repoUrl } from '../lib/env';
 import { errataCount, isoDate, readTime } from '../lib/format';
 import Rig from '../components/Rig.astro';
+import SortChips from '../components/SortChips.astro';
 import { url } from '../lib/url';
 
 const topics = ['all', ...TOPICS];
@@ -42,13 +43,20 @@ const elsewhere = await getCollection('elsewhere');
               </a>
             ))}
           </nav>
+          <SortChips for=".list" />
         </div>
         <div class="list">
           {posts.map((p, i) => {
             const d = p.data;
             const n = d.errata.length;
             return (
-              <div class="row" data-topic={d.topic} style={`--i:${i}`}>
+              <div
+                class="row"
+                data-topic={d.topic}
+                data-date={isoDate(d.date)}
+                data-name={d.title}
+                style={`--i:${i}`}
+              >
                 <span class="d">{isoDate(d.date)}</span>
                 <span>
                   <a class="t" href={url(`/posts/${p.id}`)}>

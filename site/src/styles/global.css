@@ -57,6 +57,7 @@ nav.main .navsocial { margin-left: 4px; padding-left: 18px; border-left: 1px sol
 .filters { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--mono); font-size: 11.5px; color: var(--tx3); }
 .filters a.active { color: var(--ac); }
 .filters a:hover { color: var(--tx); }
+.sec .sortchips { margin-left: auto; }
 .list { border-top: 1px solid var(--line); }
 .row { position: relative; display: grid; grid-template-columns: 104px 1fr auto; gap: 6px 24px; padding: 20px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
 .list .row { animation: row-in .5s ease both; animation-delay: calc(min(var(--i, 0), 8) * 80ms + 120ms); }
