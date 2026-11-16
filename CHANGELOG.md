@@ -18,6 +18,8 @@ structure.
 - **`public/og.png`**, a 1200×630 card in the site's style, as `og:image` and `twitter:image` on
   every page. `scripts/og/card.html` is its source and `scripts/og/render.mjs` renders it with
   headless Chrome.
+- **README status badges:** the Cloudflare deploy of `main` (its "Workers Builds" check run), CI
+  on `main`, and whether kokou.dev answers.
 
 ### Changed
 
