@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run a harness as a pod on gpu-lab, from Git Bash on Windows.
 #
+#   bench/run.sh cluster-check     # only the cluster checks below, no image or pod
 #   bench/run.sh env               # print the env.json a run would record
 #   bench/run.sh vram-accounting   # build, import, check, run, write into data/vram-accounting/
 #   bench/run.sh vram-accounting --config /out/x.yaml   # anything after the name goes to the harness
@@ -23,16 +24,16 @@ wsl_() { wsl.exe -d "$DISTRO" -- "$@" | tr -d '\r'; }
 
 target=${1:-}
 case "$target" in
-  env) ;;
+  env | cluster-check) ;;
   vram-accounting) [ -f "bench/$target/harness.py" ] || die "no bench/$target/harness.py" ;;
-  *) die "usage: bench/run.sh env|vram-accounting" ;;
+  *) die "usage: bench/run.sh cluster-check|env|vram-accounting" ;;
 esac
 
 # --- the tree the result will point at
 GIT_SHA=$(git rev-parse HEAD)
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 GIT_DIRTY=false
-if [ -n "$(git status --porcelain)" ]; then
+if [ "$target" != cluster-check ] && [ -n "$(git status --porcelain)" ]; then
   [ "${ALLOW_DIRTY:-}" = 1 ] || die "uncommitted changes; commit them, or set ALLOW_DIRTY=1 to record git.dirty: true"
   GIT_DIRTY=true
 fi
@@ -54,6 +55,12 @@ if [ -n "$CLUSTER_OTHER_GPU_PODS" ]; then
   echo "These pods hold nvidia.com/gpu and would be in every reading:" >&2
   tr , '\n' <<<"$CLUSTER_OTHER_GPU_PODS" | sed 's/^/  /' >&2
   die "scale them to 0 first, for example: kubectl -n <ns> scale deploy/<name> --replicas=0"
+fi
+if [ "$target" = cluster-check ]; then
+  kubectl --context "$CONTEXT" get namespace "$NS" >/dev/null 2>&1 \
+    || die "no namespace $NS; kubectl apply -f deploy/namespace.yaml"
+  echo "gpu-lab is ready: context, nvidia RuntimeClass, namespace $NS, no other pod on the GPU"
+  exit 0
 fi
 
 # --- the image, imported straight into k3s's containerd; no registry
