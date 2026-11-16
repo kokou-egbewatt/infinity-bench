@@ -13,7 +13,7 @@ data: cluster-matrix
 draft: false
 ---
 
-Every GPU harness and inference workload on this blog is going to run as a pod, so before writing any of them I needed a Kubernetes cluster on this machine that can actually use the GPU. It is a Windows desktop with an RTX 5060, and everything Linux runs in WSL2. There are plenty of local Kubernetes options and most of them say they support GPUs, so rather than pick one and hope, I tested them: plain Docker as a control, then k3s, k3d, kind, minikube, Rancher Desktop and Docker Desktop in both its modes. One at a time, against the same probe, with the machine cleaned back to a blank slate between each.
+Every GPU harness and inference workload on this blog is going to run as a pod, so before writing any of them I needed a Kubernetes cluster on this machine that can actually use the GPU. It is a Windows desktop with an RTX 5060, and everything Linux runs in <Term id="wsl2">WSL2</Term>. There are plenty of local Kubernetes options and most of them say they support GPUs, so rather than pick one and hope, I tested them: plain Docker as a control, then k3s, k3d, kind, minikube, Rancher Desktop and Docker Desktop in both its modes. One at a time, against the same probe, with the machine cleaned back to a blank slate between each.
 
 ## 1. Requirements
 
@@ -24,7 +24,7 @@ The cluster had to:
 - run GPU pods without `privileged: true` if at all possible;
 - start quickly from nothing and stay light, since it shares the machine with everything else I do.
 
-Out of scope: more than one node, more than one GPU, and sharing the card between pods with MPS or time-slicing. Those get their own post.
+Out of scope: more than one node, more than one GPU, and sharing the card between pods with <Term id="mps">MPS</Term> or <Term id="time-slicing">time-slicing</Term>. Those get their own post.
 
 **What counts as working.** I wrote the rules down before running anything. Every candidate ran the same probe image, built once and loaded by its image ID. The probe climbs five levels and reports the highest one it reached:
 
@@ -61,13 +61,13 @@ From what I had read, and from an earlier attempt with minikube, I went in fairl
 
 - **The GPU doesn't survive container nesting on WSL2.** So anything that runs its Kubernetes nodes as containers, like kind, k3d and minikube, can't do GPU work here. That minikube attempt had `nvidia-smi` working inside the node container, and I put it down to luck.
 - **A container needs three things to reach the GPU.** It needs four.
-- **minikube fails because of a limit in NVML.** It fails because one directory is missing.
+- **minikube fails because of a limit in <Term id="nvml">NVML</Term>.** It fails because one directory is missing.
 
 All three turned out to be wrong, and I would have ruled out kind and k3d without ever running them.
 
 ## 3. Measuring VRAM
 
-Every VRAM number on this blog will be a whole-card before and after, because nothing on WSL2 can tell you how much a single process uses. Windows lists the processes on the GPU and reports `[N/A]` for every one of them; WSL2 and pods don't list them at all. So before measuring anything else, I measured the noise.
+Every <Term id="vram">VRAM</Term> number on this blog will be a whole-card before and after, because nothing on WSL2 can tell you how much a single process uses. Windows lists the processes on the GPU and reports `[N/A]` for every one of them; WSL2 and pods don't list them at all. So before measuring anything else, I measured the noise.
 
 Thirty samples of `memory.used`, two seconds apart, at the start of every step:
 
@@ -83,7 +83,7 @@ Thirty samples of `memory.used`, two seconds apart, at the start of every step:
   }}
 />
 
-The floor moved between 1 and 39 MiB depending on what the desktop was doing. Against that, a known 2048 MiB allocation read as 2048 to 2050 MiB, and a CUDA context on its own cost 113 MiB. So the instrument works, and anything smaller than the floor is a "can't tell", not a number. That rule mattered later: none of the seven clusters held any VRAM at idle, and every reading stayed inside its floor.
+The floor moved between 1 and 39 MiB depending on what the desktop was doing. Against that, a known 2048 MiB allocation read as 2048 to 2050 MiB, and a <Term id="cuda-context">CUDA context</Term> on its own cost 113 MiB. So the instrument works, and anything smaller than the floor is a "can't tell", not a number. That rule mattered later: none of the seven clusters held any VRAM at idle, and every reading stayed inside its floor.
 
 To check a difference of your own against a floor, use the lab's <LabLink id="gpu-cluster" section="noise-floor">noise floor</LabLink> tool.
 
@@ -169,11 +169,11 @@ Every one of them reaches a verified GEMM in the end, and every one can have the
 
 <GpuFigure scene="two-routes" />
 
-**The runtime route: k3s and minikube.** The NVIDIA runtime injects everything, and pods stay unprivileged. Stock k3s finds the toolkit in the distro, adds an `nvidia` runtime to its containerd and creates an `nvidia` RuntimeClass, all without a flag from me, so a pod that names the RuntimeClass reaches level 50 on a fresh install. minikube's documented path, `--gpus=all`, stopped at level 10 with `Not Supported`, the same failure I had hit before. It isn't a limit in NVML. `--gpus` gave the node `/dev/dxg` and some driver-store files but no `/usr/lib/wsl/lib`, and the toolkit inside the node can only pass on what it was given. One more flag, `--mount-string=/usr/lib/wsl:/usr/lib/wsl`, and minikube reaches level 50 with unprivileged pods.
+**The runtime route: k3s and minikube.** The NVIDIA runtime injects everything, and pods stay unprivileged. Stock <Term id="k3s">k3s</Term> finds the toolkit in the distro, adds an `nvidia` runtime to its <Term id="containerd">containerd</Term> and creates an `nvidia` <Term id="runtimeclass">RuntimeClass</Term>, all without a flag from me, so a pod that names the RuntimeClass reaches level 50 on a fresh install. minikube's documented path, `--gpus=all`, stopped at level 10 with `Not Supported`, the same failure I had hit before. It isn't a limit in NVML. `--gpus` gave the node `/dev/dxg` and some driver-store files but no `/usr/lib/wsl/lib`, and the toolkit inside the node can only pass on what it was given. One more flag, `--mount-string=/usr/lib/wsl:/usr/lib/wsl`, and minikube reaches level 50 with unprivileged pods.
 
 The catch on this route is that rationing is opt-in. On k3s, any pod that names the RuntimeClass gets the GPU whether or not it asked for `nvidia.com/gpu`. On minikube, where `nvidia` is the node's default runtime, any image that sets `NVIDIA_VISIBLE_DEVICES=all` gets it, and every `nvidia/cuda` image does.
 
-**The mount route: k3d, kind, Rancher Desktop, and Docker Desktop in kubeadm mode.** The device and the two directories go into the node, then into each pod as hostPath volumes, and the device plugin gets the same mounts so it can count the card. Nothing reaches the GPU without mounting the paths itself, so rationing holds. The catch is that every GPU pod is privileged, and a pod that asks for the GPU but forgets the mounts gets scheduled with nothing in it.
+**The mount route: k3d, kind, Rancher Desktop, and Docker Desktop in kubeadm mode.** The device and the two directories go into the node, then into each pod as hostPath volumes, and the <Term id="device-plugin">device plugin</Term> gets the same mounts so it can count the card. Nothing reaches the GPU without mounting the paths itself, so rationing holds. The catch is that every GPU pod is privileged, and a pod that asks for the GPU but forgets the mounts gets scheduled with nothing in it.
 
 **Docker Desktop in kind mode** is the odd one out. Its node is a hidden container I can't add mounts to, so the only way through was to copy the driver files into every pod from an image, which ties the image to driver 621.01. It works, but I wouldn't run it.
 

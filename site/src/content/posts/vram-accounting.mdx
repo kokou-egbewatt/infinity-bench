@@ -12,13 +12,13 @@ data: vram-accounting
 widgets: [vram]
 ---
 
-Every model post on this site runs on the card my desktop is already using. The RTX 5060 has 8151 MiB, and Windows, the display and whatever I have open take their share before a model gets any. If I say a model fits, I need to know what it actually had.
+Every model post on this site runs on the card my desktop is already using. The RTX 5060 has 8151 <Term id="mib">MiB</Term>, and Windows, the display and whatever I have open take their share before a model gets any. If I say a model fits, I need to know what it actually had.
 
 ## 1. Method
 
-Nothing on WSL2 can say how much VRAM one process uses. Windows lists every process on the GPU and reports `[N/A]` for each one, and WSL2 and pods list none ([dev-machine.md](https://github.com/kokou-egbewatt/infinity-bench/blob/main/docs/dev-machine.md#can-i-see-vram-from-everywhere)). What every side agrees on is the whole card's `memory.used`.
+Nothing on <Term id="wsl2">WSL2</Term> can say how much <Term id="vram">VRAM</Term> one process uses. Windows lists every process on the GPU and reports `[N/A]` for each one, and WSL2 and pods list none ([dev-machine.md](https://github.com/kokou-egbewatt/infinity-bench/blob/main/docs/dev-machine.md#can-i-see-vram-from-everywhere)). What every side agrees on is the whole card's `memory.used`.
 
-So I measured by difference. A pod on gpu-lab reads `memory.used` through NVML, 30 times a second apart, and keeps the median. It reads with an app open, I close the app, it waits 30 s and reads again, I reopen it, it reads again. Three times per app. The first reading, with everything open, also gives the noise floor: how far the card moves on its own. A difference that doesn't clear it isn't a measurement.
+So I measured by difference. A pod on gpu-lab reads `memory.used` through <Term id="nvml">NVML</Term>, 30 times a second apart, and keeps the median. It reads with an app open, I close the app, it waits 30 s and reads again, I reopen it, it reads again. Three times per app. The first reading, with everything open, also gives the <Term id="noise-floor">noise floor</Term>: how far the card moves on its own. A difference that doesn't clear it isn't a measurement.
 
 VS Code stayed open the whole time, because I drove the runs from it.
 
@@ -50,7 +50,7 @@ Tick off what's running and pick a model. The rows are the ones above, and the m
 
 <VramAccount file="desktop.csv" fixed={['floor']} model="llama-3.1-8b-q4km" />
 
-With everything open, an 8B model at Q4_K_M fits with under 800 MiB left for its KV cache. With only the floor, it has about 2 GB. At the 3638 MiB I read two days later, it doesn't fit at all. So I check `memory.used` before a long-context run and close what I can, because it costs nothing.
+With everything open, an 8B model at <Term id="q4-k-m">Q4_K_M</Term> fits with under 800 MiB left for its <Term id="kv-cache">KV cache</Term>. With only the floor, it has about 2 GB. At the 3638 MiB I read two days later, it doesn't fit at all. So I check `memory.used` before a long-context run and close what I can, because it costs nothing.
 
 ## 4. Mistakes
 

@@ -112,6 +112,12 @@ An unknown scene fails the build.
 `<LabLink id="runner-fleet" section="break-even">break-even calculator</LabLink>`. It fails the
 build when the lab or the section does not exist, so a renamed tool cannot leave a dead link.
 
+**`Term`** links a term to its glossary entry: `<Term id="kv-cache">KV cache</Term>`. Hover shows
+the definition, a tap opens it on a phone, and `/glossary` lists the post under that term. Use it
+on a term's first mention in a post, not every one. The entries live in
+`site/src/data/glossary.yaml`, one or two sentences each, and an id that isn't there fails the
+build. A term a post needs that isn't in the glossary yet goes into the file in the same commit.
+
 A new widget goes in `site/src/components/widgets/`, gets an entry in `site/src/lib/widgets.ts`,
 and is added to the component map in `site/src/pages/posts/[slug].astro`.
 
