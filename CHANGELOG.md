@@ -8,6 +8,25 @@ Every merged pull request adds a version here, and `site/package.json` carries t
 `ci/scripts/version-gate.sh` enforces it and `ci/scripts/changelog-integrity.sh` checks the file's
 structure.
 
+## [0.16.0] - Sorting across the site (2026-11-16)
+
+**Newest first everywhere, with a way to change it.** Posts, series and labs share one sort
+control, and the Series page is shorter.
+
+### Added
+
+- **`SortChips`:** newest, oldest and name, on the home page's posts, the Series page's series and
+  the Labs page. One choice applies across the site and is remembered in the browser; rows slide
+  to their new place unless the reader prefers reduced motion. Without JavaScript the lists stay
+  newest first.
+- **Labs** show a one-line summary of what their tools do and their post's date, and are ordered
+  by that date, not by `widgets.ts`. The sort sits beside a "3 labs" label, like the home page.
+
+### Changed
+
+- **Series:** series are ordered by their newest post and every one starts folded. Recently
+  published shows the two newest posts, and Next up shows one, with the rest behind the fold.
+
 ## [0.15.0] - How much of the 8 GB is actually free (2026-11-16)
 
 **The vram-accounting post.** What Windows and the apps I leave open hold on the RTX 5060 before a
