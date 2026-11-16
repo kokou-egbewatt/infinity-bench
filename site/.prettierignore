@@ -8,3 +8,5 @@ src/styles/
 src/components/figures/
 # Published prose: rewrapping it churns the post without changing a rendered word.
 src/content/
+# One line on purpose: whitespace inside <Term> would show next to the term in a sentence.
+src/components/post/Term.astro

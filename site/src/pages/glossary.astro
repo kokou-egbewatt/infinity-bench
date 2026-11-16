@@ -1,0 +1,242 @@
+---
+// Every term the posts link with <Term>, A to Z, with the posts that use it.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPosts } from '../lib/posts';
+import { byLetter, checkGlossary, usedIn, type Entry } from '../lib/glossary';
+import { url } from '../lib/url';
+
+const entries: Entry[] = (await getCollection('glossary')).map(({ id, data }) => ({ id, ...data }));
+checkGlossary(entries);
+const terms = new Map(entries.map((e) => [e.id, e.term]));
+const posts = (await getPosts()).filter((p) => import.meta.env.DEV || !p.data.draft);
+const uses = usedIn(posts);
+const groups = byLetter(entries);
+---
+
+<BaseLayout
+  title="Glossary"
+  description="The terms and techniques the posts use, from KV cache to RuntimeClass, each in a sentence or two."
+>
+  <div class="wrap">
+    <div class="simple glossary">
+      <h1>Glossary</h1>
+      <p>
+        The terms the posts use, each defined once. In a post, a dotted underline means the term is
+        here. Missing one?{' '}
+        <a href="https://github.com/kokou-egbewatt/infinity-bench/issues/new?template=topic.yml">
+          Ask for it
+        </a>
+        .
+      </p>
+
+      <div class="bar">
+        <input
+          type="search"
+          placeholder={`Search ${entries.length} terms`}
+          aria-label="Search the glossary"
+          hidden
+        />
+        <nav class="letters" aria-label="Jump to letter">
+          {groups.map(([k]) => (
+            <a href={`#letter-${k}`}>{k}</a>
+          ))}
+        </nav>
+      </div>
+
+      {groups.map(([k, es]) => (
+        <section class="group" id={`letter-${k}`}>
+          <h2>{k}</h2>
+          <dl>
+            {es.map((e) => {
+              const used = uses.get(e.id) ?? [];
+              return (
+                <div
+                  class="entry"
+                  id={e.id}
+                  data-text={[e.term, ...e.aka, e.def].join(' ').toLowerCase()}
+                >
+                  <dt>
+                    {e.term}
+                    {e.aka.length > 0 && <span class="aka">{e.aka.join(', ')}</span>}
+                  </dt>
+                  <dd>
+                    <p>{e.def}</p>
+                    <p class="m">
+                      {used.length > 0 && (
+                        <span>
+                          Used in{' '}
+                          {used.map((p, i) => (
+                            <>
+                              {i > 0 && ', '}
+                              <a href={url(`/posts/${p.id}`)}>{p.data.title}</a>
+                            </>
+                          ))}
+                        </span>
+                      )}
+                      {e.see.length > 0 && (
+                        <span>
+                          See{' '}
+                          {e.see.map((s, i) => (
+                            <>
+                              {i > 0 && ', '}
+                              <a href={`#${s}`}>{terms.get(s)}</a>
+                            </>
+                          ))}
+                        </span>
+                      )}
+                      {e.source && (
+                        <span>
+                          <a href={e.source}>Source</a>
+                        </span>
+                      )}
+                    </p>
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        </section>
+      ))}
+      <p class="empty" hidden>
+        No term matches.
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Without this script the search box stays hidden and every entry shows.
+  const input = document.querySelector<HTMLInputElement>('.glossary input[type=search]');
+  const entries = [...document.querySelectorAll<HTMLElement>('.glossary .entry')];
+  const groups = [...document.querySelectorAll<HTMLElement>('.glossary .group')];
+  const empty = document.querySelector<HTMLElement>('.glossary .empty');
+  if (input) {
+    input.hidden = false;
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      for (const e of entries) e.hidden = !!q && !e.dataset.text!.includes(q);
+      for (const g of groups)
+        g.hidden = ![...g.querySelectorAll('.entry')].some((e) => !(e as HTMLElement).hidden);
+      if (empty) empty.hidden = groups.some((g) => !g.hidden);
+    });
+  }
+  // a link to /glossary#term highlights that entry
+  const mark = () => {
+    for (const e of entries) e.classList.toggle('hit', `#${e.id}` === location.hash);
+  };
+  mark();
+  window.addEventListener('hashchange', mark);
+</script>
+
+<style>
+  .bar {
+    position: sticky;
+    top: var(--hdr);
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 12px 0;
+    margin: 24px 0 8px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  input[type='search'] {
+    flex: 1 1 220px;
+    min-width: 0;
+    font: inherit;
+    font-size: 14px;
+    color: var(--tx);
+    background: var(--bg2);
+    border: 1px solid var(--line2);
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  input[type='search']:focus {
+    outline: none;
+    border-color: var(--ac);
+  }
+  .letters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--tx3);
+  }
+  .letters a:hover {
+    color: var(--ac);
+  }
+  .group {
+    scroll-margin-top: calc(var(--hdr) + 70px);
+  }
+  h2 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--tx3);
+    font-weight: 500;
+    margin: 28px 0 4px;
+  }
+  dl {
+    margin: 0;
+  }
+  .entry {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: calc(var(--hdr) + 80px);
+  }
+  .entry.hit {
+    border-left: 2px solid var(--ac);
+    padding-left: 12px;
+    margin-left: -14px;
+  }
+  dt {
+    font-family: var(--serif);
+    font-size: 19px;
+    color: var(--hi);
+  }
+  .aka {
+    margin-left: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--tx3);
+  }
+  dd {
+    margin: 4px 0 0;
+  }
+  dd p {
+    margin: 0;
+    color: var(--tx2);
+    font-size: 15px;
+  }
+  dd p.m {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--tx3);
+  }
+  dd p.m a {
+    color: var(--tx2);
+    border-bottom: 1px solid var(--line2);
+  }
+  dd p.m a:hover {
+    color: var(--hi);
+    border-color: var(--ac);
+  }
+  @media (max-width: 520px) {
+    .aka {
+      display: block;
+      margin: 2px 0 0;
+    }
+    .entry.hit {
+      margin-left: -10px;
+      padding-left: 8px;
+    }
+  }
+</style>

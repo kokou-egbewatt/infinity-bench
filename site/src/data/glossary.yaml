@@ -1,0 +1,177 @@
+# Terms the posts use, defined once. A post links one with <Term id="kv-cache">KV cache</Term>,
+# and the build fails on an id that isn't here. Keep each definition to what a reader needs to
+# follow a post: one or two sentences, first person where it's about this machine.
+#
+# id: the anchor on /glossary and what <Term> takes
+# term: how it's written in a post
+# aka: other names a reader might search for
+# def: the definition
+# source: where to read more, ideally the primary documentation
+# see: related ids
+
+# --- the card and how it's measured
+
+- id: vram
+  term: VRAM
+  aka: [GPU memory]
+  def: The GPU's own memory. The RTX 5060 has 8 GB of GDDR7, and the model's weights, its KV cache and whatever the desktop draws all have to fit in it.
+  see: [mib, kv-cache]
+
+- id: mib
+  term: MiB
+  aka: [mebibyte]
+  def: 2²⁰ bytes, 1,048,576. nvidia-smi and NVML report MiB even where they print "MB", and so does this site. My "8 GB" card reports 8151 MiB.
+  source: https://en.wikipedia.org/wiki/Byte#Multiple-byte_units
+
+- id: nvml
+  term: NVML
+  aka: [NVIDIA Management Library, nvidia-ml-py, pynvml]
+  def: NVIDIA's C library for reading a GPU's memory, utilisation, power and clocks. nvidia-smi and most monitoring tools are built on it, and my harnesses call it from Python through nvidia-ml-py.
+  source: https://docs.nvidia.com/deploy/nvml-api/
+  see: [nvidia-smi, dcgm]
+
+- id: nvidia-smi
+  term: nvidia-smi
+  def: The command-line tool on top of NVML. What it prints for memory.used is the same number NVML returns, which is why the two agree to the MiB.
+  source: https://docs.nvidia.com/deploy/nvidia-smi/index.html
+  see: [nvml]
+
+- id: dcgm
+  term: DCGM
+  aka: [Data Center GPU Manager, dcgm-exporter]
+  def: NVIDIA's monitoring and management layer for datacenter GPUs. dcgm-exporter publishes its fields to Prometheus; on a GeForce card some of them report and some are always zero.
+  source: https://docs.nvidia.com/datacenter/dcgm/latest/
+  see: [nvml]
+
+- id: cuda-context
+  term: CUDA context
+  def: The state the driver sets up the first time a process uses CUDA. It takes GPU memory before the program allocates anything, about 113 MiB on this card.
+  source: https://docs.nvidia.com/cuda/cuda-c-programming-guide/
+
+- id: noise-floor
+  term: noise floor
+  def: How far a reading moves when nothing changes. I take it as the spread of 30 one-second samples of memory.used, and a difference at or below it isn't a measurement.
+  see: [mib]
+
+# --- Kubernetes on one machine
+
+- id: wsl2
+  term: WSL2
+  aka: [Windows Subsystem for Linux]
+  def: A real Linux kernel running in a lightweight VM on Windows. The GPU reaches it through /dev/dxg, a paravirtualised device, rather than a native NVIDIA driver.
+  source: https://learn.microsoft.com/windows/wsl/about
+
+- id: k3s
+  term: k3s
+  def: A small Kubernetes distribution that ships as one binary. Mine runs inside a WSL2 distro as the gpu-lab cluster.
+  source: https://docs.k3s.io/
+  see: [wsl2, containerd]
+
+- id: containerd
+  term: containerd
+  def: The container runtime k3s runs pods with. I import images into it directly with k3s ctr images import, so there's no registry in the loop.
+  source: https://containerd.io/docs/
+
+- id: runtimeclass
+  term: RuntimeClass
+  def: A Kubernetes object that picks which runtime handler starts a pod's containers. The nvidia class adds the GPU libraries; without it a GPU pod can schedule, report Running and still find no CUDA device.
+  source: https://kubernetes.io/docs/concepts/containers/runtime-class/
+  see: [device-plugin, admission-policy]
+
+- id: device-plugin
+  term: device plugin
+  def: A pod on each node that tells the kubelet how many of a device it has. NVIDIA's advertises GPUs as nvidia.com/gpu, so the scheduler can hand them out like CPU or memory.
+  source: https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/
+  see: [daemonset, time-slicing]
+
+- id: daemonset
+  term: DaemonSet
+  def: Runs one copy of a pod on every node, or every node that matches. Device plugins and log collectors are usually DaemonSets.
+  source: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
+
+- id: admission-policy
+  term: admission policy
+  aka: [ValidatingAdmissionPolicy, CEL]
+  def: A rule the API server checks before it accepts an object, written in CEL. Mine rejects a GPU pod that has the GPU request without the RuntimeClass, or the other way round.
+  source: https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/
+  see: [runtimeclass]
+
+# --- sharing one GPU
+
+- id: time-slicing
+  term: time-slicing
+  def: A device plugin setting that advertises one GPU as several nvidia.com/gpu, so pods share it by taking turns. There's no memory isolation, so one pod can still take all of it.
+  source: https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html
+  see: [mps, mig]
+
+- id: mps
+  term: MPS
+  aka: [Multi-Process Service]
+  def: Lets kernels from several processes run on the GPU at the same time instead of in turns, which wastes less of it than time-slicing. Isolation is still limited.
+  source: https://docs.nvidia.com/deploy/mps/index.html
+  see: [time-slicing, mig]
+
+- id: mig
+  term: MIG
+  aka: [Multi-Instance GPU]
+  def: Splits a datacenter GPU such as an A100 or H100 into instances with their own memory and compute, isolated in hardware. GeForce cards like mine don't have it.
+  source: https://docs.nvidia.com/datacenter/tesla/mig-user-guide/
+  see: [time-slicing, mps]
+
+# --- serving models
+
+- id: quantization
+  term: quantization
+  def: Storing a model's weights in fewer bits than it was trained with, 8 or 4 instead of 16, to cut memory and bandwidth for some loss of accuracy.
+  see: [q4-k-m, fp8]
+
+- id: q4-k-m
+  term: Q4_K_M
+  aka: [GGUF, k-quant]
+  def: A llama.cpp quantization type that averages about 4.8 bits per weight, keeping some tensors at higher precision ("M" is the medium mix). Llama 3.1 8B at Q4_K_M is 4692 MiB.
+  source: https://github.com/ggml-org/llama.cpp/pull/1684
+  see: [quantization]
+
+- id: kv-cache
+  term: KV cache
+  def: The attention keys and values for every token so far, kept on the GPU so each new token doesn't recompute them. It grows with context length and with concurrent requests, and on a small card it's usually what runs out first.
+  source: https://arxiv.org/abs/2309.06180
+  see: [vram, fp8, preemption]
+
+- id: fp8
+  term: FP8
+  def: An 8-bit floating-point format. Used for the KV cache, it halves its memory against FP16 for a small loss of accuracy, and Blackwell supports it in hardware.
+  see: [kv-cache, quantization]
+
+- id: chunked-prefill
+  term: chunked prefill
+  def: Splitting a long prompt's first pass into chunks and interleaving them with other requests' decoding, so one long prompt doesn't stall everyone's next token.
+  source: https://docs.vllm.ai/en/latest/configuration/optimization.html
+  see: [ttft]
+
+- id: preemption
+  term: preemption
+  def: What vLLM does when the KV cache is full. It pauses a running request and frees its cache, then recomputes or swaps it back later, which shows up as a latency spike.
+  source: https://docs.vllm.ai/en/latest/configuration/optimization.html
+  see: [kv-cache]
+
+- id: ttft
+  term: TTFT
+  aka: [time to first token, p99]
+  def: Time from sending a request to receiving its first generated token, mostly queueing and prefill. I report p99, the time 99 requests in 100 beat.
+  see: [chunked-prefill]
+
+# --- fine-tuning
+
+- id: lora
+  term: LoRA
+  aka: [low-rank adaptation]
+  def: Fine-tuning by training two small matrices whose product is added to a frozen weight matrix, instead of updating every weight. The adapters are megabytes, not gigabytes.
+  source: https://arxiv.org/abs/2106.09685
+  see: [qlora]
+
+- id: qlora
+  term: QLoRA
+  def: LoRA on top of a base model quantized to 4 bits, so the frozen weights take a quarter of the memory. It's what makes fine-tuning a 7B model fit on one consumer card.
+  source: https://arxiv.org/abs/2305.14314
+  see: [lora, quantization]

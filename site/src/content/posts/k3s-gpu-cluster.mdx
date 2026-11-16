@@ -12,7 +12,7 @@ harness: "21c352d"
 data: k3s-wsl2-gpu
 ---
 
-In [the comparison](/posts/which-local-kubernetes-can-run-gpu-work-on-wsl2/), k3s was the fastest and lightest way to run GPU pods on this machine, and the only one besides minikube where those pods run unprivileged. It also came with two catches: WSL stops its distro about a minute after the last terminal closes, taking the cluster with it, and any pod that names the `nvidia` RuntimeClass gets the GPU whether or not it asked for it.
+In [the comparison](/posts/which-local-kubernetes-can-run-gpu-work-on-wsl2/), <Term id="k3s">k3s</Term> was the fastest and lightest way to run GPU pods on this machine, and the only one besides minikube where those pods run unprivileged. It also came with two catches: WSL stops its distro about a minute after the last terminal closes, taking the cluster with it, and any pod that names the `nvidia` <Term id="runtimeclass">RuntimeClass</Term> gets the GPU whether or not it asked for it.
 
 Both had to go before the cluster could carry anything I care about. The result is `gpu-lab`, run by `task cluster:*` from [NeuroMesh's `tools/cluster`](https://github.com/kokou-egbewatt/NeuroMesh/tree/main/tools/cluster), and shared by NeuroMesh and this blog.
 
@@ -52,7 +52,7 @@ while ($true) { & wsl.exe -d Ubuntu --exec /bin/sleep infinity; Start-Sleep -Sec
   }}
 />
 
-With the loop, the node is Ready 14 seconds after `wsl --shutdown` and the GPU is allocatable again at 36 seconds; the difference is the device plugin re-registering. Left alone for 15 minutes with no terminal of mine open, the node stayed Ready with nothing restarted.
+With the loop, the node is Ready 14 seconds after `wsl --shutdown` and the GPU is allocatable again at 36 seconds; the difference is the <Term id="device-plugin">device plugin</Term> re-registering. Left alone for 15 minutes with no terminal of mine open, the node stayed Ready with nothing restarted.
 
 ## 3. Device plugin
 
@@ -63,7 +63,7 @@ Incompatible strategy detected auto
 invalid device discovery strategy
 ```
 
-The plugin counts the card through NVML, so its own pod needs the driver, and on k3s the driver only reaches pods that use the `nvidia` RuntimeClass. One line on its DaemonSet fixes it:
+The plugin counts the card through <Term id="nvml">NVML</Term>, so its own pod needs the driver, and on k3s the driver only reaches pods that use the `nvidia` RuntimeClass. One line on its <Term id="daemonset">DaemonSet</Term> fixes it:
 
 ```yaml
 spec:
@@ -72,7 +72,7 @@ spec:
       runtimeClassName: nvidia
 ```
 
-After that the log reads `Detected platform: wsl` and `Registered device plugin for 'nvidia.com/gpu'`, and the node shows `nvidia.com/gpu: 1`. Time-slicing stays at one replica: the cluster is shared with the VRAM measurements on this blog, and time-slicing shares compute, not memory, so every replica would see the whole card.
+After that the log reads `Detected platform: wsl` and `Registered device plugin for 'nvidia.com/gpu'`, and the node shows `nvidia.com/gpu: 1`. <Term id="time-slicing">Time-slicing</Term> stays at one replica: the cluster is shared with the VRAM measurements on this blog, and time-slicing shares compute, not memory, so every replica would see the whole card.
 
 ## 4. Admission policy
 
@@ -81,7 +81,7 @@ With the RuntimeClass and the device plugin both in place, there are still two w
 - a pod that names the RuntimeClass without requesting `nvidia.com/gpu` gets the GPU, and the scheduler thinks the card is free;
 - a pod that requests `nvidia.com/gpu` without the RuntimeClass holds the card with no driver in it.
 
-A ValidatingAdmissionPolicy rejects both, so the only pod that reaches the GPU is one the scheduler counted:
+A <Term id="admission-policy">ValidatingAdmissionPolicy</Term> rejects both, so the only pod that reaches the GPU is one the scheduler counted:
 
 ```yaml
 validations:

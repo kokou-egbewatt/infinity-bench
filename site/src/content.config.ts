@@ -88,4 +88,15 @@ const elsewhere = defineCollection({
   schema: z.object({ title: z.string(), url: z.url(), note: z.string() }),
 });
 
-export const collections = { posts, models, elsewhere };
+const glossary = defineCollection({
+  loader: file('src/data/glossary.yaml'),
+  schema: z.object({
+    term: z.string(),
+    aka: z.array(z.string()).default([]),
+    def: z.string().max(400),
+    source: z.url().optional(),
+    see: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { posts, models, elsewhere, glossary };
