@@ -5,6 +5,21 @@
 <p align="center">
   <i>Every number on the site reproduces from here. One harness per table, committed with the post that cites it.</i><br><br>
 
+<!-- Status: the Cloudflare deploy of main, CI on main, and whether the site answers -->
+
+<a href="https://github.com/kokou-egbewatt/infinity-bench/commits/main">
+    <img src="https://img.shields.io/github/check-runs/kokou-egbewatt/infinity-bench/main?nameFilter=Workers%20Builds%3A%20infinity-bench&label=deploy" alt="Deploy status">
+  </a>
+
+<a href="https://github.com/kokou-egbewatt/infinity-bench/actions/workflows/ci.yml?query=branch%3Amain">
+    <img src="https://img.shields.io/github/actions/workflow/status/kokou-egbewatt/infinity-bench/ci.yml?branch=main&label=ci" alt="CI status">
+  </a>
+
+<a href="https://kokou.dev">
+    <img src="https://img.shields.io/website?url=https%3A%2F%2Fkokou.dev&label=kokou.dev" alt="kokou.dev up">
+  </a>
+<br>
+
 <!-- License Badges -->
 
 <a href="https://github.com/kokou-egbewatt/infinity-bench/blob/main/LICENSE">
