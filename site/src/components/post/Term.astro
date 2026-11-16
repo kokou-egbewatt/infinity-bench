@@ -1,0 +1,119 @@
+---
+// A glossary term in a post: <Term id="kv-cache">KV cache</Term>. Hover or focus shows the
+// definition; on a touch screen the first tap opens it and the link inside goes to /glossary.
+// Use it on a term's first mention in a post. Fails the build on an id not in glossary.yaml.
+// The markup stays on one line, and .prettierignore keeps it there: any whitespace inside would
+// show up next to the term in the sentence.
+import { getEntry } from 'astro:content';
+import { url } from '../../lib/url';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const entry = await getEntry('glossary', id);
+if (!entry) throw new Error(`Term: "${id}" is not in src/data/glossary.yaml`);
+const href = url(`/glossary#${id}`);
+const tip = `term-${id}-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<span class="term"><a href={href} aria-describedby={tip}><slot /></a><span class="tip" id={tip} role="tooltip"><b>{entry.data.term}</b> {entry.data.def} <a href={href}>Glossary</a></span></span>
+
+<script>
+  // Touch screens have no hover: the first tap opens the definition instead of following the link.
+  const touch = matchMedia('(hover: none)');
+  let open: HTMLElement | null = null;
+  const close = () => {
+    open?.classList.remove('open');
+    open = null;
+  };
+  document.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const term = t.closest<HTMLElement>('.term');
+    if (!term) return close();
+    if (!touch.matches || t.closest('.tip')) return;
+    if (open !== term) {
+      e.preventDefault();
+      close();
+      term.classList.add('open');
+      open = term;
+    }
+  });
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
+</script>
+
+<style>
+  .term {
+    position: relative;
+  }
+  .term > a {
+    color: inherit;
+    text-decoration: underline dotted;
+    text-decoration-color: var(--tx3);
+    text-underline-offset: 3px;
+  }
+  .term > a:hover {
+    text-decoration-color: var(--ac);
+  }
+  .tip {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    z-index: 20;
+    width: max-content;
+    max-width: min(320px, 80vw);
+    padding: 10px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--line2);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.5;
+    color: var(--tx2);
+    text-align: left;
+  }
+  .tip b {
+    display: block;
+    color: var(--hi);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .tip a {
+    color: var(--ac);
+    white-space: nowrap;
+  }
+  /* a hover bridge, so moving onto the tip doesn't close it */
+  .tip::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -8px;
+    height: 8px;
+  }
+  @media (hover: hover) {
+    .term:hover .tip,
+    .term:focus-within .tip {
+      display: block;
+    }
+  }
+  /* phones: a sheet along the bottom of the screen, so it never runs off the side */
+  @media (hover: none) {
+    .term.open .tip {
+      display: block;
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      top: auto;
+      bottom: 16px;
+      width: auto;
+      max-width: none;
+      font-size: 14px;
+    }
+  }
+</style>
