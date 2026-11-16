@@ -109,3 +109,17 @@ def test_bare_false_skips_the_last_reading():
         {**CFG, "bare": False}, d.read, d.ask, sleep=lambda s: None, log=lambda m: None
     )
     assert [r["consumer_id"] for r in rows] == ["desktop", "chrome", "tiny"]
+
+
+def test_combine_adds_up_to_everything_open():
+    spec = importlib.util.spec_from_file_location(
+        "combine", Path(__file__).resolve().parent.parent / "vram-accounting" / "combine.py"
+    )
+    combine = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(combine)
+    main = {k: {"vram_mib": v} for k, v in {"desktop": 2662, "chrome": 99, "discord": 136}.items()}
+    medal = {"medal": {"vram_mib": 191}, "dwm": {"vram_mib": 1392}}
+    docker = {"docker_desktop": {"vram_mib": 71}}
+    out = combine.combine(main, medal, docker)
+    assert sum(r["vram_mb"] for r in out) == 2662
+    assert out[0]["consumer_id"] == "floor" and out[-1]["vram_mb"] == 773
