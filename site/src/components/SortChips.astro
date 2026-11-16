@@ -1,0 +1,91 @@
+---
+// Sort chips for any list whose items carry data-date (YYYY-MM-DD, empty for unpublished) and
+// data-name. The page renders the list newest first; these reorder it in the browser, and the
+// choice is shared by every list on the site. Undated items stay last, in their original order.
+interface Props {
+  /** CSS selector of the list whose children get sorted */
+  for: string;
+}
+const { for: target } = Astro.props;
+---
+
+<div class="chips sortchips" role="group" aria-label="Sort" data-for={target}>
+  <button type="button" data-sort="new" aria-pressed="true">
+    newest
+  </button>
+  <button type="button" data-sort="old" aria-pressed="false">
+    oldest
+  </button>
+  <button type="button" data-sort="name" aria-pressed="false">
+    name
+  </button>
+</div>
+
+<script>
+  type Cmp = (a: HTMLElement, b: HTMLElement) => number;
+  const KEY = 'sort';
+  const date = (e: HTMLElement) => e.dataset.date ?? '';
+  const undatedLast =
+    (cmp: Cmp): Cmp =>
+    (a, b) =>
+      !date(a) !== !date(b) ? (date(a) ? -1 : 1) : cmp(a, b);
+  const ORDER: Record<string, Cmp> = {
+    new: undatedLast((a, b) => date(b).localeCompare(date(a))),
+    old: undatedLast((a, b) => date(a).localeCompare(date(b))),
+    name: (a, b) => (a.dataset.name ?? '').localeCompare(b.dataset.name ?? ''),
+  };
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+  const groups = [...document.querySelectorAll<HTMLElement>('.sortchips')].flatMap((g) => {
+    const list = document.querySelector<HTMLElement>(g.dataset.for!);
+    if (!list) return [];
+    const items = [...list.children].filter(
+      (e): e is HTMLElement => 'name' in (e as HTMLElement).dataset,
+    );
+    const start = new Map(items.map((e, i) => [e, i]));
+    const chips = [...g.querySelectorAll<HTMLButtonElement>('button')];
+
+    const apply = (k: string, animate: boolean) => {
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.sort === k)));
+      const before = new Map(items.map((e) => [e, e.getBoundingClientRect().top]));
+      const sorted = [...items].sort((a, b) => ORDER[k](a, b) || start.get(a)! - start.get(b)!);
+      // keep anything that isn't sorted (an empty-state note) after the items
+      const tail = items.length ? items[items.length - 1].nextSibling : null;
+      for (const e of sorted) list.insertBefore(e, tail);
+      items.splice(0, items.length, ...sorted);
+      if (!animate || still.matches) return;
+      // slide each item from where it was to where it is now
+      for (const e of sorted) {
+        const dy = before.get(e)! - e.getBoundingClientRect().top;
+        if (dy)
+          e.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], {
+            duration: 320,
+            easing: 'cubic-bezier(.2,.7,.2,1)',
+          });
+      }
+    };
+    return [{ chips, apply }];
+  });
+
+  const choose = (k: string, animate: boolean) => {
+    for (const g of groups) g.apply(k, animate);
+    try {
+      localStorage.setItem(KEY, k);
+    } catch {}
+  };
+  for (const g of groups)
+    g.chips.forEach((c) => c.addEventListener('click', () => choose(c.dataset.sort!, true)));
+
+  let saved: string | null = null;
+  try {
+    saved = localStorage.getItem(KEY);
+  } catch {}
+  if (saved && saved !== 'new' && saved in ORDER) choose(saved, false);
+</script>
+
+<style>
+  .sortchips {
+    display: flex;
+    gap: 6px;
+  }
+</style>

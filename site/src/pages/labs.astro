@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { WIDGETS } from '../lib/widgets';
 import { getPosts, resolveSeries } from '../lib/posts';
 import { url } from '../lib/url';
+import { isoDate } from '../lib/format';
+import SortChips from '../components/SortChips.astro';
 
 // A lab is listed only once its post exists. getPosts() includes drafts in dev only,
 // so a production build lists labs from published posts and nothing else.
@@ -22,8 +24,9 @@ const labs = WIDGETS.flatMap((w) => {
   const tools = w.page
     ? w.sections.map((s) => ({ name: s.name, href: `${href}#${s.id}` }))
     : [{ name: w.name, href }];
-  return [{ ...w, title: post.data.title, href, postHref, tools }];
-});
+  return [{ ...w, title: post.data.title, date: isoDate(post.data.date), href, postHref, tools }];
+  // newest post first; the sort chips reorder in the browser, and without JavaScript this stays
+}).sort((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name));
 ---
 
 <BaseLayout title="Labs">
@@ -32,27 +35,36 @@ const labs = WIDGETS.flatMap((w) => {
       <h1>Labs</h1>
       <p>These are the interactive pieces from the posts.</p>
       {labs.length ? (
-        <ul class="lablist">
-          {labs.map((w) => (
-            <li>
-              <div>
-                <a class="t" href={w.href}>
-                  {w.name}
-                </a>
-                <span class="chips">
-                  {w.tools.map((t) => (
-                    <a href={t.href}>{t.name}</a>
-                  ))}
+        <>
+          <div class="sec">
+            <h2>
+              {labs.length} {labs.length === 1 ? 'lab' : 'labs'}
+            </h2>
+            <SortChips for=".lablist" />
+          </div>
+          <ul class="lablist">
+            {labs.map((w) => (
+              <li data-date={w.date} data-name={w.name}>
+                <div>
+                  <a class="t" href={w.href}>
+                    {w.name}
+                  </a>
+                  <span class="s">{w.blurb}</span>
+                  <span class="chips">
+                    {w.tools.map((t) => (
+                      <a href={t.href}>{t.name}</a>
+                    ))}
+                  </span>
+                </div>
+                <span class="side">
+                  {w.tools.length} {w.tools.length === 1 ? 'tool' : 'tools'} · {w.date}
+                  <br />
+                  from <a href={w.postHref}>{w.title}</a>
                 </span>
-              </div>
-              <span class="side">
-                {w.tools.length} {w.tools.length === 1 ? 'tool' : 'tools'}
-                <br />
-                from <a href={w.postHref}>{w.title}</a>
-              </span>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        </>
       ) : (
         <p class="empty">No labs yet.</p>
       )}
@@ -64,6 +76,12 @@ const labs = WIDGETS.flatMap((w) => {
   /* the list uses the full width, like the home page's posts, so tools sit on one line */
   .simple.labs {
     max-width: none;
+  }
+  .sec {
+    margin-top: 32px;
+  }
+  .lablist {
+    border-top: 1px solid var(--line);
   }
   .lablist li {
     display: grid;
