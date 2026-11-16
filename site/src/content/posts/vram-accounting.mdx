@@ -40,7 +40,9 @@ With everything open, the desktop held **2662 MiB, a third of the card**. With e
 
 The apps themselves were smaller than I expected. Medal, the clip recorder, was the largest at 191 MiB. Chrome depended on how long it had been running: 193 MiB the first time I closed it, about 100 MiB each time after a fresh reopen.
 
-The last row is the uncomfortable one. With the same apps open, the everything-open reading was 2662 MiB in the first run, 2461 MiB half an hour later and 1683 MiB after that. Most likely it was a stream I was watching on Discord when the first run started: decoding and showing video holds GPU memory, and that memory went away when the stream did.
+The last row is the uncomfortable one. With the same apps open, the everything-open reading was 2662 MiB in the first run, 2461 MiB half an hour later and 1683 MiB after that. Two days later it was 3638 MiB, with Chrome, Discord, Docker Desktop, Medal, Notepad, Slack, Spotify, Steam, WhatsApp, the NVIDIA overlay and VS Code all open.
+
+My first guess was a Discord stream I'd been watching when the first run started, so I measured that on its own: three times, leave the stream with Discord still open, then rejoin. Leaving never freed anything. The card read higher with the stream closed in all three trials, and some readings moved by over 200 MiB on their own. Whatever holds that gigabyte, it isn't the stream, and closing apps one at a time can't say what it is.
 
 ## 3. Headroom
 
@@ -48,7 +50,7 @@ Tick off what's running and pick a model. The rows are the ones above, and the m
 
 <VramAccount file="desktop.csv" fixed={['floor']} model="llama-3.1-8b-q4km" />
 
-With everything open, an 8B model at Q4_K_M fits with under 800 MiB left for its KV cache. With only the floor, it has about 2 GB. So closing a few apps before a long-context run is worth doing, and it costs nothing.
+With everything open, an 8B model at Q4_K_M fits with under 800 MiB left for its KV cache. With only the floor, it has about 2 GB. At the 3638 MiB I read two days later, it doesn't fit at all. So I check `memory.used` before a long-context run and close what I can, because it costs nothing.
 
 ## 4. Mistakes
 
@@ -58,7 +60,7 @@ With everything open, an 8B model at Q4_K_M fits with under 800 MiB left for its
 
 ## 5. Unknowns
 
-- Whether the unattributed gigabyte really was the Discord stream. Measuring Discord with a stream playing and without one would settle it.
+- What the unattributed gigabyte is. It's not a Discord stream I'm watching. Discord might keep the video memory until the app itself closes, which closing Discord while a stream plays would test.
 - How much turning off hardware acceleration in Chrome, Discord and Medal wins back. I haven't measured it.
 - How much a cheap second graphics source would free, by taking the display off the 5060 entirely.
 

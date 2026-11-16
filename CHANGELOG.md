@@ -18,8 +18,10 @@ model loads, measured one app at a time from a pod on gpu-lab.
 - **The bench environment:** `bench/` with uv, a harness image imported into k3s, the
   `infinity-bench` namespace, `bench/run.sh` and a Makefile.
 - **`bench/vram-accounting/`:** the harness (NVML medians, a measured noise floor, prompts by Enter
-  or `--go-dir`), configs for the main, Medal and Docker Desktop passes, and `combine.py`.
-- **`data/vram-accounting/`:** three runs from 2026-11-14 with raw samples, and `desktop.csv`.
+  or `--go-dir`), configs for the main, Medal, Docker Desktop and Discord stream passes, and
+  `combine.py`.
+- **`data/vram-accounting/`:** three runs from 2026-11-14 and the Discord stream pass from
+  2026-11-16, with raw samples, and `desktop.csv`.
 - **The post**, and the "What is stealing my VRAM" widget pointed at its Headroom section.
 
 ### Changed
