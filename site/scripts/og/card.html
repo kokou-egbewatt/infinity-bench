@@ -1,0 +1,145 @@
+<!doctype html>
+<!-- The site's share card, 1200x630. render.mjs screenshots this into public/og.png. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Newsreader';
+        src: url('../../node_modules/@fontsource-variable/newsreader/files/newsreader-latin-opsz-normal.woff2')
+          format('woff2');
+        font-weight: 200 800;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
+          format('woff2');
+        font-weight: 100 900;
+      }
+      @font-face {
+        font-family: 'Plex Mono';
+        src: url('../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2')
+          format('woff2');
+        font-weight: 400;
+      }
+      :root {
+        --bg: #0b0b0d;
+        --bg2: #101114;
+        --line: #222328;
+        --line2: #2c2d33;
+        --tx2: #9c9ca4;
+        --tx3: #67676f;
+        --hi: #f4f4f5;
+        --ac: #5eead4;
+        --ac2: #0f2f2b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        background: var(--bg);
+        overflow: hidden;
+      }
+      .card {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        padding: 64px 72px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--line);
+        background: radial-gradient(900px 420px at 100% 0%, var(--ac2), transparent 70%), var(--bg);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-family: 'Newsreader', serif;
+        font-size: 34px;
+        color: var(--hi);
+      }
+      h1 {
+        margin: auto 0 0;
+        font-family: 'Newsreader', serif;
+        font-weight: 400;
+        font-size: 72px;
+        line-height: 1.05;
+        letter-spacing: -0.015em;
+        color: var(--hi);
+        max-width: 20ch;
+      }
+      p {
+        margin: 22px 0 0;
+        font-family: 'Inter', sans-serif;
+        font-size: 26px;
+        line-height: 1.4;
+        color: var(--tx2);
+        max-width: 40ch;
+      }
+      .foot {
+        margin-top: 44px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line2);
+        display: flex;
+        justify-content: space-between;
+        font-family: 'Plex Mono', monospace;
+        font-size: 21px;
+        color: var(--tx3);
+      }
+      .foot b {
+        color: var(--ac);
+        font-weight: 400;
+      }
+      .sms {
+        position: absolute;
+        top: 64px;
+        right: 72px;
+        display: grid;
+        grid-template-columns: repeat(10, 22px);
+        gap: 6px;
+      }
+      .sms i {
+        height: 22px;
+        border-radius: 3px;
+        background: #17181c;
+      }
+      .sms i.on {
+        background: #134e48;
+      }
+      .sms i.hot {
+        background: var(--ac);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="brand">
+        <svg width="52" height="36" viewBox="0 0 26 18" fill="none">
+          <rect x="1" y="3" width="24" height="12" rx="2" stroke="#5eead4" stroke-width="1.3" />
+          <rect x="4" y="6" width="6" height="6" rx="1" fill="#5eead4" />
+          <path d="M13 7h9M13 9.5h9M13 12h6" stroke="#2c2d33" stroke-width="1.2" />
+        </svg>
+        Kokou
+      </div>
+      <!-- the rig card's 30 SMs, a fixed pattern -->
+      <div class="sms">
+        <i></i><i></i><i class="on"></i><i></i><i></i><i></i><i class="hot"></i><i></i><i></i
+        ><i class="on"></i> <i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i></i
+        ><i></i><i class="on"></i><i></i> <i class="on"></i><i></i><i></i><i class="on"></i><i></i
+        ><i></i><i></i><i class="on"></i><i></i><i></i>
+      </div>
+      <h1>Platform Engineering<br />GPU Infrastructure</h1>
+      <p>
+        Kubernetes and GPU experiments on one 8 GB RTX 5060, with the hardware, cost and mistakes.
+      </p>
+      <div class="foot">
+        <span>1 × RTX 5060 · 8 GB · Blackwell · k3s on WSL2</span>
+        <b>kokou.dev</b>
+      </div>
+    </div>
+  </body>
+</html>
